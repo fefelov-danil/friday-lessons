@@ -1,0 +1,9 @@
+.labelCheckbox {
+    cursor: pointer;
+}
+.checkbox {
+    margin-right: 4px;
+}
+.spanClassName {
+    font-family: "OpenSans", sans-serif;
+}

@@ -1,0 +1,16 @@
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    padding: 0 20px;
+    background-image: linear-gradient(to right, #868f96 0%, #596164 100%);
+    z-index: 10;
+}
+.header a {
+    padding: 5px 20px;
+    color: #fff;
+}
+.header a:hover {
+    text-decoration: underline;
+}
