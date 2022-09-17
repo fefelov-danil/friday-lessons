@@ -1,18 +1,10 @@
 import { applyMiddleware, combineReducers, legacy_createStore as createStore } from 'redux'
 import thunk, { ThunkDispatch } from 'redux-thunk'
 
-import { changePasswordReducer } from 'features/auth/change-password/change-password-reducer'
-import { loginReducer } from 'features/auth/login/login-reducer'
-import { passwordRecoveryReducer } from 'features/auth/password-recovery/password-recovery-reducer'
-import { profileReducer } from 'features/auth/profile/profile-reducer'
-import { registrationReducer } from 'features/auth/registration/registration-reducer'
+import { authReducer } from 'features/auth/auth-reducer'
 
 const rootReducer = combineReducers({
-  login: loginReducer,
-  registration: registrationReducer,
-  passwordRecovery: passwordRecoveryReducer,
-  changePassword: changePasswordReducer,
-  profile: profileReducer,
+  auth: authReducer,
 })
 
 export type RootReducerType = ReturnType<typeof rootReducer>

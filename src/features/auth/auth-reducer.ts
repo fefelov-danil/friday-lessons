@@ -1,6 +1,6 @@
 const initialState = {}
 
-export const changePasswordReducer = (
+export const authReducer = (
   state: ChangePasswordStateType = initialState,
   action: ChangePasswordActionsType
 ): ChangePasswordStateType => {
