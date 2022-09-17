@@ -1,15 +1,19 @@
 .button {
-    display: inline-block;
-    padding: 8px 25px 6px 25px;
-    background: #F8686E;
-    font-family: "Oswald", sans-serif;
-    font-size: 16px;
-    color: #fff;
-    text-transform: uppercase;
-    border: 0;
-    border-radius: 25px;
-    transition: 0.2s;
+  display: inline-block;
+
+  padding: 8px 25px 6px 25px;
+
+  font-family: 'Oswald', sans-serif;
+  font-size: 16px;
+  color: #fff;
+  text-transform: uppercase;
+
+  background: #f8686e;
+  border: 0;
+  border-radius: 25px;
+
+  transition: 0.2s;
 }
 .button:hover {
-    background: #F82E34;
+  background: #f82e34;
 }
