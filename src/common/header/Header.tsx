@@ -1,5 +1,5 @@
 import React from 'react';
-import s from 'n1-app/a1-ui/header/Header.module.css'
+import s from 'common/header/Header.module.css'
 import {NavLink} from "react-router-dom";
 
 export const Header = () => {
@@ -10,7 +10,6 @@ export const Header = () => {
             <NavLink to={'password-recovery'}>Password recovery</NavLink>
             <NavLink to={'change-password'}>Change password</NavLink>
             <NavLink to={'profile'}>Profile</NavLink>
-            <NavLink to={'test'}>Test</NavLink>
         </div>
     );
 };

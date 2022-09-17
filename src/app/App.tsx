@@ -1,8 +1,8 @@
 import React from 'react';
 import 'assets/general-css/reset.css'
 import 'assets/general-css/App.css';
-import {Header} from "./header/Header";
-import {Pages} from "n1-app/a1-ui/routes/Pages";
+import {Header} from "common/header/Header";
+import {Pages} from "app/Pages";
 
 const App = () => {
     return (

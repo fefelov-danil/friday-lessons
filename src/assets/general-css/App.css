@@ -64,10 +64,10 @@ h2 {
     margin-bottom: 25px;
 }
 h1 {
-    font-size: 90px;
+    font-size: 60px;
 }
 h2 {
-    font-size: 75px;
+    font-size: 48px;
 }
 h3,
 h4 {
@@ -77,10 +77,10 @@ h4 {
     margin-bottom: 15px;
 }
 h3 {
-    font-size: 35px;
+    font-size: 32px;
 }
 h4 {
-    font-size: 28px;
+    font-size: 26px;
 }
 strong,
 b {
@@ -97,26 +97,12 @@ hr {
     border-width: 0;
     border-top: 1px solid #e0dede;
 }
-@media only screen and (max-width: 1020px) {
-    h1 {
-        font-size: 75px;
-    }
-    h2 {
-        font-size: 68px;
-    }
-    h3 {
-        font-size: 28px;
-    }
-    h4 {
-        font-size: 24px;
-    }
-}
 @media only screen and (max-width: 800px) {
     h1 {
-        font-size: 68px;
+        font-size: 48px;
     }
     h2 {
-        font-size: 58px;
+        font-size: 38px;
     }
     h3 {
         font-size: 26px;
@@ -127,10 +113,10 @@ hr {
 }
 @media only screen and (max-width: 500px) {
     h1 {
-        font-size: 50px;
+        font-size: 38px;
     }
     h2 {
-        font-size: 40px;
+        font-size: 30px;
     }
     h3 {
         font-size: 24px;
