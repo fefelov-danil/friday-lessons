@@ -1,19 +1,21 @@
 const initialState = {}
 
-export const profileReducer = (state: ProfileStateType = initialState, action: ProfileActionsType): ProfileStateType => {
-    switch (action.type) {
-        default:
-            return state
-    }
+export const profileReducer = (
+  state: ProfileStateType = initialState,
+  action: ProfileActionsType
+): ProfileStateType => {
+  switch (action.type) {
+    default:
+      return state
+  }
 }
 
 // Actions
-export const exampleProfileAC = () => ({type: 'EXAMPLE'} as const)
+export const exampleProfileAC = () => ({ type: 'EXAMPLE' } as const)
 
 // Thunks
 
 // Types
 type ProfileStateType = {}
 
-type ProfileActionsType =
-    | ReturnType<typeof exampleProfileAC>
+type ProfileActionsType = ReturnType<typeof exampleProfileAC>
