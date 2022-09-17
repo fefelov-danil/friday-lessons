@@ -1,9 +1,9 @@
 const initialState = {}
 
 export const authReducer = (
-  state: ChangePasswordStateType = initialState,
-  action: ChangePasswordActionsType
-): ChangePasswordStateType => {
+  state: ExampleStateType = initialState,
+  action: AuthActionsType
+): ExampleStateType => {
   switch (action.type) {
     default:
       return state
@@ -11,11 +11,11 @@ export const authReducer = (
 }
 
 // Actions
-export const exampleChangePasswordAC = () => ({ type: 'EXAMPLE' } as const)
+export const exampleAC = () => ({ type: 'EXAMPLE' } as const)
 
 // Thunks
 
 // Types
-type ChangePasswordStateType = {}
+type ExampleStateType = {}
 
-type ChangePasswordActionsType = ReturnType<typeof exampleChangePasswordAC>
+export type AuthActionsType = ReturnType<typeof exampleAC>
