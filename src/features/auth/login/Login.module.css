@@ -21,14 +21,21 @@
 p.fieldName {
   margin-bottom: 3px;
 }
-.loginContainer input[type='text'] {
-  width: 100%;
+.labelField {
+  display: block;
+
   margin-bottom: 20px;
+}
+.loginContainer input[type='text'],
+.loginContainer input[type='password'] {
+  width: 100%;
 
   border: 0;
 }
-.loginContainer input[type='text']:last-of-type {
-  margin-bottom: 30px;
+.labelCheckbox {
+  display: block;
+
+  margin-top: 28px;
 }
 .forgotPassword {
   margin-top: 20px;
