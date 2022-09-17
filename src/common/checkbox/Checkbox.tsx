@@ -37,7 +37,8 @@ export const Checkbox: React.FC<CheckboxPropsType> = ({
         className={finalInputClassName}
         {...restProps}
       />
-      {children && <span className={s.spanClassName}>{children}</span>}
+      <span className={s.listItem}></span>
+      {children && <span className={s.textForCheckbox}>{children}</span>}
     </label>
   )
 }

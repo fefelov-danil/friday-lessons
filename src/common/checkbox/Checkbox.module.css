@@ -1,9 +1,61 @@
 .labelCheckbox {
-    cursor: pointer;
+  cursor: pointer;
+
+  position: relative;
 }
+
 .checkbox {
-    margin-right: 4px;
+  position: absolute;
+  z-index: -1;
+
+  height: 0;
+  margin: 0;
+
+  opacity: 0;
 }
-.spanClassName {
-    font-family: "OpenSans", sans-serif;
+
+.listItem {
+  position: absolute;
+  top: 1px;
+  left: 0;
+
+  width: 20px;
+  height: 20px;
+
+  color: transparent;
+
+  background: #c3c3c3;
+  border: 0 solid #000;
+}
+
+.listItem:before {
+  content: '';
+
+  position: absolute;
+  top: 2px;
+  left: 7px;
+  transform: rotate(45deg);
+
+  display: none;
+
+  box-sizing: unset;
+  width: 5px;
+  height: 10px;
+
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+}
+
+.checkbox:checked ~ .listItem {
+  background: #5c5c5c;
+}
+
+.checkbox:checked ~ .listItem:before {
+  display: block;
+}
+
+.textForCheckbox {
+  padding-left: 25px;
+
+  font-family: 'OpenSans', sans-serif;
 }
