@@ -1,14 +1,14 @@
 .header {
   z-index: 10;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  height: 50px;
-  padding: 0 20px;
+  padding: 6px 20px;
 
   background-image: linear-gradient(to right, #868f96 0%, #596164 100%);
+}
+.header > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .header a {
   padding: 5px 20px;
