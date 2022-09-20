@@ -5,7 +5,9 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAppSelector } from 'app/hooks'
 import { PageNotFound } from 'common/404/PageNotFound'
 import { Login } from 'features/auth/login/Login'
+import { PasswordRecovery } from 'features/auth/password-recovery/PasswordRecovery'
 import { Profile } from 'features/auth/profile/Profile'
+import { Registration } from 'features/auth/registration/Registration'
 
 export const PATH = {
   LOGIN: '/login',
@@ -34,6 +36,8 @@ export const Pages = () => {
             <Route path={PATH.LOGIN} element={<Login />} />
           </>
         )}
+        <Route path={PATH.REGISTRATION} element={<Registration />} />
+        <Route path={PATH.PASSWORD_RECOVERY} element={<PasswordRecovery />} />
         <Route path={'/404'} element={<PageNotFound />} />
         <Route path={'*'} element={<Navigate to={'/404'} />} />
       </Routes>
