@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
 
-  min-height: calc(100vh - 50px);
+  min-height: calc(100vh - 72px);
   padding: 60px 20px;
 
   background-image: linear-gradient(60deg, #29323c 0%, #485563 100%);
@@ -50,4 +50,16 @@ p.fieldName {
   width: 100%;
 
   font-size: 19px;
+}
+.registrationText {
+  margin-top: 25px;
+  margin-bottom: 15px;
+
+  text-align: center;
+}
+.registrationLink {
+  margin-bottom: 0;
+
+  text-align: center;
+  text-decoration: underline;
 }

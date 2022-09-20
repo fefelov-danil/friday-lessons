@@ -74,12 +74,16 @@ export const Login = () => {
             <Checkbox {...formik.getFieldProps('rememberMe')}>Remember me</Checkbox>
           </label>
           <p className={s.forgotPassword}>
-            <NavLink to={'password-recovery'}>Forgot Password?</NavLink>
+            <NavLink to={'/password-recovery'}>Forgot Password?</NavLink>
           </p>
           <Button type={'submit'} className={s.signInBtn}>
             Sign In
           </Button>
         </form>
+        <p className={s.registrationText}>Create a new account</p>
+        <p className={s.registrationLink}>
+          <NavLink to={'/registration'}>Sign up</NavLink>
+        </p>
       </div>
     </div>
   )
