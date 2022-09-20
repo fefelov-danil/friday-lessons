@@ -18,4 +18,7 @@ export const authAPI = {
   logout() {
     return instance.delete('auth/me', {})
   },
+  changeUsername(name: string) {
+    return instance.put('auth/me', { name })
+  },
 }

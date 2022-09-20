@@ -89,6 +89,15 @@ export const logoutTC = () => async (dispatch: Dispatch<AllActionsType>) => {
     console.log(err)
   }
 }
+export const changeUsernameTC = (name: string) => async (dispatch: Dispatch<AllActionsType>) => {
+  try {
+    const res = await authAPI.changeUsername(name)
+
+    dispatch(setUserAC(res.data.updatedUser))
+  } catch (err) {
+    console.log(err)
+  }
+}
 
 // Types
 export type AuthStateType = {
