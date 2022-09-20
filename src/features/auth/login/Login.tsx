@@ -1,14 +1,17 @@
 import React from 'react'
 
 import { useFormik } from 'formik'
+import { useDispatch } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 
 import s from './Login.module.css'
 
+import { useAppDispatch } from 'app/hooks'
 import { Button } from 'common/button/Button'
 import { Checkbox } from 'common/checkbox/Checkbox'
 import { InputPassword } from 'common/inputPassword/InputPassword'
 import { InputText } from 'common/inputText/InputText'
+import { loginTC } from 'features/auth/auth-reducer'
 
 type FormikErrorType = {
   email?: string
@@ -17,6 +20,8 @@ type FormikErrorType = {
 }
 
 export const Login = () => {
+  const dispatch = useAppDispatch()
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -41,8 +46,8 @@ export const Login = () => {
       return errors
     },
     onSubmit: values => {
-      alert(JSON.stringify(values, null, 2))
-      // dispatch(loginTC(values))
+      dispatch(loginTC(values))
+      formik.resetForm()
     },
   })
 
