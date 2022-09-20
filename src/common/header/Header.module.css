@@ -3,7 +3,7 @@
 
   padding: 6px 20px;
 
-  background-image: linear-gradient(to right, #868f96 0%, #596164 100%);
+  background: #E2E6EB;
 }
 .header > div {
   display: flex;
@@ -13,7 +13,7 @@
 .header a {
   padding: 5px 20px;
 
-  color: #fff;
+  color: #000;
 }
 .header a:hover {
   text-decoration: underline;

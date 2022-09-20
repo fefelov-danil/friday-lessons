@@ -12,9 +12,14 @@ export const Header = () => {
   return (
     <div className={s.header}>
       <div className={'container'}>
-        <img src={logo} alt={''} />
-        {isVerifyLogin && <NavLink to={'profile'}>Profile</NavLink>}
-        {!isVerifyLogin && <NavLink to={'login'}>Sign in</NavLink>}
+        <NavLink to={'/'}>
+          <img src={logo} alt={''} />
+        </NavLink>
+        {isVerifyLogin ? (
+          <NavLink to={'/profile'}>Profile</NavLink>
+        ) : (
+          <NavLink to={'/login'}>Sign in</NavLink>
+        )}
       </div>
     </div>
   )
