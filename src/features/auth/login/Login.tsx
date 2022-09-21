@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { useFormik } from 'formik'
-import { useDispatch } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 
 import s from './Login.module.css'
@@ -52,22 +51,22 @@ export const Login = () => {
   })
 
   return (
-    <div className={s.loginPage}>
-      <div className={s.loginContainer}>
+    <div className={'formPage'}>
+      <div className={'formContainer'}>
         <h1>Sign in</h1>
         <form onSubmit={formik.handleSubmit}>
           <p className={s.fieldName}>Email:</p>
           <label className={s.labelField}>
             <InputText {...formik.getFieldProps('email')} />
             {formik.touched.email && formik.errors.email && (
-              <p className={s.fieldError}>{formik.errors.email}</p>
+              <p className={'fieldError'}>{formik.errors.email}</p>
             )}
           </label>
           <p className={s.fieldName}>Password:</p>
           <label className={s.labelField}>
             <InputPassword {...formik.getFieldProps('password')} />
             {formik.touched.password && formik.errors.password && (
-              <p style={{ color: 'red' }}>{formik.errors.password}</p>
+              <p className={'fieldError'}>{formik.errors.password}</p>
             )}
           </label>
           <label className={s.labelCheckbox}>
