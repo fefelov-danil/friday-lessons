@@ -5,7 +5,7 @@ import { AllActionsType } from '../../app/store'
 import { authAPI } from './auth-API'
 
 const initialState = {
-  isLoggedIn: true,
+  isLoggedIn: false,
   isInitialized: false,
 }
 

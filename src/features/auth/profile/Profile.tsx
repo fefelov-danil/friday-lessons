@@ -1,51 +1,54 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate } from 'react-router-dom'
 
+import { useAppDispatch, useAppSelector } from '../../../app/hooks'
 import { AppDispatch, RootState } from '../../../app/store'
 import { Button } from '../../../common/button/Button'
 import { InputText } from '../../../common/input/InputText'
 import { AuthStateType, changeUsernameTC, initializeAppTC, logoutTC } from '../auth-reducer'
 
-export const Profile = () => {
-  const profileData = useSelector<RootState, AuthStateType>(state => state.auth)
-  const dispatch = useDispatch<AppDispatch>()
+export const Profile = React.memo(() => {
+  const profileData = useAppSelector(state => state.auth)
+  const dispatch = useAppDispatch()
   const [isNameChanging, setIsNameChanging] = useState<boolean>(false)
   const [newName, setNewName] = useState<string>(profileData.user?.name || '')
   const [nameError, setNameError] = useState('')
+
+  console.log('profile rendered')
 
   useEffect(() => {
     dispatch(initializeAppTC())
   }, [])
 
-  const logoutHandler = () => {
+  const logoutHandler = useCallback(() => {
     dispatch(logoutTC())
-  }
-  const onSaveNameHandler = () => {
+  }, [])
+  const onSaveNameHandler = useCallback(() => {
     if (newName.trim().length === 0) {
       setNameError('Name is required!')
     } else {
       dispatch(changeUsernameTC(newName))
     }
     setIsNameChanging(false)
-  }
+  }, [])
   // const onBlurHandler = () => {
   //   setIsNameChanging(false)
   //   setNewName(profileData.user?.name || '')
   // }
-  const onKeyDownHandler = (key: string) => {
+  const onKeyDownHandler = useCallback((key: string) => {
     if (key === 'Escape') {
       setIsNameChanging(false)
       setNewName(profileData.user?.name || '')
     } else if (key === 'Enter') {
       onSaveNameHandler()
     }
-  }
-  const onNameChange = (name: string) => {
+  }, [])
+  const onNameChange = useCallback((name: string) => {
     setNameError('')
     setNewName(name)
-  }
+  }, [])
 
   if (!profileData.isInitialized) {
     return <div>loading..</div>
@@ -60,7 +63,7 @@ export const Profile = () => {
       <img
         style={{ width: '100px', height: '100px', borderRadius: '50%', display: 'inline-block' }}
         src={
-          profileData.user
+          profileData.user?.avatar
             ? profileData.user?.avatar
             : 'https://www.gravatar.com/avatar/ca6f903ac1e11977898f9b0c9b3d5292.jpg?size=240&d=https%3A%2F%2Fwww.artstation.com%2Fassets%2Fdefault_avatar.jpg'
         }
@@ -87,4 +90,4 @@ export const Profile = () => {
       <Button onClick={logoutHandler}>Logout</Button>
     </div>
   )
-}
+})

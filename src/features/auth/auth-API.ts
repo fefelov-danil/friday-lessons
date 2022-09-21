@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+import { UserType } from './auth-reducer'
+
 export const instance = axios.create({
-  baseURL: 'http://localhost:7542/2.0',
+  baseURL: 'https://neko-back.herokuapp.com/2.0',
   withCredentials: true,
 })
 
@@ -19,6 +21,6 @@ export const authAPI = {
     return instance.delete('auth/me', {})
   },
   changeUsername(name: string) {
-    return instance.put('auth/me', { name })
+    return instance.put<{ updatedUser: UserType; error?: string }>('auth/me', { name })
   },
 }
