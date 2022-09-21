@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+import { UserType } from './auth-reducer'
+
 export const instance = axios.create({
-  baseURL: 'https://neko-back.herokuapp.com/2.0',
+  baseURL: process.env.REACT_APP_BACK_URL || 'http://localhost:7542/2.0/',
   withCredentials: true,
 })
 
@@ -18,8 +20,14 @@ export const authAPI = {
   changePassword(values: changePasswordType) {
     return instance.post<ResponseType>('/auth/set-new-password', values)
   },
-  deleteMe() {
-    return instance.delete<ResponseType>('/auth/me', {})
+  me() {
+    return instance.post('auth/me', {})
+  },
+  logout() {
+    return instance.delete('auth/me', {})
+  },
+  changeUsername(name: string) {
+    return instance.put<{ updatedUser: UserType; error?: string }>('auth/me', { name })
   },
 }
 
@@ -43,17 +51,17 @@ type ResponseType = {
   error: string
 }
 type ResponseUserType = {
-  _id: string
+  avatar: string
+  created: string
   email: string
-  name: string
-  avatar?: string
-  publicCardPacksCount: number // количество колод
-
-  created: Date
-  updated: Date
   isAdmin: boolean
-  verified: boolean // подтвердил ли почту
+  name: string
+  publicCardPacksCount: number
   rememberMe: boolean
-
-  error?: string
+  token: string
+  tokenDeathTime: number
+  updated: string
+  verified: boolean
+  __v: number
+  _id: string
 }

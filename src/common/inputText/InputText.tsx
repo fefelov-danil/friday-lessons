@@ -47,7 +47,6 @@ export const InputText: React.FC<InputTextPropsType> = ({
         className={finalInputClassName}
         {...restProps}
       />
-      <br />
       {error && <span className={finalSpanClassName}>{error}</span>}
     </>
   )

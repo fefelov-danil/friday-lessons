@@ -1,20 +1,37 @@
 .header {
-  z-index: 10;
+    z-index: 10;
 
-  padding: 6px 20px;
+    padding: 6px 20px;
 
-  background: #E2E6EB;
+    background: #E2E6EB;
 }
+
 .header > div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
-.header a {
-  padding: 5px 20px;
 
-  color: #000;
+.header a {
+    padding: 5px 20px;
+
+    color: #000;
 }
+
 .header a:hover {
-  text-decoration: underline;
+    text-decoration: underline;
+}
+
+.profileLink {
+  line-height: 40px;
+}
+
+.headerAvatar {
+    display: inline-block;
+
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+
+    border-radius: 50%;
 }

@@ -2,6 +2,8 @@
   cursor: pointer;
 
   position: relative;
+
+  margin-right: 4px;
 }
 
 .checkbox {
@@ -57,5 +59,10 @@
 .textForCheckbox {
   padding-left: 25px;
 
+  font-family: 'OpenSans', sans-serif;
+}
+
+
+.spanClassName {
   font-family: 'OpenSans', sans-serif;
 }
