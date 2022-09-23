@@ -24,7 +24,7 @@ export const PasswordRecovery = () => {
       email: '',
       from: 'test-front-admin <roman.petrakovskiy@gmail.com>',
       message: `<p>password recovery link: 
-      <a href='http://localhost:3000/#/set-new-password/$token$'>link</a></p>`,
+      <a href='https://fefelov-danil.github.io/friday-lessons/#/set-new-password/$token$'>link</a></p>`,
     },
     validate: values => {
       const errors: FormikErrorType = {}
