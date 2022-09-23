@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios'
 import { Dispatch } from 'redux'
 
 import { setAppAuthLoadingAC, setAppErrorAC, setAppStatusAC } from 'app/app-reducer'
@@ -7,15 +8,14 @@ import {
   changePasswordType,
   forgotPasswordValuesType,
   loginValuesType,
+  registrationValuesType,
 } from 'features/auth/auth-API'
 
 const initialState = {
   isVerifyLogin: false,
   checkEmailRedirect: false,
-  isInitialized: false,
-  isRegistered: false,
-  errorMessage: '',
   isPasswordChanged: false,
+  isRegistered: false,
 }
 
 export const authReducer = (
@@ -25,6 +25,8 @@ export const authReducer = (
   switch (action.type) {
     case 'login/VERIFY-LOGIN':
       return { ...state, isVerifyLogin: action.isVerifyLogin }
+    case 'login/IS-REGISTERED':
+      return { ...state, isRegistered: action.isRegistered }
     case 'login/USER':
       return { ...state, user: action.user }
     case 'login/DELETE-USER': {
@@ -40,10 +42,7 @@ export const authReducer = (
       return { ...state, changePassword: action.forResetPass }
     case 'login/IS-PASSWORD-CHANGED':
       return { ...state, isPasswordChanged: action.isPasswordChanged }
-    case 'SET-IS-REGISTERED':
-      return { ...state, isRegistered: action.isRegistered }
-    case 'ERROR':
-      return { ...state, errorMessage: action.errorMessage }
+
     default:
       return state
   }
@@ -52,6 +51,8 @@ export const authReducer = (
 // Actions
 export const verifyLoginAC = (isVerifyLogin: boolean) =>
   ({ type: 'login/VERIFY-LOGIN', isVerifyLogin } as const)
+export const isRegisteredAC = (isRegistered: boolean) =>
+  ({ type: 'login/IS-REGISTERED', isRegistered } as const)
 export const userAC = (user: UserType) => ({ type: 'login/USER', user } as const)
 export const checkEmailRedirectAC = (redirect: boolean) =>
   ({ type: 'login/CHECK-EMAIL-REDIRECT', redirect } as const)
@@ -63,27 +64,35 @@ export const deleteUserAC = () =>
   ({
     type: 'login/DELETE-USER',
   } as const)
-export const setSuccesRegistration = (isRegistered: boolean) =>
-  ({ type: 'SET-IS-REGISTERED', isRegistered } as const)
-export const setErrorMessage = (errorMessage: string) => ({ type: 'ERROR', errorMessage } as const)
-
 
 // Thunks
+export const registrationTC =
+  (values: registrationValuesType) => (dispatch: Dispatch<AllActionsType>) => {
+    dispatch(setAppStatusAC('loading'))
+    authAPI
+      .registration(values)
+      .then(res => {
+        dispatch(isRegisteredAC(true))
+        dispatch(setAppStatusAC('succeeded'))
+      })
+      .catch((err: AxiosError) => {
+        dispatch(setAppStatusAC('failed'))
+        dispatch(setAppErrorAC(err.message))
+      })
+  }
+
 export const loginTC = (values: loginValuesType) => (dispatch: Dispatch<AllActionsType>) => {
   dispatch(setAppStatusAC('loading'))
   authAPI
     .login(values)
     .then(res => {
       dispatch(setAppStatusAC('succeeded'))
-      // dispatch(loginAC(true))
       dispatch(verifyLoginAC(true))
-      // dispatch(setIsLoggedInAC(true))
       dispatch(userAC(res.data))
     })
-    .catch(err => {
+    .catch((err: AxiosError) => {
       dispatch(setAppStatusAC('failed'))
       dispatch(setAppErrorAC(err.message))
-      // dispatch(setIsLoggedInAC(false))
     })
 }
 
@@ -126,29 +135,12 @@ export const changePasswordTC =
       })
   }
 
-// export const initializeAppTC = () => async (dispatch: Dispatch<AllActionsType>) => {
-//   dispatch(setAppStatusAC('loading'))
-//   try {
-//     const res = await authAPI.me()
-//
-//     dispatch(setIsInitializedAC(true))
-//     // dispatch(setIsLoggedInAC(true))
-//     dispatch(userAC(res.data))
-//     dispatch(setAppStatusAC('succeeded'))
-//   } catch (err) {
-//     dispatch(setIsInitializedAC(true))
-//     // dispatch(setIsLoggedInAC(false))
-//     dispatch(setAppStatusAC('failed'))
-//   }
-// }
-
 export const logoutTC = () => async (dispatch: Dispatch<AllActionsType>) => {
   dispatch(setAppStatusAC('loading'))
   try {
     await authAPI.logout()
 
     dispatch(verifyLoginAC(false))
-    // dispatch(setIsLoggedInAC(false))
     dispatch(deleteUserAC())
     dispatch(setAppStatusAC('succeeded'))
   } catch (err) {
@@ -168,18 +160,6 @@ export const changeUsernameTC = (name: string) => async (dispatch: Dispatch<AllA
     dispatch(setAppStatusAC('failed'))
   }
 }
-export const signUpTC = (email: string, password: string) => (dispatch: any) => {
-  authAPI
-    .signUp(email, password)
-    .then(res => {
-      dispatch(setSuccesRegistration(true))
-    })
-    .catch(err => {
-      dispatch(setErrorMessage(err.response.data.error))
-    })
-    .finally(() => {})
-}
-
 
 // Types
 export type AuthStateType = {
@@ -188,9 +168,7 @@ export type AuthStateType = {
   changePassword?: changePasswordType
   isPasswordChanged: boolean
   user?: UserType
-  isInitialized: boolean
   isRegistered: boolean
-  errorMessage: string
 }
 export type UserType = {
   avatar: string
@@ -210,10 +188,9 @@ export type UserType = {
 
 export type AuthActionsType =
   | ReturnType<typeof verifyLoginAC>
+  | ReturnType<typeof isRegisteredAC>
   | ReturnType<typeof userAC>
   | ReturnType<typeof checkEmailRedirectAC>
   | ReturnType<typeof changePasswordAC>
   | ReturnType<typeof isPasswordChangedAC>
   | ReturnType<typeof deleteUserAC>
-  | ReturnType<typeof setSuccesRegistration>
-  | ReturnType<typeof setErrorMessage>

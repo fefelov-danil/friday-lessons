@@ -1,68 +1,100 @@
-import React, { useState } from 'react'
+import React from 'react'
 
-import { useSelector, useDispatch } from 'react-redux'
+import { useFormik } from 'formik'
 import { Navigate, NavLink } from 'react-router-dom'
 
-import { signUpTC } from '../auth-reducer'
+import s from './Registration.module.css'
 
-import { RootState } from 'app/store'
-import { InputText } from 'common/inputText/InputText'
+import { useAppDispatch, useAppSelector } from 'app/hooks'
+import { PATH } from 'app/Pages'
 import { Button } from 'common/button/Button'
+import { InputPassword } from 'common/inputPassword/InputPassword'
+import { InputText } from 'common/inputText/InputText'
+import { isRegisteredAC, registrationTC } from 'features/auth/auth-reducer'
+
+type FormikErrorType = {
+  email?: string
+  password?: string
+  confirmPassword?: string
+}
 
 export const Registration = () => {
-  const dispatch = useDispatch<any>()
+  const dispatch = useAppDispatch()
+  const isRegistered = useAppSelector(state => state.auth.isRegistered)
 
-  const errMessage = useSelector<RootState, string>(state => state.auth.errorMessage)
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    validate: values => {
+      const errors: FormikErrorType = {}
 
-  const [email, setEmail] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
-  const [repeatPassword, setRepeatPassword] = useState<string>('')
-  const [mess, setMess] = useState<string>('')
+      if (!values.email) {
+        errors.email = 'required'
+      } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+        errors.email = 'Invalid email address'
+      }
 
-  const confirmRegistrationHandler = () => {
-    if (password === repeatPassword) {
-      dispatch(signUpTC(email, password))
-      setEmail('')
-      setPassword('')
-      setRepeatPassword('')
-    } else {
-      setMess('confirm your password currectly')
-    }
+      if (values.confirmPassword !== values.password) {
+        errors.confirmPassword = 'Пароли должны совпадать'
+      }
+
+      if (!values.password) {
+        errors.password = 'required'
+      } else if (values.password.length < 7) {
+        errors.password = 'Пароль должен быть длиннее 8ми символов'
+      }
+
+      return errors
+    },
+    onSubmit: values => {
+      dispatch(registrationTC({ email: values.email, password: values.password }))
+    },
+  })
+
+  if (isRegistered) {
+    dispatch(isRegisteredAC(false))
+
+    return <Navigate to={PATH.LOGIN} />
   }
 
-  // if ('logged in') return <Navigate to={'/main page'}/>
-
   return (
-    <div>
-      <h1>Registration</h1>
-
-      <InputText
-        placeholder="email"
-        value={email}
-        onChange={e => {
-          setEmail(e.currentTarget.value)
-        }}
-      />
-      <InputText
-        placeholder="password"
-        value={password}
-        onChange={e => {
-          setPassword(e.currentTarget.value)
-        }}
-      />
-      <InputText
-        placeholder="repeatPassword"
-        value={repeatPassword}
-        onChange={e => {
-          setRepeatPassword(e.currentTarget.value)
-        }}
-      />
-      <Button onClick={confirmRegistrationHandler}>OK</Button>
-      {errMessage && <div>{errMessage}</div>}
-      {mess && <div>{mess}</div>}
-
-      <p>Already have an account?</p>
-      <NavLink to={'/login'}>Sign In</NavLink>
+    <div className={'formPage'}>
+      <div className={'formContainer'}>
+        <h1>Sign up</h1>
+        <form onSubmit={formik.handleSubmit}>
+          <p className={s.fieldName}>Email:</p>
+          <label className={s.labelField}>
+            <InputText {...formik.getFieldProps('email')} />
+            {formik.touched.email && formik.errors.email && (
+              <p className={'fieldError'}>{formik.errors.email}</p>
+            )}
+          </label>
+          <p className={s.fieldName}>Password:</p>
+          <label className={s.labelField}>
+            <InputPassword {...formik.getFieldProps('password')} />
+            {formik.touched.password && formik.errors.password && (
+              <p className={'fieldError'}>{formik.errors.password}</p>
+            )}
+          </label>
+          <p className={s.fieldName}>Confirm password:</p>
+          <label className={s.labelField}>
+            <InputPassword {...formik.getFieldProps('confirmPassword')} />
+            {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+              <p className={'fieldError'}>{formik.errors.confirmPassword}</p>
+            )}
+          </label>
+          <Button type={'submit'} className={s.signInBtn}>
+            Sign Up
+          </Button>
+        </form>
+        <p className={s.loginText}>Already have account?</p>
+        <p className={s.loginLink}>
+          <NavLink to={PATH.LOGIN}>Sign in</NavLink>
+        </p>
+      </div>
     </div>
   )
 }

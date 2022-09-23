@@ -31,13 +31,13 @@ p.fieldName {
 
   font-size: 19px;
 }
-.registrationText {
+.loginText {
   margin-top: 25px;
   margin-bottom: 15px;
 
   text-align: center;
 }
-.registrationLink {
+.loginLink {
   margin-bottom: 0;
 
   text-align: center;

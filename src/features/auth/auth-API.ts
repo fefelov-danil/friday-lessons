@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios'
+import axios from 'axios'
 
 import { UserType } from './auth-reducer'
 
@@ -10,6 +10,9 @@ export const instance = axios.create({
 export const authAPI = {
   authMe() {
     return instance.post<ResponseUserType>('/auth/me', {})
+  },
+  registration(values: registrationValuesType) {
+    return instance.post('/auth/register', values)
   },
   login(values: loginValuesType) {
     return instance.post<ResponseUserType>('/auth/login', values)
@@ -29,11 +32,6 @@ export const authAPI = {
   changeUsername(name: string) {
     return instance.put<{ updatedUser: UserType; error?: string }>('auth/me', { name })
   },
-  signUp: (email: string, password: string) =>
-    instance.post<RegisterDataType, AxiosResponse<RegisterResponseDataType<ResponseUserType>>>(
-      '/auth/register',
-      { email, password }
-    ),
 }
 
 // types
@@ -41,6 +39,10 @@ export type loginValuesType = {
   email: string
   password: string
   rememberMe?: boolean
+}
+export type registrationValuesType = {
+  email: string
+  password: string
 }
 export type forgotPasswordValuesType = {
   email: string
@@ -69,11 +71,4 @@ type ResponseUserType = {
   verified: boolean
   __v: number
   _id: string
-}
-export type RegisterDataType = {
-  email: string
-  password: string
-}
-type RegisterResponseDataType<T = {}> = {
-  addedUser: T
 }
