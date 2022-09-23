@@ -6,6 +6,9 @@ import React, {
   useState,
 } from 'react'
 
+import DraftsIcon from '@mui/icons-material/Drafts'
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+
 import s from './InputPassword.module.css'
 
 // Пропсы стандартного инпута
@@ -47,7 +50,7 @@ export const InputPassword: React.FC<InputPasswordPropsType> = ({
   const finalInputClassName = `${s.inputPassword} ${error && s.errorInput} ${className}`
 
   return (
-    <>
+    <p className={s.inputContainer}>
       <input
         type={showPass ? 'text' : 'password'}
         onChange={onChangeCallback}
@@ -55,9 +58,16 @@ export const InputPassword: React.FC<InputPasswordPropsType> = ({
         className={finalInputClassName}
         {...restProps}
       />
+      <span onClick={() => setShowPass(!showPass)}>
+        {showPass ? (
+          <DraftsIcon sx={{ color: '#333333' }} />
+        ) : (
+          <RemoveRedEyeIcon sx={{ color: '#333333' }} />
+        )}
+      </span>
 
       <br />
       {error && <span className={finalSpanClassName}>{error}</span>}
-    </>
+    </p>
   )
 }
