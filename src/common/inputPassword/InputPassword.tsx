@@ -6,8 +6,8 @@ import React, {
   useState,
 } from 'react'
 
-import DraftsIcon from '@mui/icons-material/Drafts'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 
 import s from './InputPassword.module.css'
 
@@ -60,7 +60,7 @@ export const InputPassword: React.FC<InputPasswordPropsType> = ({
       />
       <span onClick={() => setShowPass(!showPass)}>
         {showPass ? (
-          <DraftsIcon sx={{ color: '#333333' }} />
+          <VisibilityOffIcon sx={{ color: '#333333' }} />
         ) : (
           <RemoveRedEyeIcon sx={{ color: '#333333' }} />
         )}
