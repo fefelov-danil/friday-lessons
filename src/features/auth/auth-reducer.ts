@@ -9,17 +9,18 @@ import {
   loginValuesType,
 } from 'features/auth/auth-API'
 
-const initialState: AuthStateType = {
-  // isLoggedIn: false,
+const initialState = {
   isVerifyLogin: false,
   checkEmailRedirect: false,
   isInitialized: false,
+  isPasswordChanged: false,
 }
 
-export const authReducer = (state = initialState, action: AuthActionsType): AuthStateType => {
+export const authReducer = (
+  state: AuthStateType = initialState,
+  action: AuthActionsType
+): AuthStateType => {
   switch (action.type) {
-    // case 'login/LOGIN':
-    //   return { ...state, isLoggedIn: action.isLoggedIn }
     case 'login/VERIFY-LOGIN':
       return { ...state, isVerifyLogin: action.isVerifyLogin }
     case 'login/USER':
@@ -35,15 +36,8 @@ export const authReducer = (state = initialState, action: AuthActionsType): Auth
       return { ...state, checkEmailRedirect: action.redirect }
     case 'login/CHANGE-PASSWORD':
       return { ...state, changePassword: action.forResetPass }
-    case 'login/IS-INITIALIZED': {
-      return { ...state, isInitialized: action.isInitialized }
-    }
-    // case 'SET-IS-LOGGED-IN': {
-    //   return { ...state, isLoggedIn: action.isLoggedIn }
-    // }
-    // case 'SET-USER': {
-    //   return { ...state, user: action.user }
-    // }
+    case 'login/IS-PASSWORD-CHANGED':
+      return { ...state, isPasswordChanged: action.isPasswordChanged }
 
     default:
       return state
@@ -51,7 +45,6 @@ export const authReducer = (state = initialState, action: AuthActionsType): Auth
 }
 
 // Actions
-// export const loginAC = (isLoggedIn: boolean) => ({ type: 'login/LOGIN', isLoggedIn } as const)
 export const verifyLoginAC = (isVerifyLogin: boolean) =>
   ({ type: 'login/VERIFY-LOGIN', isVerifyLogin } as const)
 export const userAC = (user: UserType) => ({ type: 'login/USER', user } as const)
@@ -59,21 +52,8 @@ export const checkEmailRedirectAC = (redirect: boolean) =>
   ({ type: 'login/CHECK-EMAIL-REDIRECT', redirect } as const)
 export const changePasswordAC = (forResetPass: changePasswordType) =>
   ({ type: 'login/CHANGE-PASSWORD', forResetPass } as const)
-export const setIsInitializedAC = (isInitialized: boolean) =>
-  ({
-    type: 'login/IS-INITIALIZED',
-    isInitialized,
-  } as const)
-// export const setIsLoggedInAC = (isLoggedIn: boolean) =>
-//   ({
-//     type: 'SET-IS-LOGGED-IN',
-//     isLoggedIn,
-//   } as const)
-// export const setUserAC = (user: UserType) =>
-//   ({
-//     type: 'SET-USER',
-//     user,
-//   } as const)
+export const isPasswordChangedAC = (isPasswordChanged: boolean) =>
+  ({ type: 'login/IS-PASSWORD-CHANGED', isPasswordChanged } as const)
 export const deleteUserAC = () =>
   ({
     type: 'login/DELETE-USER',
@@ -104,6 +84,7 @@ export const isAuthLoadingTC = () => (dispatch: Dispatch<AllActionsType>) => {
     .then(res => {
       dispatch(setAppAuthLoadingAC(false))
       dispatch(verifyLoginAC(true))
+      dispatch(userAC(res.data))
     })
     .catch(err => {
       dispatch(setAppAuthLoadingAC(false))
@@ -127,28 +108,30 @@ export const changePasswordTC =
       .changePassword(values)
       .then(res => {
         dispatch(setAppStatusAC('succeeded'))
+        dispatch(isPasswordChangedAC(true))
       })
       .catch(err => {
+        console.log(err)
         dispatch(setAppErrorAC(err.message))
         dispatch(setAppStatusAC('failed'))
       })
   }
 
-export const initializeAppTC = () => async (dispatch: Dispatch<AllActionsType>) => {
-  dispatch(setAppStatusAC('loading'))
-  try {
-    const res = await authAPI.me()
-
-    dispatch(setIsInitializedAC(true))
-    // dispatch(setIsLoggedInAC(true))
-    dispatch(userAC(res.data))
-    dispatch(setAppStatusAC('succeeded'))
-  } catch (err) {
-    dispatch(setIsInitializedAC(true))
-    // dispatch(setIsLoggedInAC(false))
-    dispatch(setAppStatusAC('failed'))
-  }
-}
+// export const initializeAppTC = () => async (dispatch: Dispatch<AllActionsType>) => {
+//   dispatch(setAppStatusAC('loading'))
+//   try {
+//     const res = await authAPI.me()
+//
+//     dispatch(setIsInitializedAC(true))
+//     // dispatch(setIsLoggedInAC(true))
+//     dispatch(userAC(res.data))
+//     dispatch(setAppStatusAC('succeeded'))
+//   } catch (err) {
+//     dispatch(setIsInitializedAC(true))
+//     // dispatch(setIsLoggedInAC(false))
+//     dispatch(setAppStatusAC('failed'))
+//   }
+// }
 
 export const logoutTC = () => async (dispatch: Dispatch<AllActionsType>) => {
   dispatch(setAppStatusAC('loading'))
@@ -179,10 +162,10 @@ export const changeUsernameTC = (name: string) => async (dispatch: Dispatch<AllA
 
 // Types
 export type AuthStateType = {
-  // isLoggedIn: boolean
   isVerifyLogin: boolean
   checkEmailRedirect: boolean
   changePassword?: changePasswordType
+  isPasswordChanged: boolean
   user?: UserType
   isInitialized: boolean
 }
@@ -203,12 +186,9 @@ export type UserType = {
 }
 
 export type AuthActionsType =
-  // | ReturnType<typeof loginAC>
   | ReturnType<typeof verifyLoginAC>
   | ReturnType<typeof userAC>
   | ReturnType<typeof checkEmailRedirectAC>
   | ReturnType<typeof changePasswordAC>
-  | ReturnType<typeof setIsInitializedAC>
-  // | ReturnType<typeof setIsLoggedInAC>
-  // | ReturnType<typeof setUserAC>
+  | ReturnType<typeof isPasswordChangedAC>
   | ReturnType<typeof deleteUserAC>

@@ -1,29 +1,27 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
-import { useAppDispatch, useAppSelector } from '../../../app/hooks'
-import { Button } from '../../../common/button/Button'
-import { InputText } from '../../../common/inputText/InputText'
-import { changeUsernameTC, initializeAppTC, logoutTC } from '../auth-reducer'
+import { changeUsernameTC, logoutTC } from '../auth-reducer'
 
 import s from './Profile.module.css'
+
+import { setAppAuthLoadingAC, setAppErrorAC } from 'app/app-reducer'
+import { useAppDispatch, useAppSelector } from 'app/hooks'
+import { Button } from 'common/button/Button'
+import { InputText } from 'common/inputText/InputText'
 
 export const Profile = () => {
   const profileData = useAppSelector(state => state.auth)
   const dispatch = useAppDispatch()
   const [isNameChanging, setIsNameChanging] = useState<boolean>(false)
   const [newName, setNewName] = useState<string>(profileData.user?.name as string)
-  const [nameError, setNameError] = useState('')
-
-  useEffect(() => {
-    dispatch(initializeAppTC())
-  }, [])
 
   const logoutHandler = () => {
     dispatch(logoutTC())
   }
+
   const onSaveNameHandler = () => {
     if (newName.trim().length === 0) {
-      setNameError('Name is required!')
+      dispatch(setAppErrorAC('Name is required!'))
     } else {
       dispatch(changeUsernameTC(newName))
     }
@@ -38,20 +36,15 @@ export const Profile = () => {
     }
   }
   const onNameChange = (name: string) => {
-    setNameError('')
     setNewName(name)
   }
   const onChangeNameHandler = () => {
     profileData.user?.name && setNewName(profileData.user?.name)
     setIsNameChanging(true)
   }
-  // const onBlurHandler = () => {
-  //   setIsNameChanging(false)
-  //   setNewName(profileData.user?.name || '')
-  // }
 
-  if (!profileData.isInitialized) {
-    return <div>loading..</div>
+  if (!profileData.isVerifyLogin) {
+    dispatch(setAppAuthLoadingAC(true))
   }
 
   return (
@@ -71,7 +64,6 @@ export const Profile = () => {
             <InputText
               value={newName}
               onChange={e => onNameChange(e.currentTarget.value)}
-              // onBlur={onBlurHandler}
               autoFocus={true}
               onKeyDown={e => onKeyDownHandler(e.key)}
             />

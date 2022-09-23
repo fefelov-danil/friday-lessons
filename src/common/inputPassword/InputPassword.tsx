@@ -1,4 +1,10 @@
-import React, { ChangeEvent, DetailedHTMLProps, InputHTMLAttributes, KeyboardEvent } from 'react'
+import React, {
+  ChangeEvent,
+  DetailedHTMLProps,
+  InputHTMLAttributes,
+  KeyboardEvent,
+  useState,
+} from 'react'
 
 import s from './InputPassword.module.css'
 
@@ -26,6 +32,8 @@ export const InputPassword: React.FC<InputPasswordPropsType> = ({
   spanClassName,
   ...restProps
 }) => {
+  const [showPass, setShowPass] = useState(false)
+
   const onChangeCallback = (e: ChangeEvent<HTMLInputElement>) => {
     onChange && onChange(e)
     onChangePassword && onChangePassword(e.currentTarget.value)
@@ -36,12 +44,12 @@ export const InputPassword: React.FC<InputPasswordPropsType> = ({
   }
 
   const finalSpanClassName = `${s.error} ${spanClassName ? spanClassName : ''}`
-  const finalInputClassName = `${s.inputPassword} ${error && s.errorInput} ${className}` // need to fix with (?:) and s.superInput
+  const finalInputClassName = `${s.inputPassword} ${error && s.errorInput} ${className}`
 
   return (
     <>
       <input
-        type={'password'}
+        type={showPass ? 'text' : 'password'}
         onChange={onChangeCallback}
         onKeyDown={onKeyPressCallback}
         className={finalInputClassName}
