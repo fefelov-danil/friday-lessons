@@ -14,6 +14,8 @@ const initialState: AuthStateType = {
   isVerifyLogin: false,
   checkEmailRedirect: false,
   isInitialized: false,
+  isRegistered: false,
+  errorMessage: '',
 }
 
 export const authReducer = (state = initialState, action: AuthActionsType): AuthStateType => {
@@ -44,7 +46,10 @@ export const authReducer = (state = initialState, action: AuthActionsType): Auth
     // case 'SET-USER': {
     //   return { ...state, user: action.user }
     // }
-
+    case 'SET-IS-REGISTERED':
+      return { ...state, isRegistered: action.isRegistered }
+    case 'ERROR':
+      return { ...state, errorMessage: action.errorMessage }
     default:
       return state
   }
@@ -78,6 +83,10 @@ export const deleteUserAC = () =>
   ({
     type: 'login/DELETE-USER',
   } as const)
+export const setSuccesRegistration = (isRegistered: boolean) =>
+  ({ type: 'SET-IS-REGISTERED', isRegistered } as const)
+export const setErrorMessage = (errorMessage: string) => ({ type: 'ERROR', errorMessage } as const)
+
 
 // Thunks
 export const loginTC = (values: loginValuesType) => (dispatch: Dispatch<AllActionsType>) => {
@@ -176,6 +185,18 @@ export const changeUsernameTC = (name: string) => async (dispatch: Dispatch<AllA
     dispatch(setAppStatusAC('failed'))
   }
 }
+export const signUpTC = (email: string, password: string) => (dispatch: any) => {
+  authAPI
+    .signUp(email, password)
+    .then(res => {
+      dispatch(setSuccesRegistration(true))
+    })
+    .catch(err => {
+      dispatch(setErrorMessage(err.response.data.error))
+    })
+    .finally(() => {})
+}
+
 
 // Types
 export type AuthStateType = {
@@ -185,6 +206,8 @@ export type AuthStateType = {
   changePassword?: changePasswordType
   user?: UserType
   isInitialized: boolean
+  isRegistered: boolean
+  errorMessage: string
 }
 export type UserType = {
   avatar: string
@@ -212,3 +235,5 @@ export type AuthActionsType =
   // | ReturnType<typeof setIsLoggedInAC>
   // | ReturnType<typeof setUserAC>
   | ReturnType<typeof deleteUserAC>
+  | ReturnType<typeof setSuccesRegistration>
+  | ReturnType<typeof setErrorMessage>
