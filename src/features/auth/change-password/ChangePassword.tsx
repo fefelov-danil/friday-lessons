@@ -1,11 +1,12 @@
 import React from 'react'
 
 import { useFormik } from 'formik'
-import { useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 
 import s from './ChangePassword.module.css'
 
-import { useAppDispatch } from 'app/hooks'
+import { useAppDispatch, useAppSelector } from 'app/hooks'
+import { PATH } from 'app/Pages'
 import { Button } from 'common/button/Button'
 import { InputPassword } from 'common/inputPassword/InputPassword'
 import { changePasswordTC } from 'features/auth/auth-reducer'
@@ -16,6 +17,7 @@ type FormikErrorType = {
 
 export const ChangePassword = () => {
   const dispatch = useAppDispatch()
+  const isPasswordChanged = useAppSelector(state => state.auth.isPasswordChanged)
   const { token } = useParams()
 
   const formik = useFormik({
@@ -36,9 +38,12 @@ export const ChangePassword = () => {
     },
     onSubmit: values => {
       dispatch(changePasswordTC(values))
-      formik.resetForm()
     },
   })
+
+  if (isPasswordChanged) {
+    return <Navigate to={PATH.PROFILE} />
+  }
 
   return (
     <div className={'formPage'}>
