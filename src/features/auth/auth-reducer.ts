@@ -67,7 +67,6 @@ export const setSuccesRegistration = (isRegistered: boolean) =>
   ({ type: 'SET-IS-REGISTERED', isRegistered } as const)
 export const setErrorMessage = (errorMessage: string) => ({ type: 'ERROR', errorMessage } as const)
 
-
 // Thunks
 export const loginTC = (values: loginValuesType) => (dispatch: Dispatch<AllActionsType>) => {
   dispatch(setAppStatusAC('loading'))
@@ -179,7 +178,6 @@ export const signUpTC = (email: string, password: string) => (dispatch: any) => 
     })
     .finally(() => {})
 }
-
 
 // Types
 export type AuthStateType = {
