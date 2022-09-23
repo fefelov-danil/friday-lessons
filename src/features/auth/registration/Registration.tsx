@@ -6,8 +6,8 @@ import { Navigate, NavLink } from 'react-router-dom'
 import { signUpTC } from '../auth-reducer'
 
 import { RootState } from 'app/store'
+import { InputText } from 'common/inputText/InputText'
 import { Button } from 'common/button/Button'
-import { InputText } from 'common/input/InputText'
 
 export const Registration = () => {
   const dispatch = useDispatch<any>()
