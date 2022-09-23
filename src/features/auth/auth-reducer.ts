@@ -1,7 +1,9 @@
-import { AxiosError } from 'axios'
+import axios, { AxiosError } from 'axios'
 import { Dispatch } from 'redux'
 
-import { setAppAuthLoadingAC, setAppErrorAC, setAppStatusAC } from 'app/app-reducer'
+import { HandleServerError } from '../../utils/error-utils'
+
+import { setAppAuthLoadingAC, setAppAlertAC, setAppStatusAC } from 'app/app-reducer'
 import { AllActionsType } from 'app/store'
 import {
   authAPI,
@@ -75,9 +77,10 @@ export const registrationTC =
         dispatch(isRegisteredAC(true))
         dispatch(setAppStatusAC('succeeded'))
       })
-      .catch((err: AxiosError) => {
-        dispatch(setAppStatusAC('failed'))
-        dispatch(setAppErrorAC(err.message))
+      .catch(err => {
+        if (err.response) {
+          HandleServerError(dispatch, err.response.data.error)
+        }
       })
   }
 
@@ -90,9 +93,10 @@ export const loginTC = (values: loginValuesType) => (dispatch: Dispatch<AllActio
       dispatch(verifyLoginAC(true))
       dispatch(userAC(res.data))
     })
-    .catch((err: AxiosError) => {
-      dispatch(setAppStatusAC('failed'))
-      dispatch(setAppErrorAC(err.message))
+    .catch(err => {
+      if (err.response) {
+        HandleServerError(dispatch, err.response.data.error)
+      }
     })
 }
 
@@ -105,18 +109,26 @@ export const isAuthLoadingTC = () => (dispatch: Dispatch<AllActionsType>) => {
       dispatch(userAC(res.data))
     })
     .catch(err => {
-      dispatch(setAppAuthLoadingAC(false))
-      // dispatch(loginAC(false))
+      if (err.response) {
+        dispatch(setAppAuthLoadingAC(false))
+      }
     })
 }
 
 export const forgotPasswordTC =
   (values: forgotPasswordValuesType) => (dispatch: Dispatch<AllActionsType>) => {
     dispatch(setAppStatusAC('loading'))
-    authAPI.forgotPassword(values).then(res => {
-      dispatch(checkEmailRedirectAC(true))
-      dispatch(setAppStatusAC('succeeded'))
-    })
+    authAPI
+      .forgotPassword(values)
+      .then(res => {
+        dispatch(checkEmailRedirectAC(true))
+        dispatch(setAppStatusAC('succeeded'))
+      })
+      .catch(err => {
+        if (err.response) {
+          HandleServerError(dispatch, err.response.data.error)
+        }
+      })
   }
 
 export const changePasswordTC =
@@ -127,11 +139,12 @@ export const changePasswordTC =
       .then(res => {
         dispatch(setAppStatusAC('succeeded'))
         dispatch(isPasswordChangedAC(true))
+        dispatch(setAppAlertAC('Password successfully changed', 'success'))
       })
       .catch(err => {
-        console.log(err)
-        dispatch(setAppErrorAC(err.message))
-        dispatch(setAppStatusAC('failed'))
+        if (err.response) {
+          HandleServerError(dispatch, err.response.data.error)
+        }
       })
   }
 
@@ -144,8 +157,11 @@ export const logoutTC = () => async (dispatch: Dispatch<AllActionsType>) => {
     dispatch(deleteUserAC())
     dispatch(setAppStatusAC('succeeded'))
   } catch (err) {
-    console.log(err)
-    dispatch(setAppStatusAC('failed'))
+    // @ts-ignore
+    if (err.response) {
+      // @ts-ignore
+      HandleServerError(dispatch, err.response.data.error)
+    }
   }
 }
 export const changeUsernameTC = (name: string) => async (dispatch: Dispatch<AllActionsType>) => {
@@ -155,9 +171,13 @@ export const changeUsernameTC = (name: string) => async (dispatch: Dispatch<AllA
 
     dispatch(userAC(res.data.updatedUser))
     dispatch(setAppStatusAC('succeeded'))
+    dispatch(setAppAlertAC('Name successfully changed', 'success'))
   } catch (err) {
-    console.log(err)
-    dispatch(setAppStatusAC('failed'))
+    // @ts-ignore
+    if (err.response) {
+      // @ts-ignore
+      HandleServerError(dispatch, err.response.data.error)
+    }
   }
 }
 

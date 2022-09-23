@@ -4,7 +4,7 @@ import { changeUsernameTC, logoutTC } from '../auth-reducer'
 
 import s from './Profile.module.css'
 
-import { setAppAuthLoadingAC, setAppErrorAC } from 'app/app-reducer'
+import { setAppAuthLoadingAC, setAppAlertAC } from 'app/app-reducer'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { Button } from 'common/button/Button'
 import { InputText } from 'common/inputText/InputText'
@@ -21,7 +21,7 @@ export const Profile = () => {
 
   const onSaveNameHandler = () => {
     if (newName.trim().length === 0) {
-      dispatch(setAppErrorAC('Name is required!'))
+      dispatch(setAppAlertAC('Name is required!', 'error'))
     } else {
       dispatch(changeUsernameTC(newName))
     }

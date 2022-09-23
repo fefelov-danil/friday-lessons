@@ -7,7 +7,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { Pages } from 'app/Pages'
-import ErrorSnackbar from 'common/errorSnackbar/ErrorSnackbar'
+import AlertSnackbar from 'common/alertSnackbar/AlertSnackbar'
 import { Header } from 'common/header/Header'
 import { isAuthLoadingTC } from 'features/auth/auth-reducer'
 
@@ -31,7 +31,7 @@ const App = () => {
           <div className={'linear-progress'}>{appStatus === 'loading' && <LinearProgress />}</div>
           <Header />
           <Pages />
-          <ErrorSnackbar />
+          <AlertSnackbar />
         </div>
       )}
     </div>

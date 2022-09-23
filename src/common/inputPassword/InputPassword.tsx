@@ -55,6 +55,7 @@ export const InputPassword: React.FC<InputPasswordPropsType> = ({
         className={finalInputClassName}
         {...restProps}
       />
+
       <br />
       {error && <span className={finalSpanClassName}>{error}</span>}
     </>

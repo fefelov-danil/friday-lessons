@@ -21,6 +21,7 @@ type FormikErrorType = {
 export const Registration = () => {
   const dispatch = useAppDispatch()
   const isRegistered = useAppSelector(state => state.auth.isRegistered)
+  const isVerifyLogin = useAppSelector(state => state.auth.isVerifyLogin)
 
   const formik = useFormik({
     initialValues: {
@@ -58,6 +59,10 @@ export const Registration = () => {
     dispatch(isRegisteredAC(false))
 
     return <Navigate to={PATH.LOGIN} />
+  }
+
+  if (isVerifyLogin) {
+    return <Navigate to={PATH.PROFILE} />
   }
 
   return (
