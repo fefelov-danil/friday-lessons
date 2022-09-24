@@ -7,11 +7,10 @@ import logo from 'assets/images/logo.png'
 import s from 'common/header/Header.module.css'
 
 export const Header = () => {
-  const isVerifyLogin = useAppSelector(state => state.auth.isVerifyLogin)
+  const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
   const userData = useAppSelector(state => state.auth.user)
 
   let avatar
-  let username = userData?.name
 
   if (userData?.avatar) {
     avatar = userData.avatar
@@ -26,7 +25,7 @@ export const Header = () => {
         <NavLink to={'/'}>
           <img src={logo} alt={''} />
         </NavLink>
-        {isVerifyLogin ? (
+        {isLoggedIn ? (
           <>
             <NavLink className={s.profileLink} to={'/profile'}>
               <img className={s.headerAvatar} src={avatar} alt="avatar" />

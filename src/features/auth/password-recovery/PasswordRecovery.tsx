@@ -9,7 +9,7 @@ import s from './PasswordRecovery.module.css'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { Button } from 'common/button/Button'
 import { InputText } from 'common/inputText/InputText'
-import { checkEmailRedirectAC, forgotPasswordTC } from 'features/auth/auth-reducer'
+import { authCheckEmailRedirectAC, forgotPasswordTC } from 'features/auth/auth-reducer'
 
 type FormikErrorType = {
   email?: string
@@ -24,7 +24,7 @@ export const PasswordRecovery = () => {
       email: '',
       from: 'test-front-admin <roman.petrakovskiy@gmail.com>',
       message: `<p>password recovery link: 
-      <a href='https://fefelov-danil.github.io/friday-lessons/#/set-new-password/$token$'>link</a></p>`,
+      <a href='http://localhost:3000//friday-lessons/#/set-new-password/$token$'>link</a></p>`,
     },
     validate: values => {
       const errors: FormikErrorType = {}
@@ -58,7 +58,7 @@ export const PasswordRecovery = () => {
             <NavLink
               to={'/login'}
               className={'standardBtn'}
-              onClick={() => dispatch(checkEmailRedirectAC(false))}
+              onClick={() => dispatch(authCheckEmailRedirectAC(false))}
             >
               Sign in
             </NavLink>

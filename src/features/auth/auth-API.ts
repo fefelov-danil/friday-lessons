@@ -23,9 +23,6 @@ export const authAPI = {
   changePassword(values: changePasswordType) {
     return instance.post<ResponseType>('/auth/set-new-password', values)
   },
-  me() {
-    return instance.post('auth/me', {})
-  },
   logout() {
     return instance.delete('auth/me', {})
   },

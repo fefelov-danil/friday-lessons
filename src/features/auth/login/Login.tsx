@@ -38,8 +38,8 @@ export const Login = () => {
 
       if (!values.password) {
         errors.password = 'required'
-      } else if (values.password.length < 3) {
-        errors.password = 'Пароль должен быть длиннее 2х символов'
+      } else if (values.password.length < 8) {
+        errors.password = 'Password not valid! must be more than 7 characters'
       }
 
       return errors

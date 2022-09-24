@@ -13,8 +13,8 @@ import { isAuthLoadingTC } from 'features/auth/auth-reducer'
 
 const App = () => {
   const dispatch = useAppDispatch()
-  const appStatus = useAppSelector(state => state.app.status)
-  const isAuthLoading = useAppSelector(state => state.app.isAuthLoading)
+  const appStatus = useAppSelector(state => state.app.appStatus)
+  const isAuthLoading = useAppSelector(state => state.app.appIsLoading)
 
   useEffect(() => {
     isAuthLoading && dispatch(isAuthLoadingTC())

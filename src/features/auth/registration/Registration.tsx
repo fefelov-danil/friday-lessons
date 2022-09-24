@@ -10,7 +10,7 @@ import { PATH } from 'app/Pages'
 import { Button } from 'common/button/Button'
 import { InputPassword } from 'common/inputPassword/InputPassword'
 import { InputText } from 'common/inputText/InputText'
-import { isRegisteredAC, registrationTC } from 'features/auth/auth-reducer'
+import { authIsRegisteredAC, registrationTC } from 'features/auth/auth-reducer'
 
 type FormikErrorType = {
   email?: string
@@ -21,7 +21,7 @@ type FormikErrorType = {
 export const Registration = () => {
   const dispatch = useAppDispatch()
   const isRegistered = useAppSelector(state => state.auth.isRegistered)
-  const isVerifyLogin = useAppSelector(state => state.auth.isVerifyLogin)
+  const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
 
   const formik = useFormik({
     initialValues: {
@@ -44,8 +44,8 @@ export const Registration = () => {
 
       if (!values.password) {
         errors.password = 'required'
-      } else if (values.password.length < 7) {
-        errors.password = 'Пароль должен быть длиннее 8ми символов'
+      } else if (values.password.length < 8) {
+        errors.password = 'Password not valid! must be more than 7 characters'
       }
 
       return errors
@@ -56,12 +56,12 @@ export const Registration = () => {
   })
 
   if (isRegistered) {
-    dispatch(isRegisteredAC(false))
+    dispatch(authIsRegisteredAC(false))
 
     return <Navigate to={PATH.LOGIN} />
   }
 
-  if (isVerifyLogin) {
+  if (isLoggedIn) {
     return <Navigate to={PATH.PROFILE} />
   }
 
