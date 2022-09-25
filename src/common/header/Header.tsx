@@ -10,15 +10,6 @@ export const Header = () => {
   const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
   const userData = useAppSelector(state => state.auth.user)
 
-  let avatar
-
-  if (userData?.avatar) {
-    avatar = userData.avatar
-  } else {
-    avatar =
-      'https://www.gravatar.com/avatar/ca6f903ac1e11977898f9b0c9b3d5292.jpg?size=240&d=https%3A%2F%2Fwww.artstation.com%2Fassets%2Fdefault_avatar.jpg'
-  }
-
   return (
     <div className={s.header}>
       <div className={'container'}>
@@ -28,7 +19,7 @@ export const Header = () => {
         {isLoggedIn ? (
           <>
             <NavLink className={s.profileLink} to={'/profile'}>
-              <img className={s.headerAvatar} src={avatar} alt="avatar" />
+              <img className={s.headerAvatar} src={userData?.avatar} alt="avatar" />
               {userData?.name}
             </NavLink>
           </>

@@ -42,20 +42,12 @@ export const Profile = () => {
     setIsNameChanging(true)
   }
 
-  // if (!profileData.authIsLoggedIn) {
-  //   dispatch(setAppLoadingAC(true))
-  // }
-
   return (
     <div className="formPage">
       <div className={'formContainer ' + s.profileContainer}>
         <img
           style={{ width: '100px', height: '100px', borderRadius: '50%', display: 'inline-block' }}
-          src={
-            profileData.user?.avatar
-              ? profileData.user.avatar
-              : 'https://www.gravatar.com/avatar/ca6f903ac1e11977898f9b0c9b3d5292.jpg?size=240&d=https%3A%2F%2Fwww.artstation.com%2Fassets%2Fdefault_avatar.jpg'
-          }
+          src={profileData.user?.avatar}
           alt="avatar"
         />
         {isNameChanging ? (

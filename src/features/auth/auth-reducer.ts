@@ -30,6 +30,11 @@ export const authReducer = (
     case 'auth/IS-REGISTERED':
       return { ...state, isRegistered: action.isRegistered }
     case 'auth/SET-USER':
+      if (!action.user.avatar) {
+        action.user.avatar =
+          'https://www.gravatar.com/avatar/ca6f903ac1e11977898f9b0c9b3d5292.jpg?size=240&d=https%3A%2F%2Fwww.artstation.com%2Fassets%2Fdefault_avatar.jpg'
+      }
+
       return { ...state, user: action.user }
     case 'auth/DELETE-USER':
       return { ...state, user: null }
