@@ -2,6 +2,8 @@ import React from 'react'
 
 import { Navigate, Route, Routes } from 'react-router-dom'
 
+import { Packs } from '../features/packs/packs/Packs'
+
 import { useAppSelector } from 'app/hooks'
 import { PageNotFound } from 'common/404/PageNotFound'
 import { ChangePassword } from 'features/auth/change-password/ChangePassword'
@@ -16,6 +18,7 @@ export const PATH = {
   PASSWORD_RECOVERY: '/password-recovery',
   CHANGE_PASSWORD: '/set-new-password/:token',
   PROFILE: '/profile',
+  PACKS: '/packs',
 }
 
 export const Pages = () => {
@@ -29,6 +32,7 @@ export const Pages = () => {
             <Route path={'/'} element={<Navigate to={PATH.PROFILE} />} />
             <Route path={PATH.LOGIN} element={<Navigate to={PATH.PROFILE} />} />
             <Route path={PATH.PROFILE} element={<Profile />} />
+            <Route path={PATH.PACKS} element={<Packs />} />
           </>
         ) : (
           <>
