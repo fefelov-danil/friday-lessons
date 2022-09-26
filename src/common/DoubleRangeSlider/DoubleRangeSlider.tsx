@@ -1,44 +1,48 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import s from './DoubleRangeSlider.module.css'
 
-export const DoubleRangeSlider = () => {
-  const min = 1
-  const max = 100
-  const [minVal, setMinVal] = useState(10)
-  const [maxVal, setMaxVal] = useState(60)
+type PropsType = {
+  min: number
+  max: number
+  minVal: number
+  maxVal: number
+  setMinVal: (min: number) => void
+  setMaxVal: (max: number) => void
+}
 
+export const DoubleRangeSlider = (props: PropsType) => {
   const sliderRangeStyle = {
-    left: `${(minVal / max) * 100}%`,
-    width: `${((max - (max - maxVal) - minVal) / max) * 100}%`,
+    left: `${(props.minVal / props.max) * 100}%`,
+    width: `${((props.max - (props.max - props.maxVal) - props.minVal) / props.max) * 100}%`,
   }
 
   return (
     <div className={s.sliderBlockContainer}>
-      <div>{minVal}</div>
+      <p className={s.sliderVal}>{props.minVal}</p>
       <div className={s.sliderContainer}>
         <input
           type="range"
-          min={min}
-          max={max}
-          value={minVal}
+          min={props.min}
+          max={props.max}
+          value={props.minVal}
           className={s.thumb + ' ' + s.thumbLeft}
           onChange={event => {
-            const value = Math.min(Number(event.target.value), maxVal - 1)
+            const value = Math.min(Number(event.target.value), props.maxVal - 1)
 
-            setMinVal(value)
+            props.setMinVal(value)
           }}
-          style={{ zIndex: minVal > max - 100 ? '5' : '' }}
+          style={{ zIndex: props.minVal > props.max - 100 ? '5' : '' }}
         />
         <input
           type="range"
-          min={min}
-          max={max}
-          value={maxVal}
+          min={props.min}
+          max={props.max}
+          value={props.maxVal}
           onChange={event => {
-            const value = Math.max(Number(event.target.value), minVal + 1)
+            const value = Math.max(Number(event.target.value), props.minVal + 1)
 
-            setMaxVal(value)
+            props.setMaxVal(value)
           }}
           className={s.thumb + ' ' + s.thumbRight}
         />
@@ -47,7 +51,7 @@ export const DoubleRangeSlider = () => {
           <div style={sliderRangeStyle} className={s.sliderRange} />
         </div>
       </div>
-      <div>{maxVal}</div>
+      <p className={s.sliderVal}>{props.maxVal}</p>
     </div>
   )
 }

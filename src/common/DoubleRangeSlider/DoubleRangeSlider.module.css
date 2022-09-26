@@ -30,13 +30,23 @@
 
     width: 100%;
 
-    background-color: #ced4da;
+    background-color: #c3c3c3;
 }
 
 .sliderRange {
     z-index: 2;
 
-    background-color: #9fe5e1;
+    background-color: #f8686e;
+}
+
+.sliderVal {
+    margin: 0;
+    padding: 5px 10px;
+
+    background: #fff;
+    border: 1px solid #a7a7a7;
+    border-radius: 5px;
+    box-shadow: 1px 1px 4px rgb(0 0 0 / 20%);
 }
 
 /* Removing the default appearance */
@@ -76,10 +86,9 @@
     height: 18px;
     margin-top: 4px;
 
-    background-color: #f1f5f7;
-    border: none;
+    background-color: #fff;
+    border: 3px solid #f82e34;
     border-radius: 50%;
-    box-shadow: 0 0 1px 1px #ced4da;
 }
 
 /* For Firefox browsers */
@@ -93,8 +102,7 @@
     height: 18px;
     margin-top: 4px;
 
-    background-color: #f1f5f7;
+    background-color: #fff;
     border: none;
     border-radius: 50%;
-    box-shadow: 0 0 1px 1px #ced4da;
 }
