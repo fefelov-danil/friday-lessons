@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios'
 import { Dispatch } from 'redux'
 
 import { appAlertAC, appSetLoadingAC, appSetStatusAC } from 'app/app-reducer'
@@ -9,7 +10,7 @@ import {
   loginValuesType,
   registrationValuesType,
 } from 'features/auth/auth-API'
-import { HandleServerError } from 'utils/error-utils'
+import { handleServerError } from 'utils/error-utils'
 
 const authInitialState = {
   isLoggedIn: false,
@@ -69,83 +70,76 @@ export const authDeleteUserAC = () =>
 
 // Thunks
 export const registrationTC =
-  (values: registrationValuesType) => (dispatch: Dispatch<AllActionsType>) => {
+  (values: registrationValuesType) => async (dispatch: Dispatch<AllActionsType>) => {
     dispatch(appSetStatusAC('loading'))
-    authAPI
-      .registration(values)
-      .then(res => {
-        dispatch(authIsRegisteredAC(true))
-        dispatch(appSetStatusAC('succeeded'))
-      })
-      .catch(err => {
-        if (err.response) {
-          HandleServerError(dispatch, err.response.data.error)
-        }
-      })
+    try {
+      await authAPI.registration(values)
+
+      dispatch(authIsRegisteredAC(true))
+      dispatch(appSetStatusAC('succeeded'))
+    } catch (e) {
+      const err = e as Error | AxiosError<{ error: string }>
+
+      handleServerError(err, dispatch)
+    }
   }
 
-export const loginTC = (values: loginValuesType) => (dispatch: Dispatch<AllActionsType>) => {
+export const loginTC = (values: loginValuesType) => async (dispatch: Dispatch<AllActionsType>) => {
   dispatch(appSetStatusAC('loading'))
-  authAPI
-    .login(values)
-    .then(res => {
-      dispatch(appSetStatusAC('succeeded'))
-      dispatch(authIsLoggedInAC(true))
-      dispatch(authUserAC(res.data))
-    })
-    .catch(err => {
-      if (err.response) {
-        HandleServerError(dispatch, err.response.data.error)
-      }
-    })
+  try {
+    const res = await authAPI.login(values)
+
+    dispatch(appSetStatusAC('succeeded'))
+    dispatch(authIsLoggedInAC(true))
+    dispatch(authUserAC(res.data))
+  } catch (e) {
+    const err = e as Error | AxiosError<{ error: string }>
+
+    handleServerError(err, dispatch)
+  }
 }
 
-export const isAuthLoadingTC = () => (dispatch: Dispatch<AllActionsType>) => {
-  authAPI
-    .authMe()
-    .then(res => {
-      dispatch(appSetLoadingAC(false))
-      dispatch(authIsLoggedInAC(true))
-      dispatch(authUserAC(res.data))
-    })
-    .catch(err => {
-      if (err.response) {
-        dispatch(appSetLoadingAC(false))
-      }
-    })
+export const isAuthLoadingTC = () => async (dispatch: Dispatch<AllActionsType>) => {
+  try {
+    const res = await authAPI.authMe()
+
+    dispatch(appSetLoadingAC(false))
+    dispatch(authIsLoggedInAC(true))
+    dispatch(authUserAC(res.data))
+  } catch (e) {
+    dispatch(appSetLoadingAC(false))
+  }
 }
 
 export const forgotPasswordTC =
-  (values: forgotPasswordValuesType) => (dispatch: Dispatch<AllActionsType>) => {
+  (values: forgotPasswordValuesType) => async (dispatch: Dispatch<AllActionsType>) => {
     dispatch(appSetStatusAC('loading'))
-    authAPI
-      .forgotPassword(values)
-      .then(res => {
-        dispatch(authCheckEmailRedirectAC(true))
-        dispatch(appSetStatusAC('succeeded'))
-      })
-      .catch(err => {
-        if (err.response) {
-          HandleServerError(dispatch, err.response.data.error)
-        }
-      })
+    try {
+      await authAPI.forgotPassword(values)
+
+      dispatch(authCheckEmailRedirectAC(true))
+      dispatch(appSetStatusAC('succeeded'))
+    } catch (e) {
+      const err = e as Error | AxiosError<{ error: string }>
+
+      handleServerError(err, dispatch)
+    }
   }
 
 export const changePasswordTC =
   (values: changePasswordType) => async (dispatch: Dispatch<AllActionsType>) => {
     dispatch(appSetStatusAC('loading'))
-    authAPI
-      .changePassword(values)
-      .then(res => {
-        dispatch(appSetStatusAC('succeeded'))
-        dispatch(authIsPasswordChangedAC(true))
-        dispatch(appAlertAC('Password successfully changed', 'success'))
-      })
-      .catch(err => {
-        if (err.response) {
-          HandleServerError(dispatch, err.response.data.error)
-        }
-      })
+    try {
+      await authAPI.changePassword(values)
+
+      dispatch(appSetStatusAC('succeeded'))
+      dispatch(authIsPasswordChangedAC(true))
+      dispatch(appAlertAC('Password successfully changed', 'success'))
+    } catch (e) {
+      const err = e as Error | AxiosError<{ error: string }>
+
+      handleServerError(err, dispatch)
+    }
   }
 
 export const logoutTC = () => async (dispatch: Dispatch<AllActionsType>) => {
@@ -156,12 +150,10 @@ export const logoutTC = () => async (dispatch: Dispatch<AllActionsType>) => {
     dispatch(authIsLoggedInAC(false))
     dispatch(authDeleteUserAC())
     dispatch(appSetStatusAC('succeeded'))
-  } catch (err) {
-    // @ts-ignore
-    if (err.response) {
-      // @ts-ignore
-      HandleServerError(dispatch, err.response.data.error)
-    }
+  } catch (e) {
+    const err = e as Error | AxiosError<{ error: string }>
+
+    handleServerError(err, dispatch)
   }
 }
 export const changeUsernameTC = (name: string) => async (dispatch: Dispatch<AllActionsType>) => {
@@ -172,12 +164,10 @@ export const changeUsernameTC = (name: string) => async (dispatch: Dispatch<AllA
     dispatch(authUserAC(res.data.updatedUser))
     dispatch(appSetStatusAC('succeeded'))
     dispatch(appAlertAC('Name successfully changed', 'success'))
-  } catch (err) {
-    // @ts-ignore
-    if (err.response) {
-      // @ts-ignore
-      HandleServerError(dispatch, err.response.data.error)
-    }
+  } catch (e) {
+    const err = e as Error | AxiosError<{ error: string }>
+
+    handleServerError(err, dispatch)
   }
 }
 
