@@ -1,14 +1,27 @@
+import { AxiosError } from 'axios'
+
+import { appSetStatusAC } from '../../app/app-reducer'
 import { AppThunk } from '../../app/store'
+import { handleServerError } from '../../utils/error-utils'
 
 import { packsAPI } from './packs-API'
 
 const packsInitialState = {
+  packsFetched: false,
   cardPacks: [] as PackType[],
+  cardPacksChanged: 0,
+  noResults: false,
   cardPacksTotalCount: 0,
+  minCardsCount: 0,
+  maxCardsCount: 10,
   filters: {
     page: 1,
     pageCount: 5,
     myPacks: '',
+    min: 0,
+    max: 10,
+    sortPacks: '0updated',
+    packName: '',
   },
 }
 
@@ -23,14 +36,30 @@ export const packsReducer = (
         cardPacks: action.cardPacks,
         cardPacksTotalCount: action.cardPacksTotalCount,
       }
+    case 'packs/SET-PACKS-FETCHED':
+      return { ...state, packsFetched: action.fetched }
+    case 'packs/SET-MIN-MAX-CARDS-COUNT':
+      return { ...state, minCardsCount: action.minCC, maxCardsCount: action.maxCC }
+    case 'packs/SET-NO-RESULTS':
+      return { ...state, noResults: action.noResults }
+    case 'packs/SET-CARDS-PACK-CHANGED':
+      return { ...state, cardPacksChanged: state.cardPacksChanged + 1 }
+
     case 'packs/SET-FILTERS':
       return { ...state, filters: action.filters }
+
     case 'packs/SET-PAGE':
       return { ...state, filters: { ...state.filters, page: action.page } }
     case 'packs/SET-MY-PACKS':
       return { ...state, filters: { ...state.filters, myPacks: action.myPacks } }
     case 'packs/SET-PAGE-COUNT':
       return { ...state, filters: { ...state.filters, pageCount: action.pageCount } }
+    case 'packs/SET-MIN-MAX':
+      return { ...state, filters: { ...state.filters, min: action.min, max: action.max } }
+    case 'packs/SET-SORT-PACKS':
+      return { ...state, filters: { ...state.filters, sortPacks: action.sortPacks } }
+    case 'packs/SET-PACK-NAME':
+      return { ...state, filters: { ...state.filters, packName: action.packName } }
     default:
       return state
   }
@@ -39,27 +68,148 @@ export const packsReducer = (
 //Actions
 export const setPacksAC = (cardPacks: PackType[], cardPacksTotalCount: number) =>
   ({ type: 'packs/SET-PACKS', cardPacks, cardPacksTotalCount } as const)
+export const setPacksFetchedAC = (fetched: boolean) =>
+  ({ type: 'packs/SET-PACKS-FETCHED', fetched } as const)
+export const setMinMaxCardsCountAC = (minCC: number, maxCC: number) =>
+  ({ type: 'packs/SET-MIN-MAX-CARDS-COUNT', minCC, maxCC } as const)
+export const setNoResultsAC = (noResults: boolean) =>
+  ({ type: 'packs/SET-NO-RESULTS', noResults } as const)
+export const setCardPacksChangedAC = () => ({ type: 'packs/SET-CARDS-PACK-CHANGED' } as const)
+
 export const setFiltersAC = (filters: typeof packsInitialState.filters) =>
   ({ type: 'packs/SET-FILTERS', filters } as const)
+
 export const setPageAC = (page: number) => ({ type: 'packs/SET-PAGE', page } as const)
 export const setMyPacksAC = (myPacks: string) => ({ type: 'packs/SET-MY-PACKS', myPacks } as const)
 export const setPageCountAC = (pageCount: number) =>
   ({ type: 'packs/SET-PAGE-COUNT', pageCount } as const)
+export const setMinMaxAC = (min: number, max: number) =>
+  ({ type: 'packs/SET-MIN-MAX', min, max } as const)
+export const setSortPacksAC = (sortPacks: string) =>
+  ({ type: 'packs/SET-SORT-PACKS', sortPacks } as const)
+export const setPackNameAC = (packName: string) =>
+  ({ type: 'packs/SET-PACK-NAME', packName } as const)
 
 //Thunks
+export const fetchPacksTC =
+  (setInitialValues: (min: number, max: number, searchValue: string) => void): AppThunk =>
+  async dispatch => {
+    try {
+      const res = await packsAPI.getPacks('')
+
+      const initialFiltersFromSS = sessionStorage.getItem('filters')
+
+      if (initialFiltersFromSS) {
+        const parsedInitialFiltersFromSS = JSON.parse(initialFiltersFromSS)
+
+        setInitialValues(
+          parsedInitialFiltersFromSS.min,
+          parsedInitialFiltersFromSS.max,
+          parsedInitialFiltersFromSS.packName
+        )
+        dispatch(setFiltersAC(parsedInitialFiltersFromSS))
+      } else {
+        setInitialValues(res.data.minCardsCount, res.data.maxCardsCount, '')
+        dispatch(setMinMaxAC(res.data.minCardsCount, res.data.maxCardsCount))
+      }
+
+      dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
+      dispatch(setPacksFetchedAC(true))
+      dispatch(appSetStatusAC('succeeded'))
+    } catch (e) {
+      const err = e as Error | AxiosError<{ error: string }>
+
+      dispatch(appSetStatusAC('failed'))
+      handleServerError(err, dispatch)
+    }
+  }
 export const getPacksTC =
-  (filters: typeof packsInitialState.filters): AppThunk =>
+  (
+    filters: typeof packsInitialState.filters,
+    setInitialValues: (min: number, max: number, searchValue: string) => void
+  ): AppThunk =>
   async dispatch => {
     try {
       const res = await packsAPI.getPacks(
-        `?page=${filters.page}&user_id=${filters.myPacks}&pageCount=${filters.pageCount}`
+        `?page=${filters.page}&user_id=${filters.myPacks}&pageCount=${filters.pageCount}&min=${filters.min}&max=${filters.max}&sortPacks=${filters.sortPacks}&packName=${filters.packName}`
       )
+
+      if (res.data.cardPacks.length === 0) {
+        dispatch(setNoResultsAC(true))
+      } else {
+        dispatch(setNoResultsAC(false))
+      }
+      console.log(res.data.maxCardsCount, filters.max)
+      if (res.data.minCardsCount > filters.min && res.data.maxCardsCount < filters.max) {
+        setInitialValues(res.data.minCardsCount, res.data.maxCardsCount, filters.packName)
+        dispatch(setMinMaxAC(res.data.minCardsCount, res.data.maxCardsCount))
+      } else if (res.data.minCardsCount > filters.min) {
+        setInitialValues(res.data.minCardsCount, filters.max, filters.packName)
+        dispatch(setMinMaxAC(res.data.minCardsCount, filters.max))
+      } else if (res.data.maxCardsCount < filters.max) {
+        console.log(1)
+        setInitialValues(filters.min, res.data.maxCardsCount, filters.packName)
+        dispatch(setMinMaxAC(filters.min, res.data.maxCardsCount))
+      } else if (res.data.maxCardsCount !== 0 && filters.max === 0) {
+        setInitialValues(filters.min, res.data.maxCardsCount, filters.packName)
+        dispatch(setMinMaxAC(filters.min, res.data.maxCardsCount))
+      }
 
       sessionStorage.setItem('filters', JSON.stringify(filters))
 
       dispatch(setPacksAC(res.data.cardPacks, res.data.cardPacksTotalCount))
-    } catch (err) {
-      console.log(err)
+      dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
+      dispatch(appSetStatusAC('succeeded'))
+    } catch (e) {
+      const err = e as Error | AxiosError<{ error: string }>
+
+      dispatch(appSetStatusAC('failed'))
+      handleServerError(err, dispatch)
+    }
+  }
+export const addPackTC =
+  (name: string, privatePack: boolean): AppThunk =>
+  async dispatch => {
+    try {
+      await packsAPI.createPack(name, '', privatePack)
+
+      dispatch(setCardPacksChangedAC())
+      dispatch(appSetStatusAC('succeeded'))
+    } catch (e) {
+      const err = e as Error | AxiosError<{ error: string }>
+
+      dispatch(appSetStatusAC('failed'))
+      handleServerError(err, dispatch)
+    }
+  }
+export const deletePackTC =
+  (id: string): AppThunk =>
+  async dispatch => {
+    try {
+      await packsAPI.deletePack(id)
+
+      dispatch(setCardPacksChangedAC())
+      dispatch(appSetStatusAC('succeeded'))
+    } catch (e) {
+      const err = e as Error | AxiosError<{ error: string }>
+
+      dispatch(appSetStatusAC('failed'))
+      handleServerError(err, dispatch)
+    }
+  }
+export const updatePackTC =
+  (id: string): AppThunk =>
+  async dispatch => {
+    try {
+      await packsAPI.changePack(id, 'changed hardcoded name', '', true)
+
+      dispatch(setCardPacksChangedAC())
+      dispatch(appSetStatusAC('succeeded'))
+    } catch (e) {
+      const err = e as Error | AxiosError<{ error: string }>
+
+      dispatch(appSetStatusAC('failed'))
+      handleServerError(err, dispatch)
     }
   }
 
@@ -84,7 +234,14 @@ export type PackType = {
 type PacksInitialStateType = typeof packsInitialState
 export type PacksActionsType =
   | ReturnType<typeof setPacksAC>
+  | ReturnType<typeof setPacksFetchedAC>
   | ReturnType<typeof setPageAC>
   | ReturnType<typeof setMyPacksAC>
   | ReturnType<typeof setPageCountAC>
   | ReturnType<typeof setFiltersAC>
+  | ReturnType<typeof setMinMaxCardsCountAC>
+  | ReturnType<typeof setMinMaxAC>
+  | ReturnType<typeof setSortPacksAC>
+  | ReturnType<typeof setPackNameAC>
+  | ReturnType<typeof setNoResultsAC>
+  | ReturnType<typeof setCardPacksChangedAC>
