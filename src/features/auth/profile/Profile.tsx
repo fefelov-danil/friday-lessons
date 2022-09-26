@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
 
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft'
+import { NavLink } from 'react-router-dom'
+
 import { changeUsernameTC, logoutTC } from '../auth-reducer'
 
 import s from './Profile.module.css'
@@ -23,7 +26,7 @@ export const Profile = () => {
     if (newName.trim().length === 0) {
       dispatch(appAlertAC('Name is required!', 'error'))
     } else {
-      dispatch(changeUsernameTC(newName))
+      dispatch(changeUsernameTC(newName.trim()))
     }
     setIsNameChanging(false)
   }
@@ -45,6 +48,10 @@ export const Profile = () => {
   return (
     <div className="formPage">
       <div className={'formContainer ' + s.profileContainer}>
+        <NavLink className={s.linkToPacks} to={'/packs'}>
+          <KeyboardDoubleArrowLeftIcon />
+          back to packs
+        </NavLink>
         <img
           style={{ width: '100px', height: '100px', borderRadius: '50%', display: 'inline-block' }}
           src={profileData.user?.avatar}
