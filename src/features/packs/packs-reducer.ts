@@ -139,7 +139,6 @@ export const getPacksTC =
       } else {
         dispatch(setNoResultsAC(false))
       }
-      console.log(res.data.maxCardsCount, filters.max)
       if (res.data.minCardsCount > filters.min && res.data.maxCardsCount < filters.max) {
         setInitialValues(res.data.minCardsCount, res.data.maxCardsCount, filters.packName)
         dispatch(setMinMaxAC(res.data.minCardsCount, res.data.maxCardsCount))
