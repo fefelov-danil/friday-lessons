@@ -1,10 +1,10 @@
 import { AxiosError } from 'axios'
 
-import { appSetStatusAC } from '../../app/app-reducer'
-import { AppThunk } from '../../app/store'
-import { handleServerError } from '../../utils/error-utils'
-
 import { packsAPI } from './packs-API'
+
+import { appSetStatusAC } from 'app/app-reducer'
+import { AppThunk } from 'app/store'
+import { handleServerError } from 'utils/error-utils'
 
 const packsInitialState = {
   packsFetched: false,
@@ -20,8 +20,8 @@ const packsInitialState = {
     myPacks: '',
     min: 0,
     max: 10,
-    sortPacks: '0updated',
-    packName: '',
+    sortPacks: '',
+    searchValue: '',
   },
 }
 
@@ -58,8 +58,8 @@ export const packsReducer = (
       return { ...state, filters: { ...state.filters, min: action.min, max: action.max } }
     case 'packs/SET-SORT-PACKS':
       return { ...state, filters: { ...state.filters, sortPacks: action.sortPacks } }
-    case 'packs/SET-PACK-NAME':
-      return { ...state, filters: { ...state.filters, packName: action.packName } }
+    case 'packs/SET-SEARCH-VALUE':
+      return { ...state, filters: { ...state.filters, searchValue: action.searchValue } }
     default:
       return state
   }
@@ -87,8 +87,8 @@ export const setMinMaxAC = (min: number, max: number) =>
   ({ type: 'packs/SET-MIN-MAX', min, max } as const)
 export const setSortPacksAC = (sortPacks: string) =>
   ({ type: 'packs/SET-SORT-PACKS', sortPacks } as const)
-export const setPackNameAC = (packName: string) =>
-  ({ type: 'packs/SET-PACK-NAME', packName } as const)
+export const setSearchValueAC = (searchValue: string) =>
+  ({ type: 'packs/SET-SEARCH-VALUE', searchValue } as const)
 
 //Thunks
 export const fetchPacksTC =
@@ -105,7 +105,7 @@ export const fetchPacksTC =
         setInitialValues(
           parsedInitialFiltersFromSS.min,
           parsedInitialFiltersFromSS.max,
-          parsedInitialFiltersFromSS.packName
+          parsedInitialFiltersFromSS.searchValue
         )
         dispatch(setFiltersAC(parsedInitialFiltersFromSS))
       } else {
@@ -131,7 +131,7 @@ export const getPacksTC =
   async dispatch => {
     try {
       const res = await packsAPI.getPacks(
-        `?page=${filters.page}&user_id=${filters.myPacks}&pageCount=${filters.pageCount}&min=${filters.min}&max=${filters.max}&sortPacks=${filters.sortPacks}&packName=${filters.packName}`
+        `?page=${filters.page}&user_id=${filters.myPacks}&pageCount=${filters.pageCount}&min=${filters.min}&max=${filters.max}&sortPacks=${filters.sortPacks}&packName=${filters.searchValue}`
       )
 
       if (res.data.cardPacks.length === 0) {
@@ -139,25 +139,13 @@ export const getPacksTC =
       } else {
         dispatch(setNoResultsAC(false))
       }
-      if (res.data.minCardsCount > filters.min && res.data.maxCardsCount < filters.max) {
-        setInitialValues(res.data.minCardsCount, res.data.maxCardsCount, filters.packName)
-        dispatch(setMinMaxAC(res.data.minCardsCount, res.data.maxCardsCount))
-      } else if (res.data.minCardsCount > filters.min) {
-        setInitialValues(res.data.minCardsCount, filters.max, filters.packName)
-        dispatch(setMinMaxAC(res.data.minCardsCount, filters.max))
-      } else if (res.data.maxCardsCount < filters.max) {
-        console.log(1)
-        setInitialValues(filters.min, res.data.maxCardsCount, filters.packName)
-        dispatch(setMinMaxAC(filters.min, res.data.maxCardsCount))
-      } else if (res.data.maxCardsCount !== 0 && filters.max === 0) {
-        setInitialValues(filters.min, res.data.maxCardsCount, filters.packName)
-        dispatch(setMinMaxAC(filters.min, res.data.maxCardsCount))
-      }
 
       sessionStorage.setItem('filters', JSON.stringify(filters))
 
       dispatch(setPacksAC(res.data.cardPacks, res.data.cardPacksTotalCount))
-      dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
+      if (res.data.minCardsCount !== 0 && res.data.maxCardsCount !== 0) {
+        dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
+      }
       dispatch(appSetStatusAC('succeeded'))
     } catch (e) {
       const err = e as Error | AxiosError<{ error: string }>
@@ -241,6 +229,6 @@ export type PacksActionsType =
   | ReturnType<typeof setMinMaxCardsCountAC>
   | ReturnType<typeof setMinMaxAC>
   | ReturnType<typeof setSortPacksAC>
-  | ReturnType<typeof setPackNameAC>
+  | ReturnType<typeof setSearchValueAC>
   | ReturnType<typeof setNoResultsAC>
   | ReturnType<typeof setCardPacksChangedAC>
