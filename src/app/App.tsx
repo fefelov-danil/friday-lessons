@@ -17,8 +17,8 @@ const App = () => {
   const isAuthLoading = useAppSelector(state => state.app.appIsLoading)
 
   useEffect(() => {
-    isAuthLoading && dispatch(isAuthLoadingTC())
-  }, [isAuthLoading])
+    dispatch(isAuthLoadingTC())
+  }, [])
 
   return (
     <div className="App">
