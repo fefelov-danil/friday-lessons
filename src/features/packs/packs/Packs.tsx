@@ -9,13 +9,6 @@ import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import SchoolIcon from '@mui/icons-material/School'
 import Pagination from '@mui/material/Pagination'
 
-import { appSetStatusAC } from '../../../app/app-reducer'
-import { useAppDispatch, useAppSelector, useDebounce } from '../../../app/hooks'
-import { Button } from '../../../common/button/Button'
-import { DoubleRangeSlider } from '../../../common/DoubleRangeSlider/DoubleRangeSlider'
-import { InputText } from '../../../common/inputText/InputText'
-import { SelectNumber } from '../../../common/select/SelectNumber'
-import { ToggleSwitch } from '../../../common/toggleSwitch/ToggleSwitch'
 import {
   addPackTC,
   deletePackTC,
@@ -24,7 +17,7 @@ import {
   setFiltersAC,
   setMinMaxAC,
   setMyPacksAC,
-  setPackNameAC,
+  setSearchValueAC,
   setPacksAC,
   setPageAC,
   setPageCountAC,
@@ -34,17 +27,25 @@ import {
 
 import s from './Packs.module.css'
 
+import { appSetStatusAC } from 'app/app-reducer'
+import { useAppDispatch, useAppSelector, useDebounce } from 'app/hooks'
+import { Button } from 'common/button/Button'
+import { DoubleRangeSlider } from 'common/DoubleRangeSlider/DoubleRangeSlider'
+import { InputText } from 'common/inputText/InputText'
+import { SelectNumber } from 'common/select/SelectNumber'
+import { ToggleSwitch } from 'common/toggleSwitch/ToggleSwitch'
+
 export const Packs = () => {
   const dispatch = useAppDispatch()
   const userId = useAppSelector(state => state.auth.user?._id)
-  const isLoading = useAppSelector(state => state.app.appStatus) === 'loading'
+  const isLoading = 'loading' === useAppSelector(state => state.app.appStatus)
   const PacksData = useAppSelector(state => state.packs)
   const filters = PacksData.filters
 
   const pagesAmount = Math.ceil(PacksData.cardPacksTotalCount / filters.pageCount)
 
-  const [searchValue, setSearchValue] = useState('')
-  const searchDebValue = useDebounce(searchValue, 500)
+  const [searchLocalVal, setSearchLocalVal] = useState('')
+  const searchDebVal = useDebounce(searchLocalVal, 500)
 
   const [minLocalVal, setMinLocalVal] = useState(filters.min)
   const [maxLocalVal, setMaxLocalVal] = useState(filters.max)
@@ -54,14 +55,12 @@ export const Packs = () => {
   const setInitialValues = (min: number, max: number, searchValue: string) => {
     setMinLocalVal(min)
     setMaxLocalVal(max)
-    setSearchValue(searchValue)
+    setSearchLocalVal(searchValue)
   }
 
   useEffect(() => {
-    if (!PacksData.packsFetched) {
-      dispatch(appSetStatusAC('loading'))
-      dispatch(fetchPacksTC(setInitialValues))
-    }
+    dispatch(appSetStatusAC('loading'))
+    dispatch(fetchPacksTC(setInitialValues))
   }, [])
   useEffect(() => {
     if (PacksData.packsFetched) {
@@ -78,7 +77,7 @@ export const Packs = () => {
     filters.min,
     filters.max,
     filters.sortPacks,
-    filters.packName,
+    filters.searchValue,
   ])
   useEffect(() => {
     dispatch(setPageAC(1))
@@ -90,8 +89,8 @@ export const Packs = () => {
   }, [maxDebVal])
   useEffect(() => {
     dispatch(setPageAC(1))
-    dispatch(setPackNameAC(searchValue))
-  }, [searchDebValue])
+    dispatch(setSearchValueAC(searchLocalVal))
+  }, [searchDebVal])
 
   const onAddPackHandler = () => {
     dispatch(appSetStatusAC('loading'))
@@ -136,7 +135,7 @@ export const Packs = () => {
       min: PacksData.minCardsCount,
       max: PacksData.maxCardsCount,
       sortPacks: '',
-      packName: '',
+      searchValue: '',
     }
 
     setInitialValues(PacksData.minCardsCount, PacksData.maxCardsCount, '')
@@ -162,8 +161,8 @@ export const Packs = () => {
         <div className={s.filters}>
           <InputText
             placeholder="Enter pack name"
-            value={searchValue}
-            onChange={e => !isLoading && setSearchValue(e.currentTarget.value)}
+            value={searchLocalVal}
+            onChange={e => !isLoading && setSearchLocalVal(e.currentTarget.value)}
           />
           <div className={s.allOrMyPacks}>
             Packs:
@@ -194,51 +193,57 @@ export const Packs = () => {
           </Button>
         </div>
         <table className={s.packsTable}>
-          <tr>
-            <th>Pack name</th>
-            <th>
-              <p className={s.sort} onClick={() => !isLoading && onSortChangeHandler('cardsCount')}>
-                Cards
-                {(filters.sortPacks === '0cardsCount' || filters.sortPacks === '1cardsCount') &&
-                  sortIcon}
-              </p>
-            </th>
-            <th>
-              <p className={s.sort} onClick={() => !isLoading && onSortChangeHandler('updated')}>
-                Updated
-                {(filters.sortPacks === '0updated' || filters.sortPacks === '1updated') && sortIcon}
-              </p>
-            </th>
-            <th>Creator</th>
-            <th>Actions</th>
-          </tr>
-          {PacksData.cardPacks.map(p => {
-            return (
-              <tr key={p._id}>
-                <td>{p.name}</td>
-                <td>{p.cardsCount}</td>
-                <td>{p.updated}</td>
-                <td>{p.user_name}</td>
-                <td>
-                  <div className={s.actionsContainer}>
-                    <SchoolIcon className={s.action} />
-                    {p.user_id === userId && (
-                      <>
-                        <EditIcon
-                          className={s.action}
-                          onClick={() => isLoading && onUpdatePackHandler(p._id)}
-                        />
-                        <DeleteIcon
-                          className={s.action}
-                          onClick={() => isLoading && onDeletePackHandler(p._id)}
-                        />
-                      </>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            )
-          })}
+          <tbody>
+            <tr>
+              <th>Pack name</th>
+              <th>
+                <p
+                  className={s.sort}
+                  onClick={() => !isLoading && onSortChangeHandler('cardsCount')}
+                >
+                  Cards
+                  {(filters.sortPacks === '0cardsCount' || filters.sortPacks === '1cardsCount') &&
+                    sortIcon}
+                </p>
+              </th>
+              <th>
+                <p className={s.sort} onClick={() => !isLoading && onSortChangeHandler('updated')}>
+                  Updated
+                  {(filters.sortPacks === '0updated' || filters.sortPacks === '1updated') &&
+                    sortIcon}
+                </p>
+              </th>
+              <th>Creator</th>
+              <th>Actions</th>
+            </tr>
+            {PacksData.cardPacks.map(p => {
+              return (
+                <tr key={p._id}>
+                  <td>{p.name}</td>
+                  <td>{p.cardsCount}</td>
+                  <td>{p.updated}</td>
+                  <td>{p.user_name}</td>
+                  <td>
+                    <div className={s.actionsContainer}>
+                      <SchoolIcon className={s.action} />
+                      {p.user_id === userId && (
+                        <>
+                          <EditIcon
+                            className={s.action}
+                            onClick={() => isLoading && onUpdatePackHandler(p._id)}
+                          />
+                          <DeleteIcon
+                            className={s.action}
+                            onClick={() => isLoading && onDeletePackHandler(p._id)}
+                          />
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
         </table>
         {PacksData.noResults && <div className={s.noResults}>No results, try other filters</div>}
         <div className={s.pagination}>
