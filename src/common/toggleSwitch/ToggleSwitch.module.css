@@ -1,0 +1,23 @@
+.toggleSwitch {
+    display: flex;
+
+    font-family: "OpenSans", sans-serif;
+    font-size: 16px;
+    color: #333;
+
+    background: #fff;
+    border: 1px solid #a7a7a7;
+    border-radius: 5px;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.param {
+    padding: 5px 15px;
+
+    transition: 0.2s;
+}
+
+.active {
+    background: #f8686e;
+    border-radius: 5px;
+}
