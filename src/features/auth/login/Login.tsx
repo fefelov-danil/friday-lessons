@@ -38,8 +38,8 @@ export const Login = () => {
 
       if (!values.password) {
         errors.password = 'required'
-      } else if (values.password.length < 3) {
-        errors.password = 'Пароль должен быть длиннее 2х символов'
+      } else if (values.password.length < 8) {
+        errors.password = 'Password not valid! must be more than 7 characters'
       }
 
       return errors
@@ -72,7 +72,9 @@ export const Login = () => {
             <Checkbox {...formik.getFieldProps('rememberMe')}>Remember me</Checkbox>
           </label>
           <p className={s.forgotPassword}>
-            <NavLink to={'/password-recovery'}>Forgot Password?</NavLink>
+            <NavLink to={'/password-recovery'} className={s.forgotPasswordLink}>
+              Forgot Password?
+            </NavLink>
           </p>
           <Button type={'submit'} className={s.signInBtn}>
             Sign In

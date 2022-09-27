@@ -1,88 +1,102 @@
 import { Dispatch } from 'redux'
 
-import { setAppAuthLoadingAC, setAppErrorAC, setAppStatusAC } from 'app/app-reducer'
+import { appAlertAC, appSetLoadingAC, appSetStatusAC } from 'app/app-reducer'
 import { AllActionsType } from 'app/store'
 import {
   authAPI,
   changePasswordType,
   forgotPasswordValuesType,
   loginValuesType,
+  registrationValuesType,
 } from 'features/auth/auth-API'
+import { HandleServerError } from 'utils/error-utils'
 
-const initialState = {
-  isVerifyLogin: false,
+const authInitialState = {
+  isLoggedIn: false,
   checkEmailRedirect: false,
-  isInitialized: false,
-  isRegistered: false,
-  errorMessage: '',
   isPasswordChanged: false,
+  isRegistered: false,
+  changePassword: null as null | changePasswordType,
+  user: null as null | UserType,
 }
 
 export const authReducer = (
-  state: AuthStateType = initialState,
+  state: AuthStateType = authInitialState,
   action: AuthActionsType
 ): AuthStateType => {
   switch (action.type) {
-    case 'login/VERIFY-LOGIN':
-      return { ...state, isVerifyLogin: action.isVerifyLogin }
-    case 'login/USER':
-      return { ...state, user: action.user }
-    case 'login/DELETE-USER': {
-      const stateCopy = { ...state }
-
-      delete stateCopy.user
-
-      return stateCopy
-    }
-    case 'login/CHECK-EMAIL-REDIRECT':
-      return { ...state, checkEmailRedirect: action.redirect }
-    case 'login/CHANGE-PASSWORD':
-      return { ...state, changePassword: action.forResetPass }
-    case 'login/IS-PASSWORD-CHANGED':
-      return { ...state, isPasswordChanged: action.isPasswordChanged }
-    case 'SET-IS-REGISTERED':
+    case 'auth/VERIFY-LOGIN':
+      return { ...state, isLoggedIn: action.isLoggedIn }
+    case 'auth/IS-REGISTERED':
       return { ...state, isRegistered: action.isRegistered }
-    case 'ERROR':
-      return { ...state, errorMessage: action.errorMessage }
+    case 'auth/SET-USER':
+      if (!action.user.avatar) {
+        action.user.avatar =
+          'https://www.gravatar.com/avatar/ca6f903ac1e11977898f9b0c9b3d5292.jpg?size=240&d=https%3A%2F%2Fwww.artstation.com%2Fassets%2Fdefault_avatar.jpg'
+      }
+
+      return { ...state, user: action.user }
+    case 'auth/DELETE-USER':
+      return { ...state, user: null }
+    case 'auth/CHECK-EMAIL-REDIRECT':
+      return { ...state, checkEmailRedirect: action.checkEmailRedirect }
+    case 'auth/CHANGE-PASSWORD':
+      return { ...state, changePassword: action.changePassword }
+    case 'auth/IS-PASSWORD-CHANGED':
+      return { ...state, isPasswordChanged: action.isPasswordChanged }
+
     default:
       return state
   }
 }
 
 // Actions
-export const verifyLoginAC = (isVerifyLogin: boolean) =>
-  ({ type: 'login/VERIFY-LOGIN', isVerifyLogin } as const)
-export const userAC = (user: UserType) => ({ type: 'login/USER', user } as const)
-export const checkEmailRedirectAC = (redirect: boolean) =>
-  ({ type: 'login/CHECK-EMAIL-REDIRECT', redirect } as const)
-export const changePasswordAC = (forResetPass: changePasswordType) =>
-  ({ type: 'login/CHANGE-PASSWORD', forResetPass } as const)
-export const isPasswordChangedAC = (isPasswordChanged: boolean) =>
-  ({ type: 'login/IS-PASSWORD-CHANGED', isPasswordChanged } as const)
-export const deleteUserAC = () =>
+export const authIsLoggedInAC = (isLoggedIn: boolean) =>
+  ({ type: 'auth/VERIFY-LOGIN', isLoggedIn } as const)
+export const authIsRegisteredAC = (isRegistered: boolean) =>
+  ({ type: 'auth/IS-REGISTERED', isRegistered } as const)
+export const authUserAC = (user: UserType) => ({ type: 'auth/SET-USER', user } as const)
+export const authCheckEmailRedirectAC = (checkEmailRedirect: boolean) =>
+  ({ type: 'auth/CHECK-EMAIL-REDIRECT', checkEmailRedirect } as const)
+export const authChangePasswordAC = (changePassword: changePasswordType) =>
+  ({ type: 'auth/CHANGE-PASSWORD', changePassword } as const)
+export const authIsPasswordChangedAC = (isPasswordChanged: boolean) =>
+  ({ type: 'auth/IS-PASSWORD-CHANGED', isPasswordChanged } as const)
+export const authDeleteUserAC = () =>
   ({
-    type: 'login/DELETE-USER',
+    type: 'auth/DELETE-USER',
   } as const)
-export const setSuccesRegistration = (isRegistered: boolean) =>
-  ({ type: 'SET-IS-REGISTERED', isRegistered } as const)
-export const setErrorMessage = (errorMessage: string) => ({ type: 'ERROR', errorMessage } as const)
 
 // Thunks
+export const registrationTC =
+  (values: registrationValuesType) => (dispatch: Dispatch<AllActionsType>) => {
+    dispatch(appSetStatusAC('loading'))
+    authAPI
+      .registration(values)
+      .then(res => {
+        dispatch(authIsRegisteredAC(true))
+        dispatch(appSetStatusAC('succeeded'))
+      })
+      .catch(err => {
+        if (err.response) {
+          HandleServerError(dispatch, err.response.data.error)
+        }
+      })
+  }
+
 export const loginTC = (values: loginValuesType) => (dispatch: Dispatch<AllActionsType>) => {
-  dispatch(setAppStatusAC('loading'))
+  dispatch(appSetStatusAC('loading'))
   authAPI
     .login(values)
     .then(res => {
-      dispatch(setAppStatusAC('succeeded'))
-      // dispatch(loginAC(true))
-      dispatch(verifyLoginAC(true))
-      // dispatch(setIsLoggedInAC(true))
-      dispatch(userAC(res.data))
+      dispatch(appSetStatusAC('succeeded'))
+      dispatch(authIsLoggedInAC(true))
+      dispatch(authUserAC(res.data))
     })
     .catch(err => {
-      dispatch(setAppStatusAC('failed'))
-      dispatch(setAppErrorAC(err.message))
-      // dispatch(setIsLoggedInAC(false))
+      if (err.response) {
+        HandleServerError(dispatch, err.response.data.error)
+      }
     })
 }
 
@@ -90,106 +104,86 @@ export const isAuthLoadingTC = () => (dispatch: Dispatch<AllActionsType>) => {
   authAPI
     .authMe()
     .then(res => {
-      dispatch(setAppAuthLoadingAC(false))
-      dispatch(verifyLoginAC(true))
-      dispatch(userAC(res.data))
+      dispatch(appSetLoadingAC(false))
+      dispatch(authIsLoggedInAC(true))
+      dispatch(authUserAC(res.data))
     })
     .catch(err => {
-      dispatch(setAppAuthLoadingAC(false))
-      // dispatch(loginAC(false))
+      if (err.response) {
+        dispatch(appSetLoadingAC(false))
+      }
     })
 }
 
 export const forgotPasswordTC =
   (values: forgotPasswordValuesType) => (dispatch: Dispatch<AllActionsType>) => {
-    dispatch(setAppStatusAC('loading'))
-    authAPI.forgotPassword(values).then(res => {
-      dispatch(checkEmailRedirectAC(true))
-      dispatch(setAppStatusAC('succeeded'))
-    })
+    dispatch(appSetStatusAC('loading'))
+    authAPI
+      .forgotPassword(values)
+      .then(res => {
+        dispatch(authCheckEmailRedirectAC(true))
+        dispatch(appSetStatusAC('succeeded'))
+      })
+      .catch(err => {
+        if (err.response) {
+          HandleServerError(dispatch, err.response.data.error)
+        }
+      })
   }
 
 export const changePasswordTC =
   (values: changePasswordType) => async (dispatch: Dispatch<AllActionsType>) => {
-    dispatch(setAppStatusAC('loading'))
+    dispatch(appSetStatusAC('loading'))
     authAPI
       .changePassword(values)
       .then(res => {
-        dispatch(setAppStatusAC('succeeded'))
-        dispatch(isPasswordChangedAC(true))
+        dispatch(appSetStatusAC('succeeded'))
+        dispatch(authIsPasswordChangedAC(true))
+        dispatch(appAlertAC('Password successfully changed', 'success'))
       })
       .catch(err => {
-        console.log(err)
-        dispatch(setAppErrorAC(err.message))
-        dispatch(setAppStatusAC('failed'))
+        if (err.response) {
+          HandleServerError(dispatch, err.response.data.error)
+        }
       })
   }
 
-// export const initializeAppTC = () => async (dispatch: Dispatch<AllActionsType>) => {
-//   dispatch(setAppStatusAC('loading'))
-//   try {
-//     const res = await authAPI.me()
-//
-//     dispatch(setIsInitializedAC(true))
-//     // dispatch(setIsLoggedInAC(true))
-//     dispatch(userAC(res.data))
-//     dispatch(setAppStatusAC('succeeded'))
-//   } catch (err) {
-//     dispatch(setIsInitializedAC(true))
-//     // dispatch(setIsLoggedInAC(false))
-//     dispatch(setAppStatusAC('failed'))
-//   }
-// }
-
 export const logoutTC = () => async (dispatch: Dispatch<AllActionsType>) => {
-  dispatch(setAppStatusAC('loading'))
+  dispatch(appSetStatusAC('loading'))
   try {
     await authAPI.logout()
 
-    dispatch(verifyLoginAC(false))
-    // dispatch(setIsLoggedInAC(false))
-    dispatch(deleteUserAC())
-    dispatch(setAppStatusAC('succeeded'))
+    dispatch(authIsLoggedInAC(false))
+    dispatch(authDeleteUserAC())
+    dispatch(appSetStatusAC('succeeded'))
   } catch (err) {
-    console.log(err)
-    dispatch(setAppStatusAC('failed'))
+    // @ts-ignore
+    if (err.response) {
+      // @ts-ignore
+      HandleServerError(dispatch, err.response.data.error)
+    }
   }
 }
 export const changeUsernameTC = (name: string) => async (dispatch: Dispatch<AllActionsType>) => {
-  dispatch(setAppStatusAC('loading'))
+  dispatch(appSetStatusAC('loading'))
   try {
     const res = await authAPI.changeUsername(name)
 
-    dispatch(userAC(res.data.updatedUser))
-    dispatch(setAppStatusAC('succeeded'))
+    dispatch(authUserAC(res.data.updatedUser))
+    dispatch(appSetStatusAC('succeeded'))
+    dispatch(appAlertAC('Name successfully changed', 'success'))
   } catch (err) {
-    console.log(err)
-    dispatch(setAppStatusAC('failed'))
+    // @ts-ignore
+    if (err.response) {
+      // @ts-ignore
+      HandleServerError(dispatch, err.response.data.error)
+    }
   }
-}
-export const signUpTC = (email: string, password: string) => (dispatch: any) => {
-  authAPI
-    .signUp(email, password)
-    .then(res => {
-      dispatch(setSuccesRegistration(true))
-    })
-    .catch(err => {
-      dispatch(setErrorMessage(err.response.data.error))
-    })
-    .finally(() => {})
 }
 
 // Types
-export type AuthStateType = {
-  isVerifyLogin: boolean
-  checkEmailRedirect: boolean
-  changePassword?: changePasswordType
-  isPasswordChanged: boolean
-  user?: UserType
-  isInitialized: boolean
-  isRegistered: boolean
-  errorMessage: string
-}
+type AuthStateType = typeof authInitialState
+
 export type UserType = {
   avatar: string
   created: string
@@ -207,11 +201,10 @@ export type UserType = {
 }
 
 export type AuthActionsType =
-  | ReturnType<typeof verifyLoginAC>
-  | ReturnType<typeof userAC>
-  | ReturnType<typeof checkEmailRedirectAC>
-  | ReturnType<typeof changePasswordAC>
-  | ReturnType<typeof isPasswordChangedAC>
-  | ReturnType<typeof deleteUserAC>
-  | ReturnType<typeof setSuccesRegistration>
-  | ReturnType<typeof setErrorMessage>
+  | ReturnType<typeof authIsLoggedInAC>
+  | ReturnType<typeof authIsRegisteredAC>
+  | ReturnType<typeof authUserAC>
+  | ReturnType<typeof authCheckEmailRedirectAC>
+  | ReturnType<typeof authChangePasswordAC>
+  | ReturnType<typeof authIsPasswordChangedAC>
+  | ReturnType<typeof authDeleteUserAC>

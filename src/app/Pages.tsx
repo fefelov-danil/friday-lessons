@@ -19,12 +19,12 @@ export const PATH = {
 }
 
 export const Pages = () => {
-  const isVerifyLogin = useAppSelector(state => state.auth.isVerifyLogin)
+  const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
 
   return (
     <div>
       <Routes>
-        {isVerifyLogin ? (
+        {isLoggedIn ? (
           <>
             <Route path={'/'} element={<Navigate to={PATH.PROFILE} />} />
             <Route path={PATH.LOGIN} element={<Navigate to={PATH.PROFILE} />} />

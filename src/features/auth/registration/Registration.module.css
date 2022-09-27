@@ -1,32 +1,45 @@
 p.fieldName {
-    margin-bottom: 3px;
-  }
-  .labelField {
-    display: block;
-  
-    margin-bottom: 20px;
-  }
-  .labelField input[type='text'],
-  .labelField input[type='password'] {
-    width: 100%;
-  
-    border: 0;
-  }
-  
-  .signUpBtn {
-    width: 100%;
-  
-    font-size: 19px;
-  }
-  .helperText {
-    margin-top: 25px;
-    margin-bottom: 15px;
-  
-    text-align: center;
-  }
-  .helperNavLink {
-    margin-bottom: 0;
-  
-    text-align: center;
-    text-decoration: underline;
-  }
+  margin-bottom: 3px;
+}
+.labelField {
+  display: block;
+
+  margin-bottom: 20px;
+}
+.labelField input[type='text'],
+.labelField input[type='password'] {
+  width: 100%;
+
+  border: 0;
+}
+.labelCheckbox {
+  display: block;
+
+  margin-top: 28px;
+}
+.forgotPassword {
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+  text-align: right;
+}
+.forgotPasswordLink:hover {
+  text-decoration: underline;
+}
+.signInBtn {
+  width: 100%;
+
+  font-size: 19px;
+}
+.loginText {
+  margin-top: 25px;
+  margin-bottom: 15px;
+
+  text-align: center;
+}
+.loginLink {
+  margin-bottom: 0;
+
+  text-align: center;
+  text-decoration: underline;
+}
