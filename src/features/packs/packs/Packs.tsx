@@ -8,6 +8,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import SchoolIcon from '@mui/icons-material/School'
 import Pagination from '@mui/material/Pagination'
+import { useNavigate } from 'react-router-dom'
 
 import {
   addPackTC,
@@ -36,6 +37,7 @@ import { SelectNumber } from 'common/select/SelectNumber'
 import { ToggleSwitch } from 'common/toggleSwitch/ToggleSwitch'
 
 export const Packs = () => {
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const userId = useAppSelector(state => state.auth.user?._id)
   const isLoading = 'loading' === useAppSelector(state => state.app.appStatus)
@@ -141,6 +143,9 @@ export const Packs = () => {
     setInitialValues(PacksData.minCardsCount, PacksData.maxCardsCount, '')
     dispatch(setFiltersAC(newFilters))
   }
+  const openLearnPage = (packId: string, packName: string) => {
+    navigate(`/learn/${packId}/${packName}`)
+  }
 
   let sortIcon = <ArrowDropUpIcon />
 
@@ -225,7 +230,10 @@ export const Packs = () => {
                   <td>{p.user_name}</td>
                   <td>
                     <div className={s.actionsContainer}>
-                      <SchoolIcon className={s.action} />
+                      <SchoolIcon
+                        className={s.action}
+                        onClick={() => openLearnPage(p._id, p.name)}
+                      />
                       {p.user_id === userId && (
                         <>
                           <EditIcon
