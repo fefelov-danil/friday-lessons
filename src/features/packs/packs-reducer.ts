@@ -124,10 +124,7 @@ export const fetchPacksTC =
     }
   }
 export const getPacksTC =
-  (
-    filters: typeof packsInitialState.filters,
-    setInitialValues: (min: number, max: number, searchValue: string) => void
-  ): AppThunk =>
+  (filters: typeof packsInitialState.filters): AppThunk =>
   async dispatch => {
     try {
       const res = await packsAPI.getPacks(

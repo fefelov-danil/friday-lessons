@@ -39,10 +39,10 @@ export const Packs = () => {
   const dispatch = useAppDispatch()
   const userId = useAppSelector(state => state.auth.user?._id)
   const isLoading = 'loading' === useAppSelector(state => state.app.appStatus)
-  const PacksData = useAppSelector(state => state.packs)
-  const filters = PacksData.filters
+  const packsData = useAppSelector(state => state.packs)
+  const filters = packsData.filters
 
-  const pagesAmount = Math.ceil(PacksData.cardPacksTotalCount / filters.pageCount)
+  const pagesAmount = Math.ceil(packsData.cardPacksTotalCount / filters.pageCount)
 
   const [searchLocalVal, setSearchLocalVal] = useState('')
   const searchDebVal = useDebounce(searchLocalVal, 500)
@@ -63,14 +63,14 @@ export const Packs = () => {
     dispatch(fetchPacksTC(setInitialValues))
   }, [])
   useEffect(() => {
-    if (PacksData.packsFetched) {
-      dispatch(setPacksAC([], PacksData.cardPacksTotalCount))
+    if (packsData.packsFetched) {
+      dispatch(setPacksAC([], packsData.cardPacksTotalCount))
       dispatch(appSetStatusAC('loading'))
-      dispatch(getPacksTC(PacksData.filters, setInitialValues))
+      dispatch(getPacksTC(packsData.filters))
     }
   }, [
-    PacksData.packsFetched,
-    PacksData.cardPacksChanged,
+    packsData.packsFetched,
+    packsData.cardPacksChanged,
     filters.page,
     filters.myPacks,
     filters.pageCount,
@@ -132,13 +132,13 @@ export const Packs = () => {
       page: 1,
       pageCount: filters.pageCount,
       myPacks: filters.myPacks,
-      min: PacksData.minCardsCount,
-      max: PacksData.maxCardsCount,
+      min: packsData.minCardsCount,
+      max: packsData.maxCardsCount,
       sortPacks: '',
       searchValue: '',
     }
 
-    setInitialValues(PacksData.minCardsCount, PacksData.maxCardsCount, '')
+    setInitialValues(packsData.minCardsCount, packsData.maxCardsCount, '')
     dispatch(setFiltersAC(newFilters))
   }
 
@@ -169,15 +169,15 @@ export const Packs = () => {
             <ToggleSwitch
               param1={'all'}
               param2={'my'}
-              selected={!!PacksData.filters.myPacks}
+              selected={!!packsData.filters.myPacks}
               onChange={onMyPacksChange}
               disabled={isLoading}
             />
           </div>
 
           <DoubleRangeSlider
-            min={PacksData.minCardsCount}
-            max={PacksData.maxCardsCount}
+            min={packsData.minCardsCount}
+            max={packsData.maxCardsCount}
             minVal={minLocalVal}
             maxVal={maxLocalVal}
             setMinVal={(min: number) => !isLoading && setMinLocalVal(min)}
@@ -216,7 +216,7 @@ export const Packs = () => {
               <th>Creator</th>
               <th>Actions</th>
             </tr>
-            {PacksData.cardPacks.map(p => {
+            {packsData.cardPacks.map(p => {
               return (
                 <tr key={p._id}>
                   <td>{p.name}</td>
@@ -245,10 +245,10 @@ export const Packs = () => {
             })}
           </tbody>
         </table>
-        {PacksData.noResults && <div className={s.noResults}>No results, try other filters</div>}
+        {packsData.noResults && <div className={s.noResults}>No results, try other filters</div>}
         <div className={s.pagination}>
           <SelectNumber
-            value={PacksData.filters.pageCount}
+            value={packsData.filters.pageCount}
             onChange={onPageCountChange}
             options={[5, 10, 25, 50]}
             disabled={isLoading}
@@ -258,7 +258,7 @@ export const Packs = () => {
           {pagesAmount > 1 && (
             <Pagination
               count={pagesAmount}
-              page={PacksData.filters.page}
+              page={packsData.filters.page}
               onChange={(e, page) => !isLoading && onPageChange(page)}
               shape="rounded"
             />

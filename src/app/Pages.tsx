@@ -29,8 +29,8 @@ export const Pages = () => {
       <Routes>
         {isLoggedIn ? (
           <>
-            <Route path={'/'} element={<Navigate to={PATH.PROFILE} />} />
-            <Route path={PATH.LOGIN} element={<Navigate to={PATH.PROFILE} />} />
+            <Route path={'/'} element={<Navigate to={PATH.PACKS} />} />
+            <Route path={PATH.LOGIN} element={<Navigate to={PATH.PACKS} />} />
             <Route path={PATH.PROFILE} element={<Profile />} />
             <Route path={PATH.PACKS} element={<Packs />} />
           </>
