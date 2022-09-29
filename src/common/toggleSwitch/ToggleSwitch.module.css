@@ -1,4 +1,6 @@
 .toggleSwitch {
+    cursor: pointer;
+
     display: flex;
 
     font-family: "OpenSans", sans-serif;

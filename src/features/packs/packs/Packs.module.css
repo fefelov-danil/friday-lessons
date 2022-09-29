@@ -108,6 +108,10 @@
     border-radius: 0 0 5px 0;
 }
 
+.packsTable tr td:first-of-type {
+    text-align: left;
+}
+
 .noResults {
     padding: 30px;
 
