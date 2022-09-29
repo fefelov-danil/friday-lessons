@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react'
 
-import { Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material'
+import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material'
 import { useParams } from 'react-router-dom'
 
+import s from './Learning.module.css'
+
 import { useAppDispatch, useAppSelector } from 'app/hooks'
+import { Button } from 'common/button/Button'
 
 const grades = [
   { value: 1, label: 'Did not know' },
@@ -85,42 +88,56 @@ export const Learning = () => {
   }
 
   return (
-    <div>
-      <p>Learn {packName}</p>
-      <div>
-        <div>Question: {card.question}</div>
-        <div>Number of attempts to answer the question: {card.shots}</div>
-        {isChecked ? (
-          <>
-            <div>Answer: {card.answer}</div>
+    <div className={'formPage'}>
+      <div className={'formContainer'}>
+        <h4 className={s.packName}>Learn “{packName}”</h4>
+        <div>
+          <div className={s.questionContainer}>
+            <p className={s.questionText}>Question:&nbsp;</p>
+            <p>{card.question}</p>
+          </div>
+          <div className={s.shotsContainer}>
+            <p>Number of attempts to answer the question: {card.shots}</p>
+          </div>
+          {isChecked ? (
+            <>
+              <div className={s.questionContainer}>
+                <p className={s.questionText}>Answer:&nbsp;</p>
+                <p>{card.answer}</p>
+              </div>
+              <div>
+                <FormControl>
+                  <FormLabel>Rate yourself:</FormLabel>
+                  <RadioGroup value={value} onChange={onChangeHandle}>
+                    {grades.map((grade, i) => (
+                      <FormControlLabel
+                        key={'grade-' + i}
+                        value={grade.value}
+                        control={<Radio onChange={() => setGrade(grade.value)} />}
+                        label={grade.label}
+                      />
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+              </div>
+              <div>
+                <Button
+                  disabled={!value}
+                  onClick={onNextHandle}
+                  className={value ? s.enabledBtn : s.disabledBtn}
+                >
+                  next
+                </Button>
+              </div>
+            </>
+          ) : (
             <div>
-              <FormControl>
-                <FormLabel>Rate yourself:</FormLabel>
-                <RadioGroup value={value} onChange={onChangeHandle}>
-                  {grades.map((grade, i) => (
-                    <FormControlLabel
-                      key={'grade-' + i}
-                      value={grade.value}
-                      control={<Radio onChange={() => setGrade(grade.value)} />}
-                      label={grade.label}
-                    />
-                  ))}
-                </RadioGroup>
-              </FormControl>
-            </div>
-            <div>
-              <Button disabled={!value} variant={'contained'} onClick={onNextHandle}>
-                next
+              <Button onClick={() => setIsChecked(true)} className={s.enabledBtn}>
+                Show answer
               </Button>
             </div>
-          </>
-        ) : (
-          <div>
-            <Button variant={'contained'} onClick={() => setIsChecked(true)}>
-              Show answer
-            </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

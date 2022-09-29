@@ -1,0 +1,23 @@
+p.packName {
+    margin-bottom: 3px;
+}
+.questionContainer {
+    display: flex;
+}
+.questionText {
+    font-weight: bold;
+}
+.shotsContainer {
+    opacity: 50%;
+}
+.enabledBtn {
+    width: 100%;
+}
+.disabledBtn {
+    width: 100%;
+}
+.disabledBtn:hover {
+    width: 100%;
+
+    background: #f8686e;
+}
