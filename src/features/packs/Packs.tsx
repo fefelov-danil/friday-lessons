@@ -8,6 +8,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import SchoolIcon from '@mui/icons-material/School'
 import Pagination from '@mui/material/Pagination'
+import { NavLink } from 'react-router-dom'
 
 import { parseDate } from '../../utils/parse-date-util'
 
@@ -16,13 +17,13 @@ import {
   deletePackTC,
   fetchPacksTC,
   getPacksTC,
-  setFiltersAC,
+  setPacksFiltersAC,
   setMinMaxAC,
   setMyPacksAC,
-  setSearchValueAC,
+  setPacksSearchValueAC,
   setPacksAC,
-  setPageAC,
-  setPageCountAC,
+  setPacksPageAC,
+  setPacksPageCountAC,
   setSortPacksAC,
   updatePackTC,
 } from './packs-reducer'
@@ -81,16 +82,16 @@ export const Packs = () => {
     filters.searchValue,
   ])
   useEffect(() => {
-    dispatch(setPageAC(1))
+    dispatch(setPacksPageAC(1))
     dispatch(setMinMaxAC(minLocalVal, filters.max))
   }, [minDebVal])
   useEffect(() => {
-    dispatch(setPageAC(1))
+    dispatch(setPacksPageAC(1))
     dispatch(setMinMaxAC(filters.min, maxLocalVal))
   }, [maxDebVal])
   useEffect(() => {
-    dispatch(setPageAC(1))
-    dispatch(setSearchValueAC(searchLocalVal))
+    dispatch(setPacksPageAC(1))
+    dispatch(setPacksSearchValueAC(searchLocalVal))
   }, [searchDebVal])
 
   const onAddPackHandler = () => {
@@ -106,18 +107,18 @@ export const Packs = () => {
     dispatch(updatePackTC(id))
   }
   const onPageChange = (page: number) => {
-    dispatch(setPageAC(page))
+    dispatch(setPacksPageAC(page))
   }
   const onMyPacksChange = (myPacks: boolean) => {
-    dispatch(setPageAC(1))
+    dispatch(setPacksPageAC(1))
     dispatch(setMyPacksAC(myPacks ? `${userId}` : ''))
   }
   const onPageCountChange = (pageCount: number) => {
-    dispatch(setPageAC(1))
-    dispatch(setPageCountAC(pageCount))
+    dispatch(setPacksPageAC(1))
+    dispatch(setPacksPageCountAC(pageCount))
   }
   const onSortChangeHandler = (sortParam: string) => {
-    dispatch(setPageAC(1))
+    dispatch(setPacksPageAC(1))
     if (filters.sortPacks.substring(1) !== sortParam) {
       dispatch(setSortPacksAC(`0${sortParam}`))
     } else {
@@ -140,7 +141,7 @@ export const Packs = () => {
     }
 
     setInitialValues(packsData.minCardsCount, packsData.maxCardsCount, '')
-    dispatch(setFiltersAC(newFilters))
+    dispatch(setPacksFiltersAC(newFilters))
   }
 
   let sortIcon = <ArrowDropUpIcon />
@@ -203,47 +204,45 @@ export const Packs = () => {
                   onClick={() => !isLoading && onSortChangeHandler('cardsCount')}
                 >
                   Cards
-                  {(filters.sortPacks === '0cardsCount' || filters.sortPacks === '1cardsCount') &&
-                    sortIcon}
+                  {filters.sortPacks.substring(1) === 'cardsCount' && sortIcon}
                 </p>
               </th>
               <th>
                 <p className={s.sort} onClick={() => !isLoading && onSortChangeHandler('updated')}>
                   Updated
-                  {(filters.sortPacks === '0updated' || filters.sortPacks === '1updated') &&
-                    sortIcon}
+                  {filters.sortPacks.substring(1) === 'updated' && sortIcon}
                 </p>
               </th>
               <th>Creator</th>
               <th>Actions</th>
             </tr>
-            {packsData.cardPacks.map(p => {
-              return (
-                <tr key={p._id}>
-                  <td>{p.name}</td>
-                  <td>{p.cardsCount}</td>
-                  <td>{parseDate(p.updated)}</td>
-                  <td>{p.user_name}</td>
-                  <td>
-                    <div className={s.actionsContainer}>
-                      <SchoolIcon className={s.action} />
-                      {p.user_id === userId && (
-                        <>
-                          <EditIcon
-                            className={s.action}
-                            onClick={() => isLoading && onUpdatePackHandler(p._id)}
-                          />
-                          <DeleteIcon
-                            className={s.action}
-                            onClick={() => isLoading && onDeletePackHandler(p._id)}
-                          />
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              )
-            })}
+            {packsData.cardPacks.map(p => (
+              <tr key={p._id}>
+                <td>
+                  <NavLink to={`${p._id}/${p.name}`}>{p.name}</NavLink>
+                </td>
+                <td>{p.cardsCount}</td>
+                <td>{parseDate(p.updated)}</td>
+                <td>{p.user_name}</td>
+                <td>
+                  <div className={s.actionsContainer}>
+                    <SchoolIcon className={s.action} />
+                    {p.user_id === userId && (
+                      <>
+                        <EditIcon
+                          className={s.action}
+                          onClick={() => !isLoading && onUpdatePackHandler(p._id)}
+                        />
+                        <DeleteIcon
+                          className={s.action}
+                          onClick={() => !isLoading && onDeletePackHandler(p._id)}
+                        />
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
         {packsData.noResults && <div className={s.noResults}>No results, try other filters</div>}

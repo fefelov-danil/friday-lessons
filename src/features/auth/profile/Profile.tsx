@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft'
 import { NavLink } from 'react-router-dom'
 
+import { LinkToPacks } from '../../../common/linkToPacks/LinkToPacks'
 import { changeUsernameTC, logoutTC } from '../auth-reducer'
 
 import s from './Profile.module.css'
@@ -48,10 +49,7 @@ export const Profile = () => {
   return (
     <div className="formPage">
       <div className={'formContainer ' + s.profileContainer}>
-        <NavLink className={s.linkToPacks} to={'/packs'}>
-          <KeyboardDoubleArrowLeftIcon />
-          back to packs
-        </NavLink>
+        <LinkToPacks />
         <img
           style={{ width: '100px', height: '100px', borderRadius: '50%', display: 'inline-block' }}
           src={profileData.user?.avatar}

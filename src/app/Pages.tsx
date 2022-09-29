@@ -2,6 +2,7 @@ import React from 'react'
 
 import { Navigate, Route, Routes } from 'react-router-dom'
 
+import { Cards } from '../features/cards/Cards'
 import { Packs } from '../features/packs/Packs'
 
 import { useAppSelector } from 'app/hooks'
@@ -19,6 +20,7 @@ export const PATH = {
   CHANGE_PASSWORD: '/set-new-password/:token',
   PROFILE: '/profile',
   PACKS: '/packs',
+  CARDS: '/packs/:packId/:packName',
 }
 
 export const Pages = () => {
@@ -33,12 +35,15 @@ export const Pages = () => {
             <Route path={PATH.LOGIN} element={<Navigate to={PATH.PACKS} />} />
             <Route path={PATH.PROFILE} element={<Profile />} />
             <Route path={PATH.PACKS} element={<Packs />} />
+            <Route path={PATH.CARDS} element={<Cards />} />
           </>
         ) : (
           <>
             <Route path={'/'} element={<Navigate to={PATH.LOGIN} />} />
             <Route path={PATH.PROFILE} element={<Navigate to={PATH.LOGIN} />} />
             <Route path={PATH.LOGIN} element={<Login />} />
+            <Route path={PATH.PACKS} element={<Login />} />
+            <Route path={PATH.CARDS} element={<Login />} />
           </>
         )}
         <Route path={PATH.REGISTRATION} element={<Registration />} />
