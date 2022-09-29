@@ -9,6 +9,7 @@ import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import SchoolIcon from '@mui/icons-material/School'
 import Pagination from '@mui/material/Pagination'
 
+import { parseDate } from '../../../utils/parse-date-util'
 import {
   addPackTC,
   deletePackTC,
@@ -221,7 +222,7 @@ export const Packs = () => {
                 <tr key={p._id}>
                   <td>{p.name}</td>
                   <td>{p.cardsCount}</td>
-                  <td>{p.updated}</td>
+                  <td>{parseDate(p.updated)}</td>
                   <td>{p.user_name}</td>
                   <td>
                     <div className={s.actionsContainer}>
