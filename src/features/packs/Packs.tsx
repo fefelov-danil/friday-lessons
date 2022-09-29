@@ -9,7 +9,8 @@ import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import SchoolIcon from '@mui/icons-material/School'
 import Pagination from '@mui/material/Pagination'
 
-import { parseDate } from '../../../utils/parse-date-util'
+import { parseDate } from '../../utils/parse-date-util'
+
 import {
   addPackTC,
   deletePackTC,
@@ -24,8 +25,7 @@ import {
   setPageCountAC,
   setSortPacksAC,
   updatePackTC,
-} from '../packs-reducer'
-
+} from './packs-reducer'
 import s from './Packs.module.css'
 
 import { appSetStatusAC } from 'app/app-reducer'

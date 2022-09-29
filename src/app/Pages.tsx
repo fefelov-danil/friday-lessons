@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Navigate, Route, Routes } from 'react-router-dom'
 
-import { Packs } from '../features/packs/packs/Packs'
+import { Packs } from '../features/packs/Packs'
 
 import { useAppSelector } from 'app/hooks'
 import { PageNotFound } from 'common/404/PageNotFound'
