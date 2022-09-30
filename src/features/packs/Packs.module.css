@@ -18,6 +18,10 @@
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+.loading {
+    opacity: 0.7;
+}
+
 .packsList {
     display: flex;
     align-items: center;
@@ -52,6 +56,10 @@
     text-decoration: underline;
 }
 
+.loading {
+    opacity: 0.6;
+}
+
 .packsTable {
     border-collapse: collapse;
 
@@ -60,7 +68,7 @@
     font-family: "OpenSans", sans-serif;
     font-size: 16px;
     color: #333;
-    vertical-align: center;
+    vertical-align: middle;
 
     border: none;
     border-radius: 5px;

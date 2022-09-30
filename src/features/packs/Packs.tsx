@@ -15,15 +15,14 @@ import { parseDate } from '../../utils/parse-date-util'
 import {
   addPackTC,
   deletePackTC,
-  fetchPacksTC,
   getPacksTC,
-  setPacksFiltersAC,
   setMinMaxAC,
   setMyPacksAC,
-  setPacksSearchValueAC,
   setPacksAC,
+  setPacksFiltersAC,
   setPacksPageAC,
   setPacksPageCountAC,
+  setPacksSearchValueAC,
   setSortPacksAC,
   updatePackTC,
 } from './packs-reducer'
@@ -61,17 +60,32 @@ export const Packs = () => {
   }
 
   useEffect(() => {
-    dispatch(appSetStatusAC('loading'))
-    dispatch(fetchPacksTC(setInitialValues))
+    if (!packsData.packsFetched) {
+      dispatch(appSetStatusAC('loading'))
+      const filtersFromSS = sessionStorage.getItem('packs-filters') // SS - SessionStorage
+
+      if (filtersFromSS) {
+        const parsedFiltersFromSS = JSON.parse(filtersFromSS)
+
+        setInitialValues(
+          parsedFiltersFromSS.min,
+          parsedFiltersFromSS.max,
+          parsedFiltersFromSS.searchValue
+        )
+
+        dispatch(setPacksFiltersAC(parsedFiltersFromSS))
+        dispatch(getPacksTC(parsedFiltersFromSS, true))
+      } else {
+        dispatch(getPacksTC(filters, true, setInitialValues))
+      }
+    }
   }, [])
   useEffect(() => {
     if (packsData.packsFetched) {
-      dispatch(setPacksAC([], packsData.cardPacksTotalCount))
       dispatch(appSetStatusAC('loading'))
-      dispatch(getPacksTC(packsData.filters))
+      dispatch(getPacksTC(filters))
     }
   }, [
-    packsData.packsFetched,
     packsData.cardPacksChanged,
     filters.page,
     filters.myPacks,
@@ -100,16 +114,18 @@ export const Packs = () => {
   }
   const onDeletePackHandler = (id: string) => {
     dispatch(appSetStatusAC('loading'))
-    dispatch(deletePackTC(id))
+    dispatch(deletePackTC(id, false))
   }
   const onUpdatePackHandler = (id: string) => {
     dispatch(appSetStatusAC('loading'))
     dispatch(updatePackTC(id))
   }
   const onPageChange = (page: number) => {
+    dispatch(setPacksAC([], packsData.cardPacksTotalCount))
     dispatch(setPacksPageAC(page))
   }
   const onMyPacksChange = (myPacks: boolean) => {
+    dispatch(setPacksAC([], packsData.cardPacksTotalCount))
     dispatch(setPacksPageAC(1))
     dispatch(setMyPacksAC(myPacks ? `${userId}` : ''))
   }
@@ -130,6 +146,7 @@ export const Packs = () => {
     }
   }
   const onDeleteFiltersHandler = () => {
+    dispatch(setPacksAC([], packsData.cardPacksTotalCount))
     const newFilters = {
       page: 1,
       pageCount: filters.pageCount,
@@ -217,7 +234,7 @@ export const Packs = () => {
               <th>Actions</th>
             </tr>
             {packsData.cardPacks.map(p => (
-              <tr key={p._id}>
+              <tr key={p._id} className={isLoading ? s.loading : ''}>
                 <td>
                   <NavLink to={`${p._id}/${p.name}`}>{p.name}</NavLink>
                 </td>

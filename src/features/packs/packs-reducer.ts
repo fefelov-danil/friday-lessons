@@ -93,45 +93,19 @@ export const setPacksSearchValueAC = (searchValue: string) =>
   ({ type: 'packs/SET-SEARCH-VALUE', searchValue } as const)
 
 //Thunks
-export const fetchPacksTC =
-  (setInitialValues: (min: number, max: number, searchValue: string) => void): AppThunk =>
-  async dispatch => {
-    try {
-      const res = await packsAPI.getPacks('')
-
-      const filtersFromSS = sessionStorage.getItem('packs-filters')
-
-      if (filtersFromSS) {
-        const parsedFiltersFromSS = JSON.parse(filtersFromSS)
-
-        setInitialValues(
-          parsedFiltersFromSS.min,
-          parsedFiltersFromSS.max,
-          parsedFiltersFromSS.searchValue
-        )
-        dispatch(setPacksFiltersAC(parsedFiltersFromSS))
-      } else {
-        setInitialValues(res.data.minCardsCount, res.data.maxCardsCount, '')
-        dispatch(setMinMaxAC(res.data.minCardsCount, res.data.maxCardsCount))
-      }
-
-      dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
-      dispatch(setPacksFetchedAC(true))
-      dispatch(appSetStatusAC('succeeded'))
-    } catch (e) {
-      const err = e as Error | AxiosError<{ error: string }>
-
-      dispatch(appSetStatusAC('failed'))
-      handleServerError(err, dispatch)
-    }
-  }
 export const getPacksTC =
-  (filters: typeof packsInitialState.filters): AppThunk =>
+  (
+    filters: typeof packsInitialState.filters,
+    packsAreNotInitialized?: boolean,
+    setInitialValues?: (min: number, max: number, searchValue: string) => void
+  ): AppThunk =>
   async dispatch => {
     try {
       const res = await packsAPI.getPacks(
         `?page=${filters.page}&user_id=${filters.myPacks}&pageCount=${filters.pageCount}&min=${filters.min}&max=${filters.max}&sortPacks=${filters.sortPacks}&packName=${filters.searchValue}`
       )
+
+      sessionStorage.setItem('packs-filters', JSON.stringify(filters))
 
       if (res.data.cardPacks.length === 0) {
         dispatch(setPacksNoResultsAC(true))
@@ -139,7 +113,15 @@ export const getPacksTC =
         dispatch(setPacksNoResultsAC(false))
       }
 
-      sessionStorage.setItem('packs-filters', JSON.stringify(filters))
+      if (packsAreNotInitialized) {
+        console.log(1)
+        if (setInitialValues) {
+          setInitialValues(res.data.minCardsCount, res.data.maxCardsCount, '')
+        }
+        dispatch(setMinMaxAC(res.data.minCardsCount, res.data.maxCardsCount))
+        dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
+        dispatch(setPacksFetchedAC(true))
+      }
 
       dispatch(setPacksAC(res.data.cardPacks, res.data.cardPacksTotalCount))
       if (res.data.minCardsCount !== 0 && res.data.maxCardsCount !== 0) {
@@ -169,13 +151,13 @@ export const addPackTC =
     }
   }
 export const deletePackTC =
-  (id: string): AppThunk =>
+  (id: string, fromCards: boolean): AppThunk =>
   async dispatch => {
     try {
       await packsAPI.deletePack(id)
 
-      dispatch(setCardPacksChangedAC())
-      dispatch(setDeletedPackAC(true))
+      if (!fromCards) dispatch(setCardPacksChangedAC())
+      else dispatch(setDeletedPackAC(true))
       dispatch(appSetStatusAC('succeeded'))
     } catch (e) {
       const err = e as Error | AxiosError<{ error: string }>
