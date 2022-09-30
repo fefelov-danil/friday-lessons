@@ -1,8 +1,5 @@
 import React, { useState } from 'react'
 
-import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft'
-import { NavLink } from 'react-router-dom'
-
 import { LinkToPacks } from '../../../common/linkToPacks/LinkToPacks'
 import { changeUsernameTC, logoutTC } from '../auth-reducer'
 

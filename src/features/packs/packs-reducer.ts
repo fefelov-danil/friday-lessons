@@ -114,7 +114,6 @@ export const getPacksTC =
       }
 
       if (packsAreNotInitialized) {
-        console.log(1)
         if (setInitialValues) {
           setInitialValues(res.data.minCardsCount, res.data.maxCardsCount, '')
         }
