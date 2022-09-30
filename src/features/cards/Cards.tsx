@@ -30,6 +30,7 @@ import {
   setCardsSearchValueAC,
   setDeletedPackAC,
   setSortCardsAC,
+  setUpadtedPackAC,
   updateCardTC,
 } from './cards-reducer'
 import s from './Cards.module.css'
@@ -85,7 +86,7 @@ export const Cards = () => {
   }
   const onUpdatePackHandler = (id: string) => {
     dispatch(appSetStatusAC('loading'))
-    dispatch(updatePackTC(id))
+    dispatch(updatePackTC(id, true))
   }
   const onAddCardHandler = () => {
     dispatch(appSetStatusAC('loading'))
@@ -131,6 +132,14 @@ export const Cards = () => {
     dispatch(setDeletedPackAC(false))
 
     return <Navigate to={'/packs'} />
+  }
+
+  if (cardsData.updatedPack) {
+    const title = cardsData.updatedPack
+
+    dispatch(setUpadtedPackAC(''))
+
+    return <Navigate to={`/packs/${packId}/${title}`} />
   }
 
   return (

@@ -118,7 +118,7 @@ export const Packs = () => {
   }
   const onUpdatePackHandler = (id: string) => {
     dispatch(appSetStatusAC('loading'))
-    dispatch(updatePackTC(id))
+    dispatch(updatePackTC(id, false))
   }
   const onPageChange = (page: number) => {
     dispatch(setPacksAC([], packsData.cardPacksTotalCount))

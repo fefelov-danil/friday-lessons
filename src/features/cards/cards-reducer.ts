@@ -14,6 +14,7 @@ const cardsInitialState = {
   cardsTotalCount: 0,
   cardsChanged: 0,
   deletedPack: false,
+  updatedPack: '',
   filters: {
     page: 1,
     pageCount: 10,
@@ -41,6 +42,8 @@ export const cardsReducer = (
       return { ...state, cardsChanged: state.cardsChanged + 1 }
     case 'cars/SET-DELETED-PACK':
       return { ...state, deletedPack: action.deletedPack }
+    case 'cards/SET-UPDATED-PACK':
+      return { ...state, updatedPack: action.newTitle }
 
     case 'cards/SET-FILTERS':
       return { ...state, filters: action.filters }
@@ -70,6 +73,8 @@ export const setCardsNoResultsAC = (noResults: boolean) =>
 export const setCardsChangedAC = () => ({ type: 'cards/SET-CARDS-CHANGED' } as const)
 export const setDeletedPackAC = (deletedPack: boolean) =>
   ({ type: 'cars/SET-DELETED-PACK', deletedPack } as const)
+export const setUpadtedPackAC = (newTitle: string) =>
+  ({ type: 'cards/SET-UPDATED-PACK', newTitle } as const)
 
 export const setCardsFiltersAC = (filters: typeof cardsInitialState.filters) =>
   ({ type: 'cards/SET-FILTERS', filters } as const)
@@ -181,3 +186,4 @@ export type CardsActionsType =
   | ReturnType<typeof setCardsNoResultsAC>
   | ReturnType<typeof setCardsChangedAC>
   | ReturnType<typeof setDeletedPackAC>
+  | ReturnType<typeof setUpadtedPackAC>

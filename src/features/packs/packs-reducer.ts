@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 
-import { setDeletedPackAC } from '../cards/cards-reducer'
+import { setDeletedPackAC, setUpadtedPackAC } from '../cards/cards-reducer'
 
 import { packsAPI } from './packs-API'
 
@@ -167,10 +167,12 @@ export const deletePackTC =
     }
   }
 export const updatePackTC =
-  (id: string): AppThunk =>
+  (id: string, fromCards: boolean): AppThunk =>
   async dispatch => {
     try {
       await packsAPI.changePack(id, 'changed hardcoded name', '', true)
+
+      if (fromCards) dispatch(setUpadtedPackAC('changed hardcoded name'))
 
       dispatch(setCardPacksChangedAC())
       dispatch(appSetStatusAC('succeeded'))
