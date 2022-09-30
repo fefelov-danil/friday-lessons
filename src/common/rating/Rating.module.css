@@ -1,0 +1,20 @@
+.star {
+    display: inline-block;
+
+    width: 20px;
+    height: 20px;
+
+    background: #c3c3c3;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+
+    transition: 0.2s;
+}
+
+.active {
+    background: #f8686e;
+}
+
+.halfActive {
+    background: linear-gradient(to right, #f8686e 0%,#f8686e 50%,#c3c3c3 50%,#c3c3c3 100%);
+    /*background: linear-gradient(to right, #f8686e, #c3c3c3);*/
+}

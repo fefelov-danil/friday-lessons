@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector, useDebounce } from '../../app/hooks'
 import { Button } from '../../common/button/Button'
 import { InputText } from '../../common/inputText/InputText'
 import { LinkToPacks } from '../../common/linkToPacks/LinkToPacks'
+import { Rating } from '../../common/rating/Rating'
 import { SelectNumber } from '../../common/select/SelectNumber'
 import { parseDate } from '../../utils/parse-date-util'
 import { deletePackTC, updatePackTC } from '../packs/packs-reducer'
@@ -63,7 +64,6 @@ export const Cards = () => {
   }, [])
   useEffect(() => {
     dispatch(appSetStatusAC('loading'))
-    dispatch(setCardsAC([]))
     if (cardsData.cardsFetched) {
       packId && dispatch(getCardsTC(packId, filters))
     }
@@ -81,7 +81,7 @@ export const Cards = () => {
 
   const onDeletePackHandler = (id: string) => {
     dispatch(appSetStatusAC('loading'))
-    dispatch(deletePackTC(id))
+    dispatch(deletePackTC(id, true))
   }
   const onUpdatePackHandler = (id: string) => {
     dispatch(appSetStatusAC('loading'))
@@ -100,9 +100,11 @@ export const Cards = () => {
     dispatch(deleteCardTC(cardId))
   }
   const onPageChange = (page: number) => {
+    dispatch(setCardsAC([]))
     dispatch(setCardsPageAC(page))
   }
   const onPageCountChange = (pageCount: number) => {
+    dispatch(setCardsAC([]))
     dispatch(setCardsPageAC(1))
     dispatch(setCardsPageCountAC(pageCount))
   }
@@ -164,17 +166,22 @@ export const Cards = () => {
             </Button>
           </div>
         </div>
+        <h3>
+          {cardsData.cardsTotalCount === 1
+            ? cardsData.cardsTotalCount + ' card'
+            : cardsData.cardsTotalCount + ' cards'}
+        </h3>
         <InputText
           placeholder="Enter question"
           value={searchLocalVal}
           onChange={e => !isLoading && setSearchLocalVal(e.currentTarget.value)}
         />
         <table className={s.cardsTable}>
-          <thead>
+          <tbody>
             <tr>
               <th>
                 <p className={s.sort} onClick={() => !isLoading && onSortChangeHandler('question')}>
-                  Question
+                  Questions
                   {filters.sortCards.substring(1) === 'question' && sortIcon}
                 </p>
               </th>
@@ -193,14 +200,14 @@ export const Cards = () => {
               </th>
               {editor && <th></th>}
             </tr>
-          </thead>
-          <tbody>
             {cardsData.cards.map(c => (
-              <tr key={c._id}>
+              <tr key={c._id} className={isLoading ? s.loading : ''}>
                 <td>{c.question}</td>
                 <td>{c.answer}</td>
                 <td>{parseDate(c.updated)}</td>
-                <td>{c.grade}</td>
+                <td>
+                  <Rating value={c.grade} />
+                </td>
                 {editor && (
                   <td>
                     <>
