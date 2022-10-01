@@ -2,7 +2,8 @@ import React from 'react'
 
 import { Navigate, Route, Routes } from 'react-router-dom'
 
-import { Packs } from '../features/packs/packs/Packs'
+import { Cards } from '../features/cards/Cards'
+import { Packs } from '../features/packs/Packs'
 
 import { useAppSelector } from 'app/hooks'
 import { PageNotFound } from 'common/404/PageNotFound'
@@ -21,6 +22,7 @@ export const PATH = {
   PROFILE: '/profile',
   PACKS: '/packs',
   LEARN: '/learn/:packId/:packName',
+  CARDS: '/packs/:packId/:packName',
 }
 
 export const Pages = () => {
@@ -31,17 +33,20 @@ export const Pages = () => {
       <Routes>
         {isLoggedIn ? (
           <>
-            <Route path={'/'} element={<Navigate to={PATH.PROFILE} />} />
-            <Route path={PATH.LOGIN} element={<Navigate to={PATH.PROFILE} />} />
+            <Route path={'/'} element={<Navigate to={PATH.PACKS} />} />
+            <Route path={PATH.LOGIN} element={<Navigate to={PATH.PACKS} />} />
             <Route path={PATH.PROFILE} element={<Profile />} />
             <Route path={PATH.PACKS} element={<Packs />} />
             <Route path={PATH.LEARN} element={<Learning />} />
+            <Route path={PATH.CARDS} element={<Cards />} />
           </>
         ) : (
           <>
             <Route path={'/'} element={<Navigate to={PATH.LOGIN} />} />
             <Route path={PATH.PROFILE} element={<Navigate to={PATH.LOGIN} />} />
             <Route path={PATH.LOGIN} element={<Login />} />
+            <Route path={PATH.PACKS} element={<Login />} />
+            <Route path={PATH.CARDS} element={<Login />} />
           </>
         )}
         <Route path={PATH.REGISTRATION} element={<Registration />} />

@@ -1,0 +1,9 @@
+.linkToPacks {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-self: flex-start;
+
+    font-weight: bold;
+    line-height: 24px;
+}

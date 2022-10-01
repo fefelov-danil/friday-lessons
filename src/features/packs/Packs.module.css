@@ -1,0 +1,158 @@
+.packsPage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: calc(100vh - 72px);
+    padding: 60px 20px;
+
+    background-image: linear-gradient(60deg, #29323c 0%, #485563 100%);
+}
+
+.packsContainer {
+    width: 100%;
+    max-width: 1200px;
+    padding: 45px 65px 65px 65px;
+
+    background: #e2e6eb;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.loading {
+    opacity: 0.7;
+}
+
+.packsList {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.filters {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+}
+
+.allOrMyPacks {
+    text-align: center;
+}
+
+.sort {
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+
+    font-weight: bold;
+}
+
+.sort:hover {
+    text-decoration: underline;
+}
+
+.loading {
+    opacity: 0.6;
+}
+
+.packsTable {
+    border-collapse: collapse;
+
+    width: 100%;
+
+    font-family: "OpenSans", sans-serif;
+    font-size: 16px;
+    color: #333;
+    vertical-align: middle;
+
+    border: none;
+    border-radius: 5px;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.packsTable th {
+    cursor: default;
+
+    padding: 10px;
+
+    font-weight: bold;
+
+    background: #c3c3c3;
+    border: none;
+    border-bottom: 2px solid #a7a7a7;
+}
+
+.packsTable th:first-child {
+    border-radius: 5px 0 0 0;
+}
+
+.packsTable th:last-child {
+    border-radius: 0 5px 0 0;
+}
+
+.packsTable td {
+    padding: 10px;
+
+    text-align: center;
+
+    background: #fff;
+    border: none;
+    border-bottom: 1px solid #a7a7a7;
+}
+
+.packsTable tr:last-child td {
+    border-bottom: 0;
+}
+
+.packsTable tr:last-child td:first-child {
+    border-radius: 0 0 0 5px;
+}
+
+.packsTable tr:last-child td:last-child {
+    border-radius: 0 0 5px 0;
+}
+
+.packsTable tr td:first-of-type {
+    text-align: left;
+}
+
+.noResults {
+    padding: 30px;
+
+    text-align: center;
+
+    background: #fff;
+    border-radius: 0 0 5px 5px;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.actionsContainer {
+    display: flex;
+    justify-content: space-around;
+}
+
+.action {
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.action:hover {
+    color: #f8686e;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+
+    margin-top: 20px;
+}
+
+.select {
+    margin-right: 10px;
+}

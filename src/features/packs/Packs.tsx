@@ -8,24 +8,25 @@ import EditIcon from '@mui/icons-material/Edit'
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import SchoolIcon from '@mui/icons-material/School'
 import Pagination from '@mui/material/Pagination'
+import { NavLink } from 'react-router-dom'
+
+import { parseDate } from '../../utils/parse-date-util'
 import { useNavigate } from 'react-router-dom'
 
 import {
   addPackTC,
   deletePackTC,
-  fetchPacksTC,
   getPacksTC,
-  setFiltersAC,
   setMinMaxAC,
   setMyPacksAC,
-  setSearchValueAC,
   setPacksAC,
-  setPageAC,
-  setPageCountAC,
+  setPacksFiltersAC,
+  setPacksPageAC,
+  setPacksPageCountAC,
+  setPacksSearchValueAC,
   setSortPacksAC,
   updatePackTC,
-} from '../packs-reducer'
-
+} from './packs-reducer'
 import s from './Packs.module.css'
 
 import { appSetStatusAC } from 'app/app-reducer'
@@ -41,10 +42,10 @@ export const Packs = () => {
   const dispatch = useAppDispatch()
   const userId = useAppSelector(state => state.auth.user?._id)
   const isLoading = 'loading' === useAppSelector(state => state.app.appStatus)
-  const PacksData = useAppSelector(state => state.packs)
-  const filters = PacksData.filters
+  const packsData = useAppSelector(state => state.packs)
+  const filters = packsData.filters
 
-  const pagesAmount = Math.ceil(PacksData.cardPacksTotalCount / filters.pageCount)
+  const pagesAmount = Math.ceil(packsData.cardPacksTotalCount / filters.pageCount)
 
   const [searchLocalVal, setSearchLocalVal] = useState('')
   const searchDebVal = useDebounce(searchLocalVal, 500)
@@ -61,18 +62,33 @@ export const Packs = () => {
   }
 
   useEffect(() => {
-    dispatch(appSetStatusAC('loading'))
-    dispatch(fetchPacksTC(setInitialValues))
+    if (!packsData.packsFetched) {
+      dispatch(appSetStatusAC('loading'))
+      const filtersFromSS = sessionStorage.getItem('packs-filters') // SS - SessionStorage
+
+      if (filtersFromSS) {
+        const parsedFiltersFromSS = JSON.parse(filtersFromSS)
+
+        setInitialValues(
+          parsedFiltersFromSS.min,
+          parsedFiltersFromSS.max,
+          parsedFiltersFromSS.searchValue
+        )
+
+        dispatch(setPacksFiltersAC(parsedFiltersFromSS))
+        dispatch(getPacksTC(parsedFiltersFromSS, true))
+      } else {
+        dispatch(getPacksTC(filters, true, setInitialValues))
+      }
+    }
   }, [])
   useEffect(() => {
-    if (PacksData.packsFetched) {
-      dispatch(setPacksAC([], PacksData.cardPacksTotalCount))
+    if (packsData.packsFetched) {
       dispatch(appSetStatusAC('loading'))
-      dispatch(getPacksTC(PacksData.filters, setInitialValues))
+      dispatch(getPacksTC(filters))
     }
   }, [
-    PacksData.packsFetched,
-    PacksData.cardPacksChanged,
+    packsData.cardPacksChanged,
     filters.page,
     filters.myPacks,
     filters.pageCount,
@@ -82,16 +98,16 @@ export const Packs = () => {
     filters.searchValue,
   ])
   useEffect(() => {
-    dispatch(setPageAC(1))
+    dispatch(setPacksPageAC(1))
     dispatch(setMinMaxAC(minLocalVal, filters.max))
   }, [minDebVal])
   useEffect(() => {
-    dispatch(setPageAC(1))
+    dispatch(setPacksPageAC(1))
     dispatch(setMinMaxAC(filters.min, maxLocalVal))
   }, [maxDebVal])
   useEffect(() => {
-    dispatch(setPageAC(1))
-    dispatch(setSearchValueAC(searchLocalVal))
+    dispatch(setPacksPageAC(1))
+    dispatch(setPacksSearchValueAC(searchLocalVal))
   }, [searchDebVal])
 
   const onAddPackHandler = () => {
@@ -100,25 +116,27 @@ export const Packs = () => {
   }
   const onDeletePackHandler = (id: string) => {
     dispatch(appSetStatusAC('loading'))
-    dispatch(deletePackTC(id))
+    dispatch(deletePackTC(id, false))
   }
   const onUpdatePackHandler = (id: string) => {
     dispatch(appSetStatusAC('loading'))
-    dispatch(updatePackTC(id))
+    dispatch(updatePackTC(id, false))
   }
   const onPageChange = (page: number) => {
-    dispatch(setPageAC(page))
+    dispatch(setPacksAC([], packsData.cardPacksTotalCount))
+    dispatch(setPacksPageAC(page))
   }
   const onMyPacksChange = (myPacks: boolean) => {
-    dispatch(setPageAC(1))
+    dispatch(setPacksAC([], packsData.cardPacksTotalCount))
+    dispatch(setPacksPageAC(1))
     dispatch(setMyPacksAC(myPacks ? `${userId}` : ''))
   }
   const onPageCountChange = (pageCount: number) => {
-    dispatch(setPageAC(1))
-    dispatch(setPageCountAC(pageCount))
+    dispatch(setPacksPageAC(1))
+    dispatch(setPacksPageCountAC(pageCount))
   }
   const onSortChangeHandler = (sortParam: string) => {
-    dispatch(setPageAC(1))
+    dispatch(setPacksPageAC(1))
     if (filters.sortPacks.substring(1) !== sortParam) {
       dispatch(setSortPacksAC(`0${sortParam}`))
     } else {
@@ -130,18 +148,19 @@ export const Packs = () => {
     }
   }
   const onDeleteFiltersHandler = () => {
+    dispatch(setPacksAC([], packsData.cardPacksTotalCount))
     const newFilters = {
       page: 1,
       pageCount: filters.pageCount,
       myPacks: filters.myPacks,
-      min: PacksData.minCardsCount,
-      max: PacksData.maxCardsCount,
+      min: packsData.minCardsCount,
+      max: packsData.maxCardsCount,
       sortPacks: '',
       searchValue: '',
     }
 
-    setInitialValues(PacksData.minCardsCount, PacksData.maxCardsCount, '')
-    dispatch(setFiltersAC(newFilters))
+    setInitialValues(packsData.minCardsCount, packsData.maxCardsCount, '')
+    dispatch(setPacksFiltersAC(newFilters))
   }
   const openLearnPage = (packId: string, packName: string) => {
     navigate(`/learn/${packId}/${packName}`)
@@ -174,15 +193,15 @@ export const Packs = () => {
             <ToggleSwitch
               param1={'all'}
               param2={'my'}
-              selected={!!PacksData.filters.myPacks}
+              selected={!!packsData.filters.myPacks}
               onChange={onMyPacksChange}
               disabled={isLoading}
             />
           </div>
 
           <DoubleRangeSlider
-            min={PacksData.minCardsCount}
-            max={PacksData.maxCardsCount}
+            min={packsData.minCardsCount}
+            max={packsData.maxCardsCount}
             minVal={minLocalVal}
             maxVal={maxLocalVal}
             setMinVal={(min: number) => !isLoading && setMinLocalVal(min)}
@@ -207,56 +226,51 @@ export const Packs = () => {
                   onClick={() => !isLoading && onSortChangeHandler('cardsCount')}
                 >
                   Cards
-                  {(filters.sortPacks === '0cardsCount' || filters.sortPacks === '1cardsCount') &&
-                    sortIcon}
+                  {filters.sortPacks.substring(1) === 'cardsCount' && sortIcon}
                 </p>
               </th>
               <th>
                 <p className={s.sort} onClick={() => !isLoading && onSortChangeHandler('updated')}>
                   Updated
-                  {(filters.sortPacks === '0updated' || filters.sortPacks === '1updated') &&
-                    sortIcon}
+                  {filters.sortPacks.substring(1) === 'updated' && sortIcon}
                 </p>
               </th>
               <th>Creator</th>
               <th>Actions</th>
             </tr>
-            {PacksData.cardPacks.map(p => {
-              return (
-                <tr key={p._id}>
-                  <td>{p.name}</td>
-                  <td>{p.cardsCount}</td>
-                  <td>{p.updated}</td>
-                  <td>{p.user_name}</td>
-                  <td>
-                    <div className={s.actionsContainer}>
-                      <SchoolIcon
-                        className={s.action}
-                        onClick={() => openLearnPage(p._id, p.name)}
-                      />
-                      {p.user_id === userId && (
-                        <>
-                          <EditIcon
-                            className={s.action}
-                            onClick={() => isLoading && onUpdatePackHandler(p._id)}
-                          />
-                          <DeleteIcon
-                            className={s.action}
-                            onClick={() => isLoading && onDeletePackHandler(p._id)}
-                          />
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              )
-            })}
+            {packsData.cardPacks.map(p => (
+              <tr key={p._id} className={isLoading ? s.loading : ''}>
+                <td>
+                  <NavLink to={`${p._id}/${p.name}`}>{p.name}</NavLink>
+                </td>
+                <td>{p.cardsCount}</td>
+                <td>{parseDate(p.updated)}</td>
+                <td>{p.user_name}</td>
+                <td>
+                  <div className={s.actionsContainer}>
+                    <SchoolIcon className={s.action} />
+                    {p.user_id === userId && (
+                      <>
+                        <EditIcon
+                          className={s.action}
+                          onClick={() => !isLoading && onUpdatePackHandler(p._id)}
+                        />
+                        <DeleteIcon
+                          className={s.action}
+                          onClick={() => !isLoading && onDeletePackHandler(p._id)}
+                        />
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
-        {PacksData.noResults && <div className={s.noResults}>No results, try other filters</div>}
+        {packsData.noResults && <div className={s.noResults}>No results, try other filters</div>}
         <div className={s.pagination}>
           <SelectNumber
-            value={PacksData.filters.pageCount}
+            value={packsData.filters.pageCount}
             onChange={onPageCountChange}
             options={[5, 10, 25, 50]}
             disabled={isLoading}
@@ -266,7 +280,7 @@ export const Packs = () => {
           {pagesAmount > 1 && (
             <Pagination
               count={pagesAmount}
-              page={PacksData.filters.page}
+              page={packsData.filters.page}
               onChange={(e, page) => !isLoading && onPageChange(page)}
               shape="rounded"
             />

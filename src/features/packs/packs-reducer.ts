@@ -1,5 +1,7 @@
 import { AxiosError } from 'axios'
 
+import { setDeletedPackAC, setUpadtedPackAC } from '../cards/cards-reducer'
+
 import { packsAPI } from './packs-API'
 
 import { appSetStatusAC } from 'app/app-reducer'
@@ -72,61 +74,30 @@ export const setPacksFetchedAC = (fetched: boolean) =>
   ({ type: 'packs/SET-PACKS-FETCHED', fetched } as const)
 export const setMinMaxCardsCountAC = (minCC: number, maxCC: number) =>
   ({ type: 'packs/SET-MIN-MAX-CARDS-COUNT', minCC, maxCC } as const)
-export const setNoResultsAC = (noResults: boolean) =>
+export const setPacksNoResultsAC = (noResults: boolean) =>
   ({ type: 'packs/SET-NO-RESULTS', noResults } as const)
 export const setCardPacksChangedAC = () => ({ type: 'packs/SET-CARDS-PACK-CHANGED' } as const)
 
-export const setFiltersAC = (filters: typeof packsInitialState.filters) =>
+export const setPacksFiltersAC = (filters: typeof packsInitialState.filters) =>
   ({ type: 'packs/SET-FILTERS', filters } as const)
 
-export const setPageAC = (page: number) => ({ type: 'packs/SET-PAGE', page } as const)
+export const setPacksPageAC = (page: number) => ({ type: 'packs/SET-PAGE', page } as const)
 export const setMyPacksAC = (myPacks: string) => ({ type: 'packs/SET-MY-PACKS', myPacks } as const)
-export const setPageCountAC = (pageCount: number) =>
+export const setPacksPageCountAC = (pageCount: number) =>
   ({ type: 'packs/SET-PAGE-COUNT', pageCount } as const)
 export const setMinMaxAC = (min: number, max: number) =>
   ({ type: 'packs/SET-MIN-MAX', min, max } as const)
 export const setSortPacksAC = (sortPacks: string) =>
   ({ type: 'packs/SET-SORT-PACKS', sortPacks } as const)
-export const setSearchValueAC = (searchValue: string) =>
+export const setPacksSearchValueAC = (searchValue: string) =>
   ({ type: 'packs/SET-SEARCH-VALUE', searchValue } as const)
 
 //Thunks
-export const fetchPacksTC =
-  (setInitialValues: (min: number, max: number, searchValue: string) => void): AppThunk =>
-  async dispatch => {
-    try {
-      const res = await packsAPI.getPacks('')
-
-      const initialFiltersFromSS = sessionStorage.getItem('filters')
-
-      if (initialFiltersFromSS) {
-        const parsedInitialFiltersFromSS = JSON.parse(initialFiltersFromSS)
-
-        setInitialValues(
-          parsedInitialFiltersFromSS.min,
-          parsedInitialFiltersFromSS.max,
-          parsedInitialFiltersFromSS.searchValue
-        )
-        dispatch(setFiltersAC(parsedInitialFiltersFromSS))
-      } else {
-        setInitialValues(res.data.minCardsCount, res.data.maxCardsCount, '')
-        dispatch(setMinMaxAC(res.data.minCardsCount, res.data.maxCardsCount))
-      }
-
-      dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
-      dispatch(setPacksFetchedAC(true))
-      dispatch(appSetStatusAC('succeeded'))
-    } catch (e) {
-      const err = e as Error | AxiosError<{ error: string }>
-
-      dispatch(appSetStatusAC('failed'))
-      handleServerError(err, dispatch)
-    }
-  }
 export const getPacksTC =
   (
     filters: typeof packsInitialState.filters,
-    setInitialValues: (min: number, max: number, searchValue: string) => void
+    packsAreNotInitialized?: boolean,
+    setInitialValues?: (min: number, max: number, searchValue: string) => void
   ): AppThunk =>
   async dispatch => {
     try {
@@ -134,13 +105,22 @@ export const getPacksTC =
         `?page=${filters.page}&user_id=${filters.myPacks}&pageCount=${filters.pageCount}&min=${filters.min}&max=${filters.max}&sortPacks=${filters.sortPacks}&packName=${filters.searchValue}`
       )
 
+      sessionStorage.setItem('packs-filters', JSON.stringify(filters))
+
       if (res.data.cardPacks.length === 0) {
-        dispatch(setNoResultsAC(true))
+        dispatch(setPacksNoResultsAC(true))
       } else {
-        dispatch(setNoResultsAC(false))
+        dispatch(setPacksNoResultsAC(false))
       }
 
-      sessionStorage.setItem('filters', JSON.stringify(filters))
+      if (packsAreNotInitialized) {
+        if (setInitialValues) {
+          setInitialValues(res.data.minCardsCount, res.data.maxCardsCount, '')
+        }
+        dispatch(setMinMaxAC(res.data.minCardsCount, res.data.maxCardsCount))
+        dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
+        dispatch(setPacksFetchedAC(true))
+      }
 
       dispatch(setPacksAC(res.data.cardPacks, res.data.cardPacksTotalCount))
       if (res.data.minCardsCount !== 0 && res.data.maxCardsCount !== 0) {
@@ -170,12 +150,13 @@ export const addPackTC =
     }
   }
 export const deletePackTC =
-  (id: string): AppThunk =>
+  (id: string, fromCards: boolean): AppThunk =>
   async dispatch => {
     try {
       await packsAPI.deletePack(id)
 
-      dispatch(setCardPacksChangedAC())
+      if (!fromCards) dispatch(setCardPacksChangedAC())
+      else dispatch(setDeletedPackAC(true))
       dispatch(appSetStatusAC('succeeded'))
     } catch (e) {
       const err = e as Error | AxiosError<{ error: string }>
@@ -185,10 +166,12 @@ export const deletePackTC =
     }
   }
 export const updatePackTC =
-  (id: string): AppThunk =>
+  (id: string, fromCards: boolean): AppThunk =>
   async dispatch => {
     try {
       await packsAPI.changePack(id, 'changed hardcoded name', '', true)
+
+      if (fromCards) dispatch(setUpadtedPackAC('changed hardcoded name'))
 
       dispatch(setCardPacksChangedAC())
       dispatch(appSetStatusAC('succeeded'))
@@ -222,13 +205,13 @@ type PacksInitialStateType = typeof packsInitialState
 export type PacksActionsType =
   | ReturnType<typeof setPacksAC>
   | ReturnType<typeof setPacksFetchedAC>
-  | ReturnType<typeof setPageAC>
+  | ReturnType<typeof setPacksPageAC>
   | ReturnType<typeof setMyPacksAC>
-  | ReturnType<typeof setPageCountAC>
-  | ReturnType<typeof setFiltersAC>
+  | ReturnType<typeof setPacksPageCountAC>
+  | ReturnType<typeof setPacksFiltersAC>
   | ReturnType<typeof setMinMaxCardsCountAC>
   | ReturnType<typeof setMinMaxAC>
   | ReturnType<typeof setSortPacksAC>
-  | ReturnType<typeof setSearchValueAC>
-  | ReturnType<typeof setNoResultsAC>
+  | ReturnType<typeof setPacksSearchValueAC>
+  | ReturnType<typeof setPacksNoResultsAC>
   | ReturnType<typeof setCardPacksChangedAC>
