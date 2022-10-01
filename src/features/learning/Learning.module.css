@@ -1,3 +1,12 @@
+.learningContainer {
+    display: flex;
+    flex-direction: column;
+}
+.arrowButton {
+    position: absolute;
+    top: 110px;
+    left: 40px;
+}
 p.packName {
     margin-bottom: 3px;
 }

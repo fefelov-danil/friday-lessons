@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom'
 import s from './Learning.module.css'
 
 import { useAppDispatch, useAppSelector } from 'app/hooks'
+import { BackArrowButton } from 'common/BackArrowButton/BackArrowButton'
 import { Button } from 'common/button/Button'
 
 const grades = [
@@ -88,7 +89,10 @@ export const Learning = () => {
   }
 
   return (
-    <div className={'formPage'}>
+    <div className={'formPage' + ' ' + s.learningContainer}>
+      <div className={s.arrowButton}>
+        <BackArrowButton />
+      </div>
       <div className={'formContainer'}>
         <h4 className={s.packName}>Learn “{packName}”</h4>
         <div>
