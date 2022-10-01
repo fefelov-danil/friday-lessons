@@ -9,6 +9,7 @@ import s from './Profile.module.css'
 
 import { appAlertAC } from 'app/app-reducer'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
+import { BackArrowButton } from 'common/BackArrowButton/BackArrowButton'
 import { Button } from 'common/button/Button'
 import { InputText } from 'common/inputText/InputText'
 
@@ -47,11 +48,10 @@ export const Profile = () => {
 
   return (
     <div className="formPage">
+      <div className={s.arrowButton}>
+        <BackArrowButton />
+      </div>
       <div className={'formContainer ' + s.profileContainer}>
-        <NavLink className={s.linkToPacks} to={'/packs'}>
-          <KeyboardDoubleArrowLeftIcon />
-          back to packs
-        </NavLink>
         <img
           style={{ width: '100px', height: '100px', borderRadius: '50%', display: 'inline-block' }}
           src={profileData.user?.avatar}
