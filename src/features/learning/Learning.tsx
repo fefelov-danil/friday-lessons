@@ -8,6 +8,7 @@ import s from './Learning.module.css'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { BackArrowButton } from 'common/BackArrowButton/BackArrowButton'
 import { Button } from 'common/button/Button'
+import { CardType, getCardsTC, updateCardGradeTC } from 'features/cards/cards-reducer'
 
 const grades = [
   { value: 1, label: 'Did not know' },
@@ -17,7 +18,8 @@ const grades = [
   { value: 5, label: 'Knew the answer' },
 ]
 
-const getCard = (cards: _CardsType[]) => {
+// clever Random by IgnatZakalinsky
+const getCard = (cards: CardType[]) => {
   const sum = cards.reduce((acc, card) => acc + (6 - card.grade) * (6 - card.grade), 0)
   const rand = Math.random() * sum
   const res = cards.reduce(
@@ -41,34 +43,24 @@ export const Learning = () => {
 
   const { packId, packName } = useParams<'packId' | 'packName'>()
 
-  // const {cards} = useAppSelector(state => state.cards)
-  const cards: _CardsType[] = []
+  const cards = useAppSelector(state => state.cards.cards)
+  const filters = useAppSelector(state => state.cards.filters)
 
-  // change <_CardsType> to ours <CardsType>
-  const [card, setCard] = useState<_CardsType>({
-    _id: '0',
-    cardsPack_id: '0',
-    user_id: '',
+  const [card, setCard] = useState<CardType>({
     answer: '6',
     question: '2+2*2=?',
+    cardsPack_id: '0',
     grade: 1,
     shots: 33,
-    comments: '',
-    type: '',
-    rating: 0,
-    more_id: '',
+    user_id: '',
     created: '',
     updated: '',
-    __v: 0,
-    answerImg: '',
-    answerVideo: '',
-    questionImg: '',
-    questionVideo: '',
+    _id: '0',
   })
 
   useEffect(() => {
     if (first) {
-      // packId && dispatch(thunk_creator_get_cards(packId))
+      packId && dispatch(getCardsTC(packId, { ...filters, pageCount: 100 }))
       setFirst(false)
     }
     if (cards.length > 0) {
@@ -79,7 +71,7 @@ export const Learning = () => {
   const onNextHandle = () => {
     if (packId) {
       setIsChecked(false)
-      // dispatch(thunk_creator_that_send_grade(card._id, grade))
+      dispatch(updateCardGradeTC(grade, card._id))
       setCard(getCard(cards))
     }
   }
@@ -145,26 +137,4 @@ export const Learning = () => {
       </div>
     </div>
   )
-}
-
-// temporary type of Cards
-type _CardsType = {
-  _id: string
-  cardsPack_id: string
-  user_id: string
-  answer: string
-  question: string
-  grade: number
-  shots: number
-  comments: string
-  type: string
-  rating: number
-  more_id: string
-  created: string
-  updated: string
-  __v: number
-  answerImg: string
-  answerVideo: string
-  questionImg: string
-  questionVideo: string
 }

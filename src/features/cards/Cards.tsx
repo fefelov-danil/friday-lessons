@@ -13,7 +13,6 @@ import { appSetStatusAC } from '../../app/app-reducer'
 import { useAppDispatch, useAppSelector, useDebounce } from '../../app/hooks'
 import { Button } from '../../common/button/Button'
 import { InputText } from '../../common/inputText/InputText'
-import { LinkToPacks } from '../../common/linkToPacks/LinkToPacks'
 import { Rating } from '../../common/rating/Rating'
 import { SelectNumber } from '../../common/select/SelectNumber'
 import { parseDate } from '../../utils/parse-date-util'
@@ -34,6 +33,8 @@ import {
   updateCardTC,
 } from './cards-reducer'
 import s from './Cards.module.css'
+
+import { BackArrowButton } from 'common/BackArrowButton/BackArrowButton'
 
 export const Cards = () => {
   const dispatch = useAppDispatch()
@@ -144,8 +145,10 @@ export const Cards = () => {
 
   return (
     <div className={s.cardsPage}>
+      <div className={s.arrowButton}>
+        <BackArrowButton />
+      </div>
       <div className={s.cardsContainer}>
-        <LinkToPacks />
         <div className={s.titleAndButtons}>
           <div className={s.titleContainer}>
             <h1>{packName}</h1>

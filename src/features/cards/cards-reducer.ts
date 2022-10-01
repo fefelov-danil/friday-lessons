@@ -159,6 +159,21 @@ export const deleteCardTC =
       handleServerError(err, dispatch)
     }
   }
+export const updateCardGradeTC =
+  (grade: number, cardId: string): AppThunk =>
+  async dispatch => {
+    try {
+      await cardsAPI.updateCardGrade(grade, cardId)
+
+      dispatch(setCardsChangedAC())
+      dispatch(appSetStatusAC('succeeded'))
+    } catch (e) {
+      const err = e as Error | AxiosError<{ error: string }>
+
+      dispatch(appSetStatusAC('failed'))
+      handleServerError(err, dispatch)
+    }
+  }
 
 //Types
 type CardsStateType = typeof cardsInitialState

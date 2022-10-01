@@ -8,10 +8,9 @@ import EditIcon from '@mui/icons-material/Edit'
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import SchoolIcon from '@mui/icons-material/School'
 import Pagination from '@mui/material/Pagination'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 import { parseDate } from '../../utils/parse-date-util'
-import { useNavigate } from 'react-router-dom'
 
 import {
   addPackTC,
@@ -248,7 +247,7 @@ export const Packs = () => {
                 <td>{p.user_name}</td>
                 <td>
                   <div className={s.actionsContainer}>
-                    <SchoolIcon className={s.action} />
+                    <SchoolIcon className={s.action} onClick={() => openLearnPage(p._id, p.name)} />
                     {p.user_id === userId && (
                       <>
                         <EditIcon

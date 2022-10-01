@@ -3,22 +3,25 @@ import axios from 'axios'
 import { CardType } from './cards-reducer'
 
 export const instance = axios.create({
-  baseURL: 'https://neko-back.herokuapp.com/2.0/cards/card',
+  baseURL: 'https://neko-back.herokuapp.com/2.0/cards',
   withCredentials: true,
 })
 
 export const cardsAPI = {
   getCards(payload: string) {
-    return instance.get<GetCardsResponceType>(`?${payload}`)
+    return instance.get<GetCardsResponceType>(`/card?${payload}`)
   },
   addCard(packId: string, question: string, answer: string) {
-    return instance.post('', { card: { cardsPack_id: packId, question, answer } })
+    return instance.post('/card', { card: { cardsPack_id: packId, question, answer } })
   },
   updateCard(cardId: string, question: string, answer: string) {
-    return instance.put('', { card: { _id: cardId, question, answer } })
+    return instance.put('/card', { card: { _id: cardId, question, answer } })
   },
   deleteCard(cardId: string) {
-    return instance.delete(`?id=${cardId}`)
+    return instance.delete(`/card?id=${cardId}`)
+  },
+  updateCardGrade(grade: number, cardId: string) {
+    return instance.put(`/grade`, { grade, card_id: cardId })
   },
 }
 
