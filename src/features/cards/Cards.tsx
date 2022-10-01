@@ -7,7 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import SchoolIcon from '@mui/icons-material/School'
 import Pagination from '@mui/material/Pagination'
-import { Navigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 
 import { appSetStatusAC } from '../../app/app-reducer'
 import { useAppDispatch, useAppSelector, useDebounce } from '../../app/hooks'
@@ -37,6 +37,7 @@ import s from './Cards.module.css'
 import { BackArrowButton } from 'common/BackArrowButton/BackArrowButton'
 
 export const Cards = () => {
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const cardsData = useAppSelector(state => state.cards)
   const editor = useAppSelector(state => state.auth.user?._id) === cardsData.creatorId
@@ -122,6 +123,9 @@ export const Cards = () => {
       }
     }
   }
+  const openLearnPage = () => {
+    navigate(`/learn/${packId}/${packName}`)
+  }
 
   let sortIcon = <ArrowDropDownIcon />
 
@@ -172,7 +176,7 @@ export const Cards = () => {
                 Add Card
               </Button>
             )}
-            <Button>
+            <Button onClick={openLearnPage}>
               <SchoolIcon />
               Learn Pack
             </Button>
