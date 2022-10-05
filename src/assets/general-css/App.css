@@ -231,3 +231,147 @@ ul.ul-custom li:before {
 .standardBtn:hover {
   background: #f82e34;
 }
+
+/* Таблица */
+.sort {
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0;
+
+  font-weight: bold;
+}
+
+.sort:hover {
+  text-decoration: underline;
+}
+
+.loading {
+  opacity: 0.6;
+}
+
+.table {
+  border-collapse: collapse;
+
+  width: 100%;
+
+  font-family: "OpenSans", sans-serif;
+  font-size: 16px;
+  color: #333;
+  vertical-align: middle;
+
+  border: none;
+  border-radius: 5px;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.table th {
+  cursor: default;
+
+  padding: 10px;
+
+  font-weight: bold;
+
+  background: #c3c3c3;
+  border: none;
+  border-bottom: 2px solid #a7a7a7;
+}
+
+.table th:first-child {
+  border-radius: 5px 0 0 0;
+}
+
+.table th:last-child {
+  border-radius: 0 5px 0 0;
+}
+
+.table td {
+  padding: 10px;
+
+  text-align: center;
+
+  background: #fff;
+  border: none;
+  border-bottom: 1px solid #a7a7a7;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.table tr:last-child td:first-child {
+  border-radius: 0 0 0 5px;
+}
+
+.table tr:last-child td:last-child {
+  border-radius: 0 0 5px 0;
+}
+
+.table tr td:first-of-type {
+  text-align: left;
+}
+
+.noResults {
+  padding: 30px;
+
+  text-align: center;
+
+  background: #fff;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.actionsContainer {
+  display: flex;
+  justify-content: space-around;
+}
+
+.action {
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.action:hover {
+  color: #f8686e;
+}
+
+.disabledAction {
+  color: #C3C3C3;
+}
+
+/* Пагинация */
+.pagination {
+  display: flex;
+  align-items: center;
+
+  margin-top: 20px;
+}
+
+.select {
+  margin-right: 10px;
+}
+
+/* Контейнер для большой страницы (packs, cards) */
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: calc(100vh - 72px);
+  padding: 60px 20px;
+
+  background-image: linear-gradient(60deg, #29323c 0%, #485563 100%);
+}
+
+.pageContainer {
+  width: 100%;
+  max-width: 1200px;
+  padding: 45px 65px 65px 65px;
+
+  background: #e2e6eb;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}

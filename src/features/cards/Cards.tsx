@@ -148,22 +148,22 @@ export const Cards = () => {
   }
 
   return (
-    <div className={s.cardsPage}>
+    <div className="page">
       <div className={s.arrowButton}>
         <BackArrowButton />
       </div>
-      <div className={s.cardsContainer}>
+      <div className="pageContainer">
         <div className={s.titleAndButtons}>
           <div className={s.titleContainer}>
             <h1>{packName}</h1>
             {editor && (
               <>
                 <EditIcon
-                  className={s.action}
+                  className="action"
                   onClick={() => !isLoading && onUpdatePackHandler(packId || '')}
                 />
                 <DeleteIcon
-                  className={s.action}
+                  className="action"
                   onClick={() => !isLoading && onDeletePackHandler(packId || '')}
                 />
               </>
@@ -176,7 +176,10 @@ export const Cards = () => {
                 Add Card
               </Button>
             )}
-            <Button onClick={openLearnPage}>
+            <Button
+              disabled={cardsData.cards.length === 0}
+              onClick={() => cardsData.cards.length !== 0 && openLearnPage()}
+            >
               <SchoolIcon />
               Learn Pack
             </Button>
@@ -191,25 +194,26 @@ export const Cards = () => {
           placeholder="Enter question"
           value={searchLocalVal}
           onChange={e => !isLoading && setSearchLocalVal(e.currentTarget.value)}
+          className={s.cardsSearch}
         />
-        <table className={s.cardsTable}>
+        <table className="table">
           <tbody>
             <tr>
               <th>
-                <p className={s.sort} onClick={() => !isLoading && onSortChangeHandler('question')}>
+                <p className="sort" onClick={() => !isLoading && onSortChangeHandler('question')}>
                   Questions
                   {filters.sortCards.substring(1) === 'question' && sortIcon}
                 </p>
               </th>
               <th>Answers</th>
               <th>
-                <p className={s.sort} onClick={() => !isLoading && onSortChangeHandler('updated')}>
+                <p className="sort" onClick={() => !isLoading && onSortChangeHandler('updated')}>
                   Updated
                   {filters.sortCards.substring(1) === 'updated' && sortIcon}
                 </p>
               </th>
               <th>
-                <p className={s.sort} onClick={() => !isLoading && onSortChangeHandler('grade')}>
+                <p className="sort" onClick={() => !isLoading && onSortChangeHandler('grade')}>
                   Grade
                   {filters.sortCards.substring(1) === 'grade' && sortIcon}
                 </p>
@@ -217,7 +221,7 @@ export const Cards = () => {
               {editor && <th></th>}
             </tr>
             {cardsData.cards.map(c => (
-              <tr key={c._id} className={isLoading ? s.loading : ''}>
+              <tr key={c._id} className={isLoading ? 'loading' : ''}>
                 <td>{c.question}</td>
                 <td>{c.answer}</td>
                 <td>{parseDate(c.updated)}</td>
@@ -228,11 +232,11 @@ export const Cards = () => {
                   <td>
                     <>
                       <EditIcon
-                        className={s.action}
+                        className="action"
                         onClick={() => !isLoading && onUpdateCardHandler(c._id)}
                       />
                       <DeleteIcon
-                        className={s.action}
+                        className="action"
                         onClick={() => !isLoading && onDeleteCardHandler(c._id)}
                       />
                     </>
@@ -242,16 +246,16 @@ export const Cards = () => {
             ))}
           </tbody>
         </table>
-        {cardsData.noResults && <div className={s.noResults}>No cards here</div>}
-        <div className={s.pagination}>
+        {cardsData.noResults && <div className="noResults">No cards here</div>}
+        <div className="pagination">
           <SelectNumber
             value={filters.pageCount}
             onChange={onPageCountChange}
             options={[10, 15, 25, 50]}
             disabled={isLoading}
-            className={s.select}
+            className="select"
           />
-          <span>cards on page</span>
+          <span>packs on page</span>
           {pagesAmount > 1 && (
             <Pagination
               count={pagesAmount}
