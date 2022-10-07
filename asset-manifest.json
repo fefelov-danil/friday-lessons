@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/friday-lessons/static/css/main.6c7af43c.css",
-    "main.js": "/friday-lessons/static/js/main.3790ddb2.js",
+    "main.css": "/friday-lessons/static/css/main.6dfa993e.css",
+    "main.js": "/friday-lessons/static/js/main.3ceedaa8.js",
     "static/js/787.cfef8d12.chunk.js": "/friday-lessons/static/js/787.cfef8d12.chunk.js",
     "static/media/Oswald-Medium.eot": "/friday-lessons/static/media/Oswald-Medium.0922d1d6384e1966882d.eot",
     "static/media/Oswald-Medium.ttf": "/friday-lessons/static/media/Oswald-Medium.412de8ccd54c42018cad.ttf",
@@ -20,12 +20,12 @@
     "static/media/OpenSansRegular.woff": "/friday-lessons/static/media/OpenSansRegular.f815477469249e798748.woff",
     "static/media/logo.png": "/friday-lessons/static/media/logo.ecef50e1ce664ccccf6d.png",
     "index.html": "/friday-lessons/index.html",
-    "main.6c7af43c.css.map": "/friday-lessons/static/css/main.6c7af43c.css.map",
-    "main.3790ddb2.js.map": "/friday-lessons/static/js/main.3790ddb2.js.map",
+    "main.6dfa993e.css.map": "/friday-lessons/static/css/main.6dfa993e.css.map",
+    "main.3ceedaa8.js.map": "/friday-lessons/static/js/main.3ceedaa8.js.map",
     "787.cfef8d12.chunk.js.map": "/friday-lessons/static/js/787.cfef8d12.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.6c7af43c.css",
-    "static/js/main.3790ddb2.js"
+    "static/css/main.6dfa993e.css",
+    "static/js/main.3ceedaa8.js"
   ]
 }
