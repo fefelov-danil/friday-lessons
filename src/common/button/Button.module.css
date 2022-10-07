@@ -17,3 +17,7 @@
 .button:hover {
   background: #f82e34;
 }
+.button:disabled {
+  opacity: 0.7;
+  background: #f8686e;
+}

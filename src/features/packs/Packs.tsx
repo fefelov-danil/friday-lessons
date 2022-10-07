@@ -16,6 +16,7 @@ import {
   addPackTC,
   deletePackTC,
   getPacksTC,
+  PackType,
   setMinMaxAC,
   setMyPacksAC,
   setPacksAC,
@@ -54,10 +55,9 @@ export const Packs = () => {
   const minDebVal = useDebounce(minLocalVal, 500)
   const maxDebVal = useDebounce(maxLocalVal, 500)
 
-  const setInitialValues = (min: number, max: number, searchValue: string) => {
+  const setInitialValues = (min: number, max: number) => {
     setMinLocalVal(min)
     setMaxLocalVal(max)
-    setSearchLocalVal(searchValue)
   }
 
   useEffect(() => {
@@ -68,11 +68,8 @@ export const Packs = () => {
       if (filtersFromSS) {
         const parsedFiltersFromSS = JSON.parse(filtersFromSS)
 
-        setInitialValues(
-          parsedFiltersFromSS.min,
-          parsedFiltersFromSS.max,
-          parsedFiltersFromSS.searchValue
-        )
+        setInitialValues(parsedFiltersFromSS.min, parsedFiltersFromSS.max)
+        setSearchLocalVal(parsedFiltersFromSS.searchValue)
 
         dispatch(setPacksFiltersAC(parsedFiltersFromSS))
         dispatch(getPacksTC(parsedFiltersFromSS, true))
@@ -84,7 +81,7 @@ export const Packs = () => {
   useEffect(() => {
     if (packsData.packsFetched) {
       dispatch(appSetStatusAC('loading'))
-      dispatch(getPacksTC(filters))
+      dispatch(getPacksTC(filters, false, setInitialValues))
     }
   }, [
     packsData.cardPacksChanged,
@@ -122,11 +119,9 @@ export const Packs = () => {
     dispatch(updatePackTC(id, false))
   }
   const onPageChange = (page: number) => {
-    dispatch(setPacksAC([], packsData.cardPacksTotalCount))
     dispatch(setPacksPageAC(page))
   }
   const onMyPacksChange = (myPacks: boolean) => {
-    dispatch(setPacksAC([], packsData.cardPacksTotalCount))
     dispatch(setPacksPageAC(1))
     dispatch(setMyPacksAC(myPacks ? `${userId}` : ''))
   }
@@ -147,7 +142,6 @@ export const Packs = () => {
     }
   }
   const onDeleteFiltersHandler = () => {
-    dispatch(setPacksAC([], packsData.cardPacksTotalCount))
     const newFilters = {
       page: 1,
       pageCount: filters.pageCount,
@@ -158,7 +152,8 @@ export const Packs = () => {
       searchValue: '',
     }
 
-    setInitialValues(packsData.minCardsCount, packsData.maxCardsCount, '')
+    setInitialValues(packsData.minCardsCount, packsData.maxCardsCount)
+    setSearchLocalVal('')
     dispatch(setPacksFiltersAC(newFilters))
   }
   const openLearnPage = (packId: string, packName: string) => {
@@ -172,8 +167,8 @@ export const Packs = () => {
   }
 
   return (
-    <div className={s.packsPage}>
-      <div className={s.packsContainer}>
+    <div className="page">
+      <div className="pageContainer">
         <div className={s.packsList}>
           <h1>Packs List</h1>
           <Button style={{ display: 'flex' }} disabled={isLoading} onClick={onAddPackHandler}>
@@ -215,21 +210,18 @@ export const Packs = () => {
             <FilterAltOffIcon />
           </Button>
         </div>
-        <table className={s.packsTable}>
+        <table className="table">
           <tbody>
             <tr>
               <th>Pack name</th>
               <th>
-                <p
-                  className={s.sort}
-                  onClick={() => !isLoading && onSortChangeHandler('cardsCount')}
-                >
+                <p className="sort" onClick={() => !isLoading && onSortChangeHandler('cardsCount')}>
                   Cards
                   {filters.sortPacks.substring(1) === 'cardsCount' && sortIcon}
                 </p>
               </th>
               <th>
-                <p className={s.sort} onClick={() => !isLoading && onSortChangeHandler('updated')}>
+                <p className="sort" onClick={() => !isLoading && onSortChangeHandler('updated')}>
                   Updated
                   {filters.sortPacks.substring(1) === 'updated' && sortIcon}
                 </p>
@@ -237,8 +229,8 @@ export const Packs = () => {
               <th>Creator</th>
               <th>Actions</th>
             </tr>
-            {packsData.cardPacks.map(p => (
-              <tr key={p._id} className={isLoading ? s.loading : ''}>
+            {packsData.cardPacks.map((p: PackType) => (
+              <tr key={p._id} className={isLoading ? 'loading' : ''}>
                 <td>
                   <NavLink to={`${p._id}/${p.name}`}>{p.name}</NavLink>
                 </td>
@@ -246,16 +238,19 @@ export const Packs = () => {
                 <td>{parseDate(p.updated)}</td>
                 <td>{p.user_name}</td>
                 <td>
-                  <div className={s.actionsContainer}>
-                    <SchoolIcon className={s.action} onClick={() => openLearnPage(p._id, p.name)} />
+                  <div className="actionsContainer">
+                    <SchoolIcon
+                      className={p.cardsCount === 0 ? 'disabledAction' : 'action'}
+                      onClick={() => p.cardsCount !== 0 && openLearnPage(p._id, p.name)}
+                    />
                     {p.user_id === userId && (
                       <>
                         <EditIcon
-                          className={s.action}
+                          className="action"
                           onClick={() => !isLoading && onUpdatePackHandler(p._id)}
                         />
                         <DeleteIcon
-                          className={s.action}
+                          className="action"
                           onClick={() => !isLoading && onDeletePackHandler(p._id)}
                         />
                       </>
@@ -266,14 +261,14 @@ export const Packs = () => {
             ))}
           </tbody>
         </table>
-        {packsData.noResults && <div className={s.noResults}>No results, try other filters</div>}
-        <div className={s.pagination}>
+        {packsData.noResults && <div className="noResults">No results, try other filters</div>}
+        <div className="pagination">
           <SelectNumber
             value={packsData.filters.pageCount}
             onChange={onPageCountChange}
             options={[5, 10, 25, 50]}
             disabled={isLoading}
-            className={s.select}
+            className="select"
           />
           <span>packs on page</span>
           {pagesAmount > 1 && (

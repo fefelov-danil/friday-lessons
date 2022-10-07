@@ -97,9 +97,9 @@ export const getPacksTC =
   (
     filters: typeof packsInitialState.filters,
     packsAreNotInitialized?: boolean,
-    setInitialValues?: (min: number, max: number, searchValue: string) => void
+    setInitialValues?: (min: number, max: number) => void
   ): AppThunk =>
-  async dispatch => {
+  async (dispatch, getState) => {
     try {
       const res = await packsAPI.getPacks(
         `?page=${filters.page}&user_id=${filters.myPacks}&pageCount=${filters.pageCount}&min=${filters.min}&max=${filters.max}&sortPacks=${filters.sortPacks}&packName=${filters.searchValue}`
@@ -115,7 +115,7 @@ export const getPacksTC =
 
       if (packsAreNotInitialized) {
         if (setInitialValues) {
-          setInitialValues(res.data.minCardsCount, res.data.maxCardsCount, '')
+          setInitialValues(res.data.minCardsCount, res.data.maxCardsCount)
         }
         dispatch(setMinMaxAC(res.data.minCardsCount, res.data.maxCardsCount))
         dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
@@ -123,8 +123,19 @@ export const getPacksTC =
       }
 
       dispatch(setPacksAC(res.data.cardPacks, res.data.cardPacksTotalCount))
-      if (res.data.minCardsCount !== 0 && res.data.maxCardsCount !== 0) {
+
+      const currentMinCardsCount = getState().packs.minCardsCount
+      const currentMaxCardsCount = getState().packs.maxCardsCount
+
+      if (
+        res.data.minCardsCount !== currentMinCardsCount ||
+        res.data.maxCardsCount !== currentMaxCardsCount
+      ) {
+        if (setInitialValues) {
+          setInitialValues(res.data.minCardsCount, res.data.maxCardsCount)
+        }
         dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
+        dispatch(setMinMaxAC(res.data.minCardsCount, res.data.maxCardsCount))
       }
       dispatch(appSetStatusAC('succeeded'))
     } catch (e) {
