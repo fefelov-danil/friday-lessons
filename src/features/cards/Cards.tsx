@@ -30,7 +30,7 @@ import {
   setCardsPageCountAC,
   setCardsSearchValueAC,
   setSortCardsAC,
-  setUpadtedPackAC,
+  setUpdatedPackAC,
 } from './cards-reducer'
 import s from './Cards.module.css'
 
@@ -53,7 +53,7 @@ export const Cards = () => {
   useEffect(() => {
     dispatch(appSetStatusAC('loading'))
     if (!cardsData.cardsFetched) {
-      dispatch(setUpadtedPackAC(''))
+      dispatch(setUpdatedPackAC(''))
       const filtersFromSS = sessionStorage.getItem('cards-filters') // SS - SessionStorage
 
       if (filtersFromSS) {

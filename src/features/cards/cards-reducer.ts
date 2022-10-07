@@ -80,7 +80,7 @@ export const setCardsNoResultsAC = (noResults: boolean) =>
 export const setCardsChangedAC = () => ({ type: 'cards/SET-CARDS-CHANGED' } as const)
 export const setDeletedPackAC = (deletedPack: boolean) =>
   ({ type: 'cars/SET-DELETED-PACK', deletedPack } as const)
-export const setUpadtedPackAC = (newTitle: string) =>
+export const setUpdatedPackAC = (newTitle: string) =>
   ({ type: 'cards/SET-UPDATED-PACK', newTitle } as const)
 
 export const setCardsFiltersAC = (filters: typeof cardsInitialState.filters) =>
@@ -222,5 +222,5 @@ export type CardsActionsType =
   | ReturnType<typeof setCardsNoResultsAC>
   | ReturnType<typeof setCardsChangedAC>
   | ReturnType<typeof setDeletedPackAC>
-  | ReturnType<typeof setUpadtedPackAC>
+  | ReturnType<typeof setUpdatedPackAC>
   | ReturnType<typeof updateCardGradeAC>
