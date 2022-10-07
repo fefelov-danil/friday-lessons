@@ -10,22 +10,21 @@ import SchoolIcon from '@mui/icons-material/School'
 import Pagination from '@mui/material/Pagination'
 import { NavLink, useNavigate } from 'react-router-dom'
 
+import { AddPackModal } from '../../common/modals/AddPackModal/AddPackModal'
+import { DeletePackModal } from '../../common/modals/DeletePackModal/DeletePackModal'
+import { UpdatePackModal } from '../../common/modals/UpdatePackModal/UpdatePackModal'
 import { parseDate } from '../../utils/parse-date-util'
 
 import {
-  addPackTC,
-  deletePackTC,
   getPacksTC,
   PackType,
   setMinMaxAC,
   setMyPacksAC,
-  setPacksAC,
   setPacksFiltersAC,
   setPacksPageAC,
   setPacksPageCountAC,
   setPacksSearchValueAC,
   setSortPacksAC,
-  updatePackTC,
 } from './packs-reducer'
 import s from './Packs.module.css'
 
@@ -106,18 +105,6 @@ export const Packs = () => {
     dispatch(setPacksSearchValueAC(searchLocalVal))
   }, [searchDebVal])
 
-  const onAddPackHandler = () => {
-    dispatch(appSetStatusAC('loading'))
-    dispatch(addPackTC('new hardcoded pack', true))
-  }
-  const onDeletePackHandler = (id: string) => {
-    dispatch(appSetStatusAC('loading'))
-    dispatch(deletePackTC(id, false))
-  }
-  const onUpdatePackHandler = (id: string) => {
-    dispatch(appSetStatusAC('loading'))
-    dispatch(updatePackTC(id, false))
-  }
   const onPageChange = (page: number) => {
     dispatch(setPacksPageAC(page))
   }
@@ -171,9 +158,14 @@ export const Packs = () => {
       <div className="pageContainer">
         <div className={s.packsList}>
           <h1>Packs List</h1>
-          <Button style={{ display: 'flex' }} disabled={isLoading} onClick={onAddPackHandler}>
-            <AddIcon /> Add new pack
-          </Button>
+
+          <AddPackModal
+            openButton={
+              <Button style={{ display: 'flex' }} disabled={isLoading}>
+                <AddIcon /> Add new pack
+              </Button>
+            }
+          />
         </div>
 
         <div className={s.filters}>
@@ -245,13 +237,18 @@ export const Packs = () => {
                     />
                     {p.user_id === userId && (
                       <>
-                        <EditIcon
-                          className="action"
-                          onClick={() => !isLoading && onUpdatePackHandler(p._id)}
+                        <UpdatePackModal
+                          openButton={<EditIcon className="action" />}
+                          name={p.name}
+                          id={p._id}
+                          fromCards={false}
                         />
-                        <DeleteIcon
-                          className="action"
-                          onClick={() => !isLoading && onDeletePackHandler(p._id)}
+
+                        <DeletePackModal
+                          title={p.name}
+                          id={p._id}
+                          openButton={<DeleteIcon className="action" />}
+                          fromCards={false}
                         />
                       </>
                     )}

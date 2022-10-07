@@ -46,6 +46,13 @@ export const packsReducer = (
       return { ...state, noResults: action.noResults }
     case 'packs/SET-CARDS-PACK-CHANGED':
       return { ...state, cardPacksChanged: state.cardPacksChanged + 1 }
+    case 'packs/SET-NEW-PACK-NAME':
+      return {
+        ...state,
+        cardPacks: state.cardPacks.map(p =>
+          p._id === action.id ? { ...p, name: action.newName } : p
+        ),
+      }
 
     case 'packs/SET-FILTERS':
       return { ...state, filters: action.filters }
@@ -77,6 +84,8 @@ export const setMinMaxCardsCountAC = (minCC: number, maxCC: number) =>
 export const setPacksNoResultsAC = (noResults: boolean) =>
   ({ type: 'packs/SET-NO-RESULTS', noResults } as const)
 export const setCardPacksChangedAC = () => ({ type: 'packs/SET-CARDS-PACK-CHANGED' } as const)
+export const setNewPackNameAC = (id: string, newName: string) =>
+  ({ type: 'packs/SET-NEW-PACK-NAME', id, newName } as const)
 
 export const setPacksFiltersAC = (filters: typeof packsInitialState.filters) =>
   ({ type: 'packs/SET-FILTERS', filters } as const)
@@ -135,7 +144,6 @@ export const getPacksTC =
           setInitialValues(res.data.minCardsCount, res.data.maxCardsCount)
         }
         dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
-        dispatch(setMinMaxAC(res.data.minCardsCount, res.data.maxCardsCount))
       }
       dispatch(appSetStatusAC('succeeded'))
     } catch (e) {
@@ -161,13 +169,14 @@ export const addPackTC =
     }
   }
 export const deletePackTC =
-  (id: string, fromCards: boolean): AppThunk =>
+  (id: string, fromCards: boolean, callBack?: () => void): AppThunk =>
   async dispatch => {
     try {
       await packsAPI.deletePack(id)
 
       if (!fromCards) dispatch(setCardPacksChangedAC())
       else dispatch(setDeletedPackAC(true))
+      callBack && callBack()
       dispatch(appSetStatusAC('succeeded'))
     } catch (e) {
       const err = e as Error | AxiosError<{ error: string }>
@@ -177,14 +186,21 @@ export const deletePackTC =
     }
   }
 export const updatePackTC =
-  (id: string, fromCards: boolean): AppThunk =>
+  (
+    id: string,
+    newTitle: string,
+    fromCards: boolean,
+    callBack?: (newName: string) => void
+  ): AppThunk =>
   async dispatch => {
     try {
-      await packsAPI.changePack(id, 'changed hardcoded name', '', true)
+      await packsAPI.changePack(id, newTitle, '')
 
-      if (fromCards) dispatch(setUpadtedPackAC('changed hardcoded name'))
+      if (fromCards) dispatch(setUpadtedPackAC(newTitle))
 
       dispatch(setCardPacksChangedAC())
+      dispatch(setNewPackNameAC(id, newTitle))
+      callBack && callBack(newTitle)
       dispatch(appSetStatusAC('succeeded'))
     } catch (e) {
       const err = e as Error | AxiosError<{ error: string }>
@@ -226,3 +242,4 @@ export type PacksActionsType =
   | ReturnType<typeof setPacksSearchValueAC>
   | ReturnType<typeof setPacksNoResultsAC>
   | ReturnType<typeof setCardPacksChangedAC>
+  | ReturnType<typeof setNewPackNameAC>

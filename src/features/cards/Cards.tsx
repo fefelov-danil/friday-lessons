@@ -7,30 +7,30 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import SchoolIcon from '@mui/icons-material/School'
 import Pagination from '@mui/material/Pagination'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { appSetStatusAC } from '../../app/app-reducer'
 import { useAppDispatch, useAppSelector, useDebounce } from '../../app/hooks'
 import { Button } from '../../common/button/Button'
 import { InputText } from '../../common/inputText/InputText'
+import { AddPackModal } from '../../common/modals/AddCardModal/AddCardModal'
+import { DeleteCardModal } from '../../common/modals/DeleteCardModal/DeleteCardModal'
+import { DeletePackModal } from '../../common/modals/DeletePackModal/DeletePackModal'
+import { UpdateCardModal } from '../../common/modals/UpdateCardsModal/UpdateCardModal'
+import { UpdatePackModal } from '../../common/modals/UpdatePackModal/UpdatePackModal'
 import { Rating } from '../../common/rating/Rating'
 import { SelectNumber } from '../../common/select/SelectNumber'
 import { parseDate } from '../../utils/parse-date-util'
-import { deletePackTC, updatePackTC } from '../packs/packs-reducer'
 
 import {
-  addCardTC,
-  deleteCardTC,
   getCardsTC,
   setCardsAC,
   setCardsFiltersAC,
   setCardsPageAC,
   setCardsPageCountAC,
   setCardsSearchValueAC,
-  setDeletedPackAC,
   setSortCardsAC,
   setUpadtedPackAC,
-  updateCardTC,
 } from './cards-reducer'
 import s from './Cards.module.css'
 
@@ -53,6 +53,7 @@ export const Cards = () => {
   useEffect(() => {
     dispatch(appSetStatusAC('loading'))
     if (!cardsData.cardsFetched) {
+      dispatch(setUpadtedPackAC(''))
       const filtersFromSS = sessionStorage.getItem('cards-filters') // SS - SessionStorage
 
       if (filtersFromSS) {
@@ -82,26 +83,6 @@ export const Cards = () => {
     dispatch(setCardsSearchValueAC(searchDebVal))
   }, [searchDebVal])
 
-  const onDeletePackHandler = (id: string) => {
-    dispatch(appSetStatusAC('loading'))
-    dispatch(deletePackTC(id, true))
-  }
-  const onUpdatePackHandler = (id: string) => {
-    dispatch(appSetStatusAC('loading'))
-    dispatch(updatePackTC(id, true))
-  }
-  const onAddCardHandler = () => {
-    dispatch(appSetStatusAC('loading'))
-    packId && dispatch(addCardTC(packId, 'hardcoded question', 'hardcoded answer'))
-  }
-  const onUpdateCardHandler = (cardId: string) => {
-    dispatch(appSetStatusAC('loading'))
-    dispatch(updateCardTC(cardId, 'changed question', 'changed answer'))
-  }
-  const onDeleteCardHandler = (cardId: string) => {
-    dispatch(appSetStatusAC('loading'))
-    dispatch(deleteCardTC(cardId))
-  }
   const onPageChange = (page: number) => {
     dispatch(setCardsAC([]))
     dispatch(setCardsPageAC(page))
@@ -133,18 +114,14 @@ export const Cards = () => {
     sortIcon = <ArrowDropUpIcon />
   }
 
-  if (cardsData.deletedPack) {
-    dispatch(setDeletedPackAC(false))
-
-    return <Navigate to={'/packs'} />
+  const deletedPack = () => {
+    navigate('/packs')
   }
 
-  if (cardsData.updatedPack) {
-    const title = cardsData.updatedPack
+  const changePackName = (newName: string) => {
+    console.log(newName)
 
-    dispatch(setUpadtedPackAC(''))
-
-    return <Navigate to={`/packs/${packId}/${title}`} />
+    navigate(`/packs/${packId}/${newName}`)
   }
 
   return (
@@ -158,23 +135,35 @@ export const Cards = () => {
             <h1>{packName}</h1>
             {editor && (
               <>
-                <EditIcon
-                  className="action"
-                  onClick={() => !isLoading && onUpdatePackHandler(packId || '')}
+                <UpdatePackModal
+                  openButton={<EditIcon className="action" />}
+                  name={packName ? packName : ''}
+                  id={packId ? packId : ''}
+                  fromCards={true}
+                  callBack={changePackName}
                 />
-                <DeleteIcon
-                  className="action"
-                  onClick={() => !isLoading && onDeletePackHandler(packId || '')}
+
+                <DeletePackModal
+                  title={packName ? packName : ''}
+                  id={packId ? packId : ''}
+                  openButton={<DeleteIcon className="action" />}
+                  fromCards={true}
+                  callBack={deletedPack}
                 />
               </>
             )}
           </div>
           <div className={s.buttonsContainer}>
             {editor && (
-              <Button onClick={onAddCardHandler}>
-                <AddIcon />
-                Add Card
-              </Button>
+              <AddPackModal
+                packId={packId ? packId : ''}
+                openButton={
+                  <Button>
+                    <AddIcon />
+                    Add Card
+                  </Button>
+                }
+              />
             )}
             <Button
               disabled={cardsData.cards.length === 0}
@@ -230,16 +219,20 @@ export const Cards = () => {
                 </td>
                 {editor && (
                   <td>
-                    <>
-                      <EditIcon
-                        className="action"
-                        onClick={() => !isLoading && onUpdateCardHandler(c._id)}
+                    <div className="actionsContainer">
+                      <UpdateCardModal
+                        openButton={<EditIcon className="action" />}
+                        id={c._id}
+                        question={c.question}
+                        answer={c.answer}
                       />
-                      <DeleteIcon
-                        className="action"
-                        onClick={() => !isLoading && onDeleteCardHandler(c._id)}
+
+                      <DeleteCardModal
+                        openButton={<DeleteIcon className="action" />}
+                        title={c.question}
+                        id={c._id}
                       />
-                    </>
+                    </div>
                   </td>
                 )}
               </tr>
