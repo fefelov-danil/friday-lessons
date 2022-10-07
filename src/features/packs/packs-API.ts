@@ -17,8 +17,8 @@ export const packsAPI = {
   deletePack(id: string) {
     return instance.delete(`?id=${id}`)
   },
-  changePack(_id: string, name: string, deckCover: string, privatePack: boolean) {
-    return instance.put('', { cardsPack: { _id, name, deckCover, private: privatePack } })
+  changePack(_id: string, name: string, deckCover: string) {
+    return instance.put('', { cardsPack: { _id, name, deckCover } })
   },
 }
 
