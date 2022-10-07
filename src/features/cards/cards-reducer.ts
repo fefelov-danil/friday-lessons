@@ -56,6 +56,13 @@ export const cardsReducer = (
       return { ...state, filters: { ...state.filters, searchValue: action.searchValue } }
     case 'cards/SET-SORT-CARDS':
       return { ...state, filters: { ...state.filters, sortCards: action.sortCards } }
+    case 'cards/SET-CARD-GRADE':
+      return {
+        ...state,
+        cards: state.cards.map(card =>
+          card._id === action.card_id ? { ...card, grade: action.grade, shots: action.shots } : card
+        ),
+      }
     default:
       return state
   }
@@ -86,6 +93,13 @@ export const setCardsSearchValueAC = (searchValue: string) =>
   ({ type: 'cards/SET-SEARCH-VALUE', searchValue } as const)
 export const setSortCardsAC = (sortCards: string) =>
   ({ type: 'cards/SET-SORT-CARDS', sortCards } as const)
+export const updateCardGradeAC = (card_id: string, grade: number, shots: number) =>
+  ({
+    type: 'cards/SET-CARD-GRADE',
+    card_id,
+    grade,
+    shots,
+  } as const)
 
 //Thunks
 export const getCardsTC =
@@ -163,8 +177,15 @@ export const updateCardGradeTC =
   (grade: number, cardId: string): AppThunk =>
   async dispatch => {
     try {
-      await cardsAPI.updateCardGrade(grade, cardId)
+      const res = await cardsAPI.updateCardGrade(grade, cardId)
 
+      dispatch(
+        updateCardGradeAC(
+          res.data.updatedGrade.card_id,
+          res.data.updatedGrade.grade,
+          res.data.updatedGrade.shots
+        )
+      )
       dispatch(setCardsChangedAC())
       dispatch(appSetStatusAC('succeeded'))
     } catch (e) {
@@ -202,3 +223,4 @@ export type CardsActionsType =
   | ReturnType<typeof setCardsChangedAC>
   | ReturnType<typeof setDeletedPackAC>
   | ReturnType<typeof setUpadtedPackAC>
+  | ReturnType<typeof updateCardGradeAC>

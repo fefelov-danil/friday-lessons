@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom'
 
 import s from './Learning.module.css'
 
+import { appSetStatusAC } from 'app/app-reducer'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { BackArrowButton } from 'common/BackArrowButton/BackArrowButton'
 import { Button } from 'common/button/Button'
@@ -36,30 +37,31 @@ const getCard = (cards: CardType[]) => {
 
 export const Learning = () => {
   const dispatch = useAppDispatch()
+  const { packId, packName } = useParams<'packId' | 'packName'>()
   const [isChecked, setIsChecked] = useState(false)
   const [first, setFirst] = useState(true)
   const [value, setValue] = useState('')
   const [grade, setGrade] = useState(0)
 
-  const { packId, packName } = useParams<'packId' | 'packName'>()
-
   const cards = useAppSelector(state => state.cards.cards)
   const filters = useAppSelector(state => state.cards.filters)
+  const isLoading = 'loading' === useAppSelector(state => state.app.appStatus)
 
   const [card, setCard] = useState<CardType>({
-    answer: '6',
-    question: '2+2*2=?',
-    cardsPack_id: '0',
-    grade: 1,
-    shots: 33,
+    answer: '',
+    question: '',
+    cardsPack_id: '',
+    grade: 0,
+    shots: 0,
     user_id: '',
     created: '',
     updated: '',
-    _id: '0',
+    _id: '',
   })
 
   useEffect(() => {
     if (first) {
+      dispatch(appSetStatusAC('loading'))
       packId && dispatch(getCardsTC(packId, { ...filters, pageCount: 100 }))
       setFirst(false)
     }
@@ -70,8 +72,10 @@ export const Learning = () => {
 
   const onNextHandle = () => {
     if (packId) {
+      dispatch(appSetStatusAC('loading'))
       setIsChecked(false)
       dispatch(updateCardGradeTC(grade, card._id))
+      setValue('')
       setCard(getCard(cards))
     }
   }
@@ -83,7 +87,7 @@ export const Learning = () => {
   return (
     <div className={'formPage' + ' ' + s.learningContainer}>
       <div className={s.arrowButton}>
-        <BackArrowButton />
+        <BackArrowButton title="Cards List" packData={{ packId, packName }} />
       </div>
       <div className={'formContainer'}>
         <h4 className={s.packName}>Learn “{packName}”</h4>
@@ -128,7 +132,11 @@ export const Learning = () => {
             </>
           ) : (
             <div>
-              <Button onClick={() => setIsChecked(true)} className={s.enabledBtn}>
+              <Button
+                onClick={() => setIsChecked(true)}
+                disabled={isLoading}
+                className={s.enabledBtn}
+              >
                 Show answer
               </Button>
             </div>
