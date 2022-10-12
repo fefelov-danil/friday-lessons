@@ -26,8 +26,8 @@ export const authAPI = {
   logout() {
     return instance.delete('auth/me', {})
   },
-  changeUsername(name: string) {
-    return instance.put<{ updatedUser: UserType; error?: string }>('auth/me', { name })
+  changeUserProfile(data: UpdateUserType) {
+    return instance.put<{ updatedUser: UserType; error?: string }>('auth/me', data)
   },
 }
 
@@ -68,4 +68,8 @@ type ResponseUserType = {
   verified: boolean
   __v: number
   _id: string
+}
+type UpdateUserType = {
+  name?: string
+  avatar?: string
 }

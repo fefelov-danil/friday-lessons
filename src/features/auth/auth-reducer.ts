@@ -156,20 +156,22 @@ export const logoutTC = () => async (dispatch: Dispatch<AllActionsType>) => {
     handleServerError(err, dispatch)
   }
 }
-export const changeUsernameTC = (name: string) => async (dispatch: Dispatch<AllActionsType>) => {
-  dispatch(appSetStatusAC('loading'))
-  try {
-    const res = await authAPI.changeUsername(name)
+export const updateUserTC =
+  (data: { name?: string; avatar?: string }) => async (dispatch: Dispatch<AllActionsType>) => {
+    dispatch(appSetStatusAC('loading'))
 
-    dispatch(authUserAC(res.data.updatedUser))
-    dispatch(appSetStatusAC('succeeded'))
-    dispatch(appAlertAC('Name successfully changed', 'success'))
-  } catch (e) {
-    const err = e as Error | AxiosError<{ error: string }>
+    try {
+      const res = await authAPI.changeUserProfile(data)
 
-    handleServerError(err, dispatch)
+      dispatch(authUserAC(res.data.updatedUser))
+      dispatch(appSetStatusAC('succeeded'))
+      dispatch(appAlertAC('Name successfully changed', 'success'))
+    } catch (e) {
+      const err = e as Error | AxiosError<{ error: string }>
+
+      handleServerError(err, dispatch)
+    }
   }
-}
 
 // Types
 type AuthStateType = typeof authInitialState
