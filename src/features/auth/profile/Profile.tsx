@@ -1,9 +1,7 @@
-import React, { ChangeEvent, useState } from 'react'
+import { useState } from 'react'
 
-import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft'
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
-import { Avatar, Badge, IconButton, Box } from '@mui/material'
-import { NavLink } from 'react-router-dom'
+import { Avatar, Badge, IconButton } from '@mui/material'
 
 import { logoutTC, updateUserTC } from '../auth-reducer'
 
@@ -14,8 +12,7 @@ import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { BackArrowButton } from 'common/BackArrowButton/BackArrowButton'
 import { Button } from 'common/button/Button'
 import { InputText } from 'common/inputText/InputText'
-import { convertFileToBase64 } from 'utils/convertFileToBase64'
-import { handleServerError } from 'utils/error-utils'
+import { UploadImage } from 'common/UploadImage/UploadImage'
 
 export const Profile = () => {
   const profileData = useAppSelector(state => state.auth)
@@ -49,18 +46,8 @@ export const Profile = () => {
     profileData.user && setNewName(profileData.user.name)
     setIsNameChanging(true)
   }
-  const uploadHandler = (e: ChangeEvent<HTMLInputElement>): void => {
-    if (e.target.files && e.target.files.length) {
-      const file = e.target.files && e.target.files[0]
-
-      if (file.size < 400000) {
-        convertFileToBase64(file, (file64: string) => {
-          dispatch(updateUserTC({ avatar: file64 }))
-        })
-      } else {
-        dispatch(appAlertAC('Incorrect file size or type', 'error'))
-      }
-    }
+  const changeAvatar = (file64: string): void => {
+    dispatch(updateUserTC({ avatar: file64 }))
   }
   const errorHandler = (): void => {
     dispatch(updateUserTC({ avatar: ' ' }))
@@ -73,31 +60,24 @@ export const Profile = () => {
         <BackArrowButton />
       </div>
       <div className={'formContainer ' + s.profileContainer}>
-        <Badge
-          overlap="circular"
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          badgeContent={
-            <label htmlFor="icon-button-photo">
-              <input
-                style={{ display: 'none' }}
-                type="file"
-                accept="image/*"
-                onChange={uploadHandler}
-                id="icon-button-photo"
-              />
+        <UploadImage callBackFn={changeAvatar}>
+          <Badge
+            overlap="circular"
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            badgeContent={
               <IconButton component="span" style={{ backgroundColor: '#808080' }}>
                 <PhotoCameraIcon style={{ color: 'white' }} sx={{ cursor: 'pointer' }} />
               </IconButton>
-            </label>
-          }
-        >
-          <Avatar
-            alt="avatar"
-            src={profileData.user?.avatar}
-            sx={{ width: 140, height: 140 }}
-            onError={errorHandler}
-          />
-        </Badge>
+            }
+          >
+            <Avatar
+              alt="avatar"
+              src={profileData.user?.avatar}
+              sx={{ width: 140, height: 140 }}
+              onError={errorHandler}
+            />
+          </Badge>
+        </UploadImage>
         {isNameChanging ? (
           <>
             <InputText
@@ -124,4 +104,31 @@ export const Profile = () => {
       </div>
     </div>
   )
+}
+{
+  /* <Badge
+          overlap="circular"
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          badgeContent={
+            <label htmlFor="icon-button-photo">
+              <input
+                style={{ display: 'none' }}
+                type="file"
+                accept="image/*"
+                onChange={uploadHandler}
+                id="icon-button-photo"
+              />
+              <IconButton component="span" style={{ backgroundColor: '#808080' }}>
+                <PhotoCameraIcon style={{ color: 'white' }} sx={{ cursor: 'pointer' }} />
+              </IconButton>
+            </label>
+          }
+        >
+          <Avatar
+            alt="avatar"
+            src={profileData.user?.avatar}
+            sx={{ width: 140, height: 140 }}
+            onError={errorHandler}
+          />
+        </Badge> */
 }
