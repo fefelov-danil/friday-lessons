@@ -147,6 +147,14 @@ export const Packs = () => {
   const openLearnPage = (packId: string, packName: string) => {
     navigate(`/learn/${packId}/${packName}`)
   }
+  // function avatarImg() returns cover of pack. It checks if cover is found or contains string 'data:image/' as in base64 url
+  const avatarImg = (deckCover: string) => {
+    if (deckCover && deckCover.substring(0, 11) === 'data:image/') {
+      return deckCover
+    } else {
+      return img_not_available
+    }
+  }
 
   let sortIcon = <ArrowDropUpIcon />
 
@@ -227,7 +235,7 @@ export const Packs = () => {
               <tr key={p._id} className={isLoading ? 'loading' : ''}>
                 <td className={s.cover_img}>
                   <img
-                    src={p.deckCover ? p.deckCover : img_not_available}
+                    src={avatarImg(p.deckCover)}
                     alt="not_available"
                     className={s.img_not_available}
                   />
