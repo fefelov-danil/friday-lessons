@@ -30,6 +30,7 @@ import s from './Packs.module.css'
 
 import { appSetStatusAC } from 'app/app-reducer'
 import { useAppDispatch, useAppSelector, useDebounce } from 'app/hooks'
+import img_not_available from 'assets/images/Image_not_available.png'
 import { Button } from 'common/button/Button'
 import { DoubleRangeSlider } from 'common/DoubleRangeSlider/DoubleRangeSlider'
 import { InputText } from 'common/inputText/InputText'
@@ -205,6 +206,7 @@ export const Packs = () => {
         <table className="table">
           <tbody>
             <tr>
+              <th>Cover</th>
               <th>Pack name</th>
               <th>
                 <p className="sort" onClick={() => !isLoading && onSortChangeHandler('cardsCount')}>
@@ -223,6 +225,13 @@ export const Packs = () => {
             </tr>
             {packsData.cardPacks.map((p: PackType) => (
               <tr key={p._id} className={isLoading ? 'loading' : ''}>
+                <td className={s.cover_img}>
+                  <img
+                    src={p.deckCover ? p.deckCover : img_not_available}
+                    alt="not_available"
+                    className={s.img_not_available}
+                  />
+                </td>
                 <td>
                   <NavLink to={`${p._id}/${p.name}`}>{p.name}</NavLink>
                 </td>

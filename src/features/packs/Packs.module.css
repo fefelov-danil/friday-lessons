@@ -19,3 +19,12 @@
 .allOrMyPacks {
     text-align: center;
 }
+
+.img_not_available {
+    max-width: 65px;
+    max-height: 40px;
+}
+
+.cover_img {
+    text-align: center !important;
+}
