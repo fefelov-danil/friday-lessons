@@ -1,3 +1,14 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.container * {
+    margin: 4px;
+}
+
 .title {
     text-align: center;
 }
@@ -9,3 +20,4 @@
 .checkBoxContainer {
     margin-top: 20px;
 }
+

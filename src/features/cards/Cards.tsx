@@ -139,6 +139,7 @@ export const Cards = () => {
                   openButton={<EditIcon className="action" />}
                   name={packName ? packName : ''}
                   id={packId ? packId : ''}
+                  deckCover={''}
                   fromCards={true}
                   callBack={changePackName}
                 />

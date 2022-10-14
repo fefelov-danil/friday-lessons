@@ -154,10 +154,10 @@ export const getPacksTC =
     }
   }
 export const addPackTC =
-  (name: string, privatePack: boolean): AppThunk =>
+  (name: string, deckCover: string, privatePack: boolean): AppThunk =>
   async dispatch => {
     try {
-      await packsAPI.createPack(name, '', privatePack)
+      await packsAPI.createPack(name, deckCover, privatePack)
 
       dispatch(setCardPacksChangedAC())
       dispatch(appSetStatusAC('succeeded'))
@@ -189,12 +189,13 @@ export const updatePackTC =
   (
     id: string,
     newTitle: string,
+    deckCover: string,
     fromCards: boolean,
     callBack?: (newName: string) => void
   ): AppThunk =>
   async dispatch => {
     try {
-      await packsAPI.changePack(id, newTitle, '')
+      await packsAPI.changePack(id, newTitle, deckCover)
 
       if (fromCards) dispatch(setUpdatedPackAC(newTitle))
 

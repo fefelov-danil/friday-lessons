@@ -258,6 +258,7 @@ export const Packs = () => {
                           openButton={<EditIcon className="action" />}
                           name={p.name}
                           id={p._id}
+                          deckCover={p.deckCover}
                           fromCards={false}
                         />
 
