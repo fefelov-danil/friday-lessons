@@ -6,3 +6,27 @@
     width: 100%;
     margin-bottom: 20px;
 }
+
+.switch {
+    display: flex;
+    align-self: center;
+
+    margin-bottom: 20px;
+}
+
+.addImage {
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin-bottom: 20px;
+    padding: 40px;
+
+    font-size: 18px;
+    color: #a7a7a7;
+
+    border: 2px dashed #a7a7a7;
+    border-radius: 10px;
+}

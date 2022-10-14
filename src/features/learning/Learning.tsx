@@ -48,6 +48,8 @@ export const Learning = () => {
   const isLoading = 'loading' === useAppSelector(state => state.app.appStatus)
 
   const [card, setCard] = useState<CardType>({
+    questionImg: '',
+    answerImg: '',
     answer: '',
     question: '',
     cardsPack_id: '',
@@ -84,6 +86,8 @@ export const Learning = () => {
     setValue((event.target as HTMLInputElement).value)
   }
 
+  console.log(card)
+
   return (
     <div className={'formPage' + ' ' + s.learningContainer}>
       <div className={s.arrowButton}>
@@ -94,7 +98,13 @@ export const Learning = () => {
         <div>
           <div className={s.questionContainer}>
             <p className={s.questionText}>Question:&nbsp;</p>
-            <p>{card.question}</p>
+            <p>
+              {card.questionImg ? (
+                <img src={card.questionImg ? card.questionImg : ''} alt="error" />
+              ) : (
+                card.question
+              )}
+            </p>
           </div>
           <div className={s.shotsContainer}>
             <p>Number of attempts to answer the question: {card.shots}</p>
@@ -103,7 +113,13 @@ export const Learning = () => {
             <>
               <div className={s.questionContainer}>
                 <p className={s.questionText}>Answer:&nbsp;</p>
-                <p>{card.answer}</p>
+                <p>
+                  {card.answerImg ? (
+                    <img src={card.answerImg ? card.answerImg : ''} alt="error" />
+                  ) : (
+                    card.answer
+                  )}
+                </p>
               </div>
               <div>
                 <FormControl>
