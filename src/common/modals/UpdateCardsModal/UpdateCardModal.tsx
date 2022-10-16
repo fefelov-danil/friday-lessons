@@ -38,9 +38,17 @@ export const UpdateCardModal = ({
   const [questionImage, setQuestionImage] = useState(questionImg)
   const [answerImage, setAnswerImage] = useState(answerImg)
 
+  const clearValues = () => {
+    setNewQuestion('')
+    setNewAnswer('')
+    setQuestionImage('')
+    setAnswerImage('')
+  }
+
   const onUpdateCardHandler = () => {
     dispatch(appSetStatusAC('loading'))
     dispatch(updateCardTC(id, newQuestion, newAnswer, questionImage, answerImage))
+    clearValues()
   }
 
   let questionInputText

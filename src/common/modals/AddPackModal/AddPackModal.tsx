@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 
 import { Avatar, Button } from '@mui/material'
 
@@ -26,6 +26,7 @@ export const AddPackModal = ({ openButton }: PropsType) => {
     dispatch(addPackTC(packName, newCover, privatePack))
     setPackName('')
     setPrivatePack(false)
+    setNewCover('')
   }
 
   return (

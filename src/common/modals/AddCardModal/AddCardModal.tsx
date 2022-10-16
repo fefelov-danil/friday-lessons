@@ -27,11 +27,17 @@ export const AddPackModal = ({ openButton, packId }: PropsType) => {
   const [questionImage, setQuestionImage] = useState('')
   const [answerImage, setAnswerImage] = useState('')
 
+  const clearValues = () => {
+    setQuestion('')
+    setAnswer('')
+    setQuestionImage('')
+    setAnswerImage('')
+  }
+
   const onAddCardHandler = () => {
     dispatch(appSetStatusAC('loading'))
     dispatch(addCardTC(packId, question, answer, questionImage, answerImage))
-    setQuestion('')
-    setAnswer('')
+    clearValues()
   }
 
   let questionInputText
