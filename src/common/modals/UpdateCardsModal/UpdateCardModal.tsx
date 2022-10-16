@@ -18,16 +18,25 @@ type PropsType = {
   id: string
   question: string
   answer: string
+  questionImg: string
+  answerImg: string
 }
 
-export const UpdateCardModal = ({ openButton, id, question, answer }: PropsType) => {
+export const UpdateCardModal = ({
+  openButton,
+  id,
+  question,
+  answer,
+  questionImg,
+  answerImg,
+}: PropsType) => {
   const dispatch = useAppDispatch()
   const [newQuestion, setNewQuestion] = useState(question)
   const [newAnswer, setNewAnswer] = useState(answer)
-  const [questionWithImage, setQuestionWithImage] = useState(false)
-  const [answerWithImage, setAnswerWithImage] = useState(false)
-  const [questionImage, setQuestionImage] = useState('')
-  const [answerImage, setAnswerImage] = useState('')
+  const [questionWithImage, setQuestionWithImage] = useState(!!questionImg)
+  const [answerWithImage, setAnswerWithImage] = useState(!!answerImg)
+  const [questionImage, setQuestionImage] = useState(questionImg)
+  const [answerImage, setAnswerImage] = useState(answerImg)
 
   const onUpdateCardHandler = () => {
     dispatch(appSetStatusAC('loading'))
@@ -38,17 +47,19 @@ export const UpdateCardModal = ({ openButton, id, question, answer }: PropsType)
 
   if (questionImage === '') {
     questionInputText = (
-      <>
+      <div className={s.addImage}>
         <InsertPhotoIcon />
         choose file
-      </>
+      </div>
     )
   } else {
     questionInputText = (
-      <>
-        <DoneOutlineIcon />
-        file uploaded
-      </>
+      <div className={s.image} style={{ backgroundImage: `url(${questionImage})` }}>
+        <p className={s.uploadContainer}>
+          <InsertPhotoIcon />
+          click here to upload new file
+        </p>
+      </div>
     )
   }
 
@@ -56,17 +67,19 @@ export const UpdateCardModal = ({ openButton, id, question, answer }: PropsType)
 
   if (answerImage === '') {
     answerInputText = (
-      <>
+      <div className={s.addImage}>
         <InsertPhotoIcon />
         choose file
-      </>
+      </div>
     )
   } else {
     answerInputText = (
-      <>
-        <DoneOutlineIcon />
-        file uploaded
-      </>
+      <div className={s.image} style={{ backgroundImage: `url(${answerImage})` }}>
+        <p className={s.uploadContainer}>
+          <InsertPhotoIcon />
+          click here to upload new file
+        </p>
+      </div>
     )
   }
 
@@ -83,9 +96,7 @@ export const UpdateCardModal = ({ openButton, id, question, answer }: PropsType)
           className={s.switch}
         />
         {questionWithImage ? (
-          <UploadImage callBackFn={setQuestionImage}>
-            <div className={s.addImage}>{questionInputText}</div>
-          </UploadImage>
+          <UploadImage callBackFn={setQuestionImage}>{questionInputText}</UploadImage>
         ) : (
           <InputText
             placeholder="Enter question"
@@ -103,9 +114,7 @@ export const UpdateCardModal = ({ openButton, id, question, answer }: PropsType)
           className={s.switch}
         />
         {answerWithImage ? (
-          <UploadImage callBackFn={setAnswerImage}>
-            <div className={s.addImage}>{answerInputText}</div>
-          </UploadImage>
+          <UploadImage callBackFn={setAnswerImage}>{answerInputText}</UploadImage>
         ) : (
           <InputText
             placeholder="Enter answer"

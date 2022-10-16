@@ -43,11 +43,9 @@ export const Cards = () => {
   const dispatch = useAppDispatch()
   const { packId, packName } = useParams()
   const cardsData = useAppSelector(state => state.cards)
-  const packData = useAppSelector(state => state.packs.cardPacks.find(p => p._id === packId && p))
-  const deckCover = packData && packData.deckCover
+  const deckCover = cardsData.deckCover
   const editor = useAppSelector(state => state.auth.user?._id) === cardsData.creatorId
   const filters = cardsData.filters
-
   const isLoading = 'loading' === useAppSelector(state => state.app.appStatus)
   const pagesAmount = Math.ceil(cardsData.cardsTotalCount / filters.pageCount)
 
@@ -123,8 +121,6 @@ export const Cards = () => {
   }
 
   const changePackName = (newName: string) => {
-    console.log(newName)
-
     navigate(`/packs/${packId}/${newName}`)
   }
 
@@ -251,6 +247,8 @@ export const Cards = () => {
                         id={c._id}
                         question={c.question}
                         answer={c.answer}
+                        questionImg={c.questionImg ? c.questionImg : ''}
+                        answerImg={c.answerImg ? c.answerImg : ''}
                       />
 
                       <DeleteCardModal

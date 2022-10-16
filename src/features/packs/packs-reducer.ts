@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 
-import { setDeletedPackAC, setUpdatedPackAC } from '../cards/cards-reducer'
+import { setDeletedPackAC, setNewDeckCoverAC, setUpdatedPackAC } from '../cards/cards-reducer'
 
 import { packsAPI } from './packs-API'
 
@@ -207,6 +207,7 @@ export const updatePackTC =
 
       if (fromCards) dispatch(setUpdatedPackAC(newTitle))
 
+      dispatch(setNewDeckCoverAC(deckCover))
       dispatch(setCardPacksChangedAC())
       dispatch(setNewPackNameAC(id, newTitle))
       callBack && callBack(newTitle)

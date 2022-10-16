@@ -53,7 +53,6 @@ export const Packs = () => {
   const [minLocalVal, setMinLocalVal] = useState(filters.min)
   const [maxLocalVal, setMaxLocalVal] = useState(filters.max)
 
-  console.log(filters.max + '   ' + maxLocalVal)
   const minDebVal = useDebounce(minLocalVal, 500)
   const maxDebVal = useDebounce(maxLocalVal, 500)
 

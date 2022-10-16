@@ -10,6 +10,7 @@ const cardsInitialState = {
   creatorId: '',
   cardsFetched: false,
   noResults: false,
+  deckCover: '',
   cards: [] as CardType[],
   cardsTotalCount: 0,
   cardsChanged: 0,
@@ -44,6 +45,8 @@ export const cardsReducer = (
       return { ...state, deletedPack: action.deletedPack }
     case 'cards/SET-UPDATED-PACK':
       return { ...state, updatedPack: action.newTitle }
+    case 'cards/SET-NEW-DECK-COVER':
+      return { ...state, deckCover: action.deckCover }
 
     case 'cards/SET-FILTERS':
       return { ...state, filters: action.filters }
@@ -82,6 +85,8 @@ export const setDeletedPackAC = (deletedPack: boolean) =>
   ({ type: 'cars/SET-DELETED-PACK', deletedPack } as const)
 export const setUpdatedPackAC = (newTitle: string) =>
   ({ type: 'cards/SET-UPDATED-PACK', newTitle } as const)
+export const setNewDeckCoverAC = (deckCover: string) =>
+  ({ type: 'cards/SET-NEW-DECK-COVER', deckCover } as const)
 
 export const setCardsFiltersAC = (filters: typeof cardsInitialState.filters) =>
   ({ type: 'cards/SET-FILTERS', filters } as const)
@@ -116,6 +121,7 @@ export const getCardsTC =
       } else {
         dispatch(setCardsNoResultsAC(false))
       }
+      dispatch(setNewDeckCoverAC(res.data.packDeckCover))
       dispatch(setCreatorIdAC(res.data.packUserId))
       dispatch(setCardsAC(res.data.cards))
       dispatch(setCardsTotalCountAC(res.data.cardsTotalCount))
@@ -238,3 +244,4 @@ export type CardsActionsType =
   | ReturnType<typeof setDeletedPackAC>
   | ReturnType<typeof setUpdatedPackAC>
   | ReturnType<typeof updateCardGradeAC>
+  | ReturnType<typeof setNewDeckCoverAC>

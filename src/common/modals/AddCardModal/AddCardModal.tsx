@@ -38,17 +38,19 @@ export const AddPackModal = ({ openButton, packId }: PropsType) => {
 
   if (questionImage === '') {
     questionInputText = (
-      <>
+      <div className={s.addImage}>
         <InsertPhotoIcon />
         choose file
-      </>
+      </div>
     )
   } else {
     questionInputText = (
-      <>
-        <DoneOutlineIcon />
-        file uploaded
-      </>
+      <div className={s.image} style={{ backgroundImage: `url(${questionImage})` }}>
+        <p className={s.uploadContainer}>
+          <InsertPhotoIcon />
+          click here to upload new file
+        </p>
+      </div>
     )
   }
 
@@ -56,17 +58,19 @@ export const AddPackModal = ({ openButton, packId }: PropsType) => {
 
   if (answerImage === '') {
     answerInputText = (
-      <>
+      <div className={s.addImage}>
         <InsertPhotoIcon />
         choose file
-      </>
+      </div>
     )
   } else {
     answerInputText = (
-      <>
-        <DoneOutlineIcon />
-        file uploaded
-      </>
+      <div className={s.image} style={{ backgroundImage: `url(${answerImage})` }}>
+        <p className={s.uploadContainer}>
+          <InsertPhotoIcon />
+          click here to upload new file
+        </p>
+      </div>
     )
   }
 
@@ -83,9 +87,7 @@ export const AddPackModal = ({ openButton, packId }: PropsType) => {
           className={s.switch}
         />
         {questionWithImage ? (
-          <UploadImage callBackFn={setQuestionImage}>
-            <div className={s.addImage}>{questionInputText}</div>
-          </UploadImage>
+          <UploadImage callBackFn={setQuestionImage}>{questionInputText}</UploadImage>
         ) : (
           <InputText
             placeholder="Enter question"
@@ -103,9 +105,7 @@ export const AddPackModal = ({ openButton, packId }: PropsType) => {
           className={s.switch}
         />
         {answerWithImage ? (
-          <UploadImage callBackFn={setAnswerImage}>
-            <div className={s.addImage}>{answerInputText}</div>
-          </UploadImage>
+          <UploadImage callBackFn={setAnswerImage}>{answerInputText}</UploadImage>
         ) : (
           <InputText
             placeholder="Enter answer"

@@ -9,7 +9,7 @@ export const instance = axios.create({
 
 export const cardsAPI = {
   getCards(payload: string) {
-    return instance.get<GetCardsResponceType>(`/card?${payload}`)
+    return instance.get<GetCardsResponseType>(`/card?${payload}`)
   },
   addCard(
     packId: string,
@@ -41,7 +41,7 @@ export const cardsAPI = {
   },
 }
 
-type GetCardsResponceType = {
+type GetCardsResponseType = {
   cards: CardType[]
   cardsTotalCount: number
   maxGrade: number
@@ -49,4 +49,5 @@ type GetCardsResponceType = {
   page: number
   pageCount: number
   packUserId: string
+  packDeckCover: string
 }
