@@ -13,7 +13,7 @@ type PropsType = {
 
 export const ToggleSwitch = (props: PropsType) => {
   return (
-    <div className={s.toggleSwitch}>
+    <div className={s.toggleSwitch + ' ' + props.className}>
       <div
         className={props.selected ? s.param : s.param + ' ' + s.active}
         onClick={() => !props.disabled && props.onChange(false)}

@@ -126,7 +126,11 @@ export const getPacksTC =
         if (setInitialValues) {
           setInitialValues(res.data.minCardsCount, res.data.maxCardsCount)
         }
-        dispatch(setMinMaxAC(res.data.minCardsCount, res.data.maxCardsCount))
+        sessionStorage.setItem(
+          'packs-filters',
+          JSON.stringify({ ...filters, min: res.data.minCardsCount, max: res.data.maxCardsCount })
+        )
+        // dispatch(setMinMaxAC(res.data.minCardsCount, res.data.maxCardsCount))
         dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
         dispatch(setPacksFetchedAC(true))
       }
@@ -144,6 +148,10 @@ export const getPacksTC =
           setInitialValues(res.data.minCardsCount, res.data.maxCardsCount)
         }
         dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
+        sessionStorage.setItem(
+          'packs-filters',
+          JSON.stringify({ ...filters, min: res.data.minCardsCount, max: res.data.maxCardsCount })
+        )
       }
       dispatch(appSetStatusAC('succeeded'))
     } catch (e) {

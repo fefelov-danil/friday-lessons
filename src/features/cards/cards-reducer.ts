@@ -129,10 +129,16 @@ export const getCardsTC =
     }
   }
 export const addCardTC =
-  (packId: string, question: string, answer: string): AppThunk =>
+  (
+    packId: string,
+    question: string,
+    answer: string,
+    questionImg: string,
+    answerImg: string
+  ): AppThunk =>
   async dispatch => {
     try {
-      await cardsAPI.addCard(packId, question, answer)
+      await cardsAPI.addCard(packId, question, answer, questionImg, answerImg)
 
       dispatch(setCardsChangedAC())
       dispatch(appSetStatusAC('succeeded'))
@@ -144,10 +150,16 @@ export const addCardTC =
     }
   }
 export const updateCardTC =
-  (cardId: string, question: string, answer: string): AppThunk =>
+  (
+    cardId: string,
+    question: string,
+    answer: string,
+    questionImage: string,
+    answerImage: string
+  ): AppThunk =>
   async dispatch => {
     try {
-      await cardsAPI.updateCard(cardId, question, answer)
+      await cardsAPI.updateCard(cardId, question, answer, questionImage, answerImage)
 
       dispatch(setCardsChangedAC())
       dispatch(appSetStatusAC('succeeded'))
@@ -199,6 +211,8 @@ export const updateCardGradeTC =
 //Types
 type CardsStateType = typeof cardsInitialState
 export type CardType = {
+  answerImg: string
+  questionImg: string
   answer: string
   question: string
   cardsPack_id: string

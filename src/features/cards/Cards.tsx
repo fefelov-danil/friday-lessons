@@ -23,6 +23,7 @@ import { SelectNumber } from '../../common/select/SelectNumber'
 import { parseDate } from '../../utils/parse-date-util'
 
 import {
+  CardType,
   getCardsTC,
   setCardsAC,
   setCardsFiltersAC,
@@ -210,10 +211,26 @@ export const Cards = () => {
               </th>
               {editor && <th></th>}
             </tr>
-            {cardsData.cards.map(c => (
+            {cardsData.cards.map((c: CardType) => (
               <tr key={c._id} className={isLoading ? 'loading' : ''}>
-                <td>{c.question}</td>
-                <td>{c.answer}</td>
+                <td>
+                  {c.questionImg ? (
+                    <div className={s.cardImages}>
+                      <img src={c.questionImg ? c.questionImg : ''} alt="error" />
+                    </div>
+                  ) : (
+                    c.question
+                  )}
+                </td>
+                <td>
+                  {c.answerImg ? (
+                    <div className={s.cardImages}>
+                      <img src={c.answerImg ? c.answerImg : ''} alt="error" />
+                    </div>
+                  ) : (
+                    c.answer
+                  )}
+                </td>
                 <td>{parseDate(c.updated)}</td>
                 <td>
                   <Rating value={c.grade} />
