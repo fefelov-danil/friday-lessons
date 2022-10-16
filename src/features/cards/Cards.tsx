@@ -11,6 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { appSetStatusAC } from '../../app/app-reducer'
 import { useAppDispatch, useAppSelector, useDebounce } from '../../app/hooks'
+import img_not_available from '../../assets/images/Image_not_available.png'
 import { Button } from '../../common/button/Button'
 import { InputText } from '../../common/inputText/InputText'
 import { AddPackModal } from '../../common/modals/AddCardModal/AddCardModal'
@@ -40,11 +41,13 @@ import { BackArrowButton } from 'common/BackArrowButton/BackArrowButton'
 export const Cards = () => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
+  const { packId, packName } = useParams()
   const cardsData = useAppSelector(state => state.cards)
+  const packData = useAppSelector(state => state.packs.cardPacks.find(p => p._id === packId && p))
+  const deckCover = packData && packData.deckCover
   const editor = useAppSelector(state => state.auth.user?._id) === cardsData.creatorId
   const filters = cardsData.filters
 
-  const { packId, packName } = useParams()
   const isLoading = 'loading' === useAppSelector(state => state.app.appStatus)
   const pagesAmount = Math.ceil(cardsData.cardsTotalCount / filters.pageCount)
 
@@ -133,6 +136,11 @@ export const Cards = () => {
       <div className="pageContainer">
         <div className={s.titleAndButtons}>
           <div className={s.titleContainer}>
+            <img
+              className={s.deckAva}
+              src={deckCover ? deckCover : img_not_available}
+              alt="not_available"
+            />
             <h1>{packName}</h1>
             {editor && (
               <>
@@ -140,7 +148,7 @@ export const Cards = () => {
                   openButton={<EditIcon className="action" />}
                   name={packName ? packName : ''}
                   id={packId ? packId : ''}
-                  deckCover={''}
+                  deckCover={deckCover ? deckCover : img_not_available}
                   fromCards={true}
                   callBack={changePackName}
                 />

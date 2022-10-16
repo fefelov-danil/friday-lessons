@@ -7,10 +7,9 @@ import { useAppDispatch } from '../../../app/hooks'
 import { addPackTC } from '../../../features/packs/packs-reducer'
 import { Checkbox } from '../../checkbox/Checkbox'
 import { InputText } from '../../inputText/InputText'
+import { UploadImage } from '../../UploadImage/UploadImage'
 import { BasicModal } from '../BasicModal'
 import s from '../UpdatePackModal/UpdatePackModal.module.css'
-
-import { UploadImage } from 'common/UploadImage/UploadImage'
 
 type PropsType = {
   openButton: ReactNode
