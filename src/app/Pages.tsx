@@ -10,6 +10,7 @@ import { PageNotFound } from 'common/404/PageNotFound'
 import { ChangePassword } from 'features/auth/change-password/ChangePassword'
 import { Login } from 'features/auth/login/Login'
 import { PasswordRecovery } from 'features/auth/password-recovery/PasswordRecovery'
+import { GuestProfile } from 'features/auth/profile-guest/GuestProfile'
 import { Profile } from 'features/auth/profile/Profile'
 import { Registration } from 'features/auth/registration/Registration'
 import { Learning } from 'features/learning/Learning'
@@ -20,6 +21,7 @@ export const PATH = {
   PASSWORD_RECOVERY: '/password-recovery',
   CHANGE_PASSWORD: '/set-new-password/:token',
   PROFILE: '/profile',
+  GUEST_PROFILE: '/guest-profile/:userId',
   PACKS: '/packs',
   LEARN: '/learn/:packId/:packName',
   CARDS: '/packs/:packId/:packName',
@@ -36,6 +38,7 @@ export const Pages = () => {
             <Route path={'/'} element={<Navigate to={PATH.PACKS} />} />
             <Route path={PATH.LOGIN} element={<Navigate to={PATH.PACKS} />} />
             <Route path={PATH.PROFILE} element={<Profile />} />
+            <Route path={PATH.GUEST_PROFILE} element={<GuestProfile />} />
             <Route path={PATH.PACKS} element={<Packs />} />
             <Route path={PATH.LEARN} element={<Learning />} />
             <Route path={PATH.CARDS} element={<Cards />} />

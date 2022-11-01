@@ -253,7 +253,9 @@ export const Packs = () => {
                 </td>
                 <td>{p.cardsCount}</td>
                 <td>{parseDate(p.updated)}</td>
-                <td>{p.user_name}</td>
+                <td>
+                  <NavLink to={`/guest-profile/${p.user_id}`}>{p.user_name}</NavLink>
+                </td>
                 <td>
                   <div className="actionsContainer">
                     <SchoolIcon

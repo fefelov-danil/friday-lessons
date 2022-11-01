@@ -184,7 +184,7 @@ export const getGuestUserProfileTC = (id: string) => async (dispatch: Dispatch<A
   try {
     const res = await authAPI.getUser(id)
 
-    // dispatch(authUserAC(res.data.updatedUser))
+    dispatch(setUserProfileAC(res.data.user))
     dispatch(appSetStatusAC('succeeded'))
   } catch (e) {
     const err = e as Error | AxiosError<{ error: string }>
