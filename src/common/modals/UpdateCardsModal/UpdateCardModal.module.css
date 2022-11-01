@@ -6,3 +6,54 @@
     width: 100%;
     margin-bottom: 20px;
 }
+
+.switch {
+    display: flex;
+    align-self: center;
+
+    margin-bottom: 20px;
+}
+
+.addImage {
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin-bottom: 20px;
+    padding: 40px;
+
+    font-size: 18px;
+    color: #a7a7a7;
+
+    border: 2px dashed #a7a7a7;
+    border-radius: 10px;
+}
+
+.image {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 20px;
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.uploadContainer {
+cursor: pointer;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    height: 100%;
+    padding: 20px;
+
+    font-weight: bold;
+    text-align: center;
+
+    background-color: rgba(195,195,195, 0.5);
+}

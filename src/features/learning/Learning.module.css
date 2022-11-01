@@ -11,7 +11,7 @@ p.packName {
     margin-bottom: 3px;
 }
 .questionContainer {
-    display: flex;
+    /*display: flex;*/
 }
 .questionText {
     font-weight: bold;

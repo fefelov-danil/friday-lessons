@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 
 import { Avatar, Button } from '@mui/material'
 
@@ -7,10 +7,9 @@ import { useAppDispatch } from '../../../app/hooks'
 import { addPackTC } from '../../../features/packs/packs-reducer'
 import { Checkbox } from '../../checkbox/Checkbox'
 import { InputText } from '../../inputText/InputText'
+import { UploadImage } from '../../UploadImage/UploadImage'
 import { BasicModal } from '../BasicModal'
 import s from '../UpdatePackModal/UpdatePackModal.module.css'
-
-import { UploadImage } from 'common/UploadImage/UploadImage'
 
 type PropsType = {
   openButton: ReactNode
@@ -27,6 +26,7 @@ export const AddPackModal = ({ openButton }: PropsType) => {
     dispatch(addPackTC(packName, newCover, privatePack))
     setPackName('')
     setPrivatePack(false)
+    setNewCover('')
   }
 
   return (

@@ -10,6 +10,7 @@ const cardsInitialState = {
   creatorId: '',
   cardsFetched: false,
   noResults: false,
+  deckCover: '',
   cards: [] as CardType[],
   cardsTotalCount: 0,
   cardsChanged: 0,
@@ -44,6 +45,8 @@ export const cardsReducer = (
       return { ...state, deletedPack: action.deletedPack }
     case 'cards/SET-UPDATED-PACK':
       return { ...state, updatedPack: action.newTitle }
+    case 'cards/SET-NEW-DECK-COVER':
+      return { ...state, deckCover: action.deckCover }
 
     case 'cards/SET-FILTERS':
       return { ...state, filters: action.filters }
@@ -82,6 +85,8 @@ export const setDeletedPackAC = (deletedPack: boolean) =>
   ({ type: 'cars/SET-DELETED-PACK', deletedPack } as const)
 export const setUpdatedPackAC = (newTitle: string) =>
   ({ type: 'cards/SET-UPDATED-PACK', newTitle } as const)
+export const setNewDeckCoverAC = (deckCover: string) =>
+  ({ type: 'cards/SET-NEW-DECK-COVER', deckCover } as const)
 
 export const setCardsFiltersAC = (filters: typeof cardsInitialState.filters) =>
   ({ type: 'cards/SET-FILTERS', filters } as const)
@@ -116,6 +121,7 @@ export const getCardsTC =
       } else {
         dispatch(setCardsNoResultsAC(false))
       }
+      dispatch(setNewDeckCoverAC(res.data.packDeckCover))
       dispatch(setCreatorIdAC(res.data.packUserId))
       dispatch(setCardsAC(res.data.cards))
       dispatch(setCardsTotalCountAC(res.data.cardsTotalCount))
@@ -129,10 +135,16 @@ export const getCardsTC =
     }
   }
 export const addCardTC =
-  (packId: string, question: string, answer: string): AppThunk =>
+  (
+    packId: string,
+    question: string,
+    answer: string,
+    questionImg: string,
+    answerImg: string
+  ): AppThunk =>
   async dispatch => {
     try {
-      await cardsAPI.addCard(packId, question, answer)
+      await cardsAPI.addCard(packId, question, answer, questionImg, answerImg)
 
       dispatch(setCardsChangedAC())
       dispatch(appSetStatusAC('succeeded'))
@@ -144,10 +156,16 @@ export const addCardTC =
     }
   }
 export const updateCardTC =
-  (cardId: string, question: string, answer: string): AppThunk =>
+  (
+    cardId: string,
+    question: string,
+    answer: string,
+    questionImage: string,
+    answerImage: string
+  ): AppThunk =>
   async dispatch => {
     try {
-      await cardsAPI.updateCard(cardId, question, answer)
+      await cardsAPI.updateCard(cardId, question, answer, questionImage, answerImage)
 
       dispatch(setCardsChangedAC())
       dispatch(appSetStatusAC('succeeded'))
@@ -199,6 +217,8 @@ export const updateCardGradeTC =
 //Types
 type CardsStateType = typeof cardsInitialState
 export type CardType = {
+  answerImg: string
+  questionImg: string
   answer: string
   question: string
   cardsPack_id: string
@@ -224,3 +244,4 @@ export type CardsActionsType =
   | ReturnType<typeof setDeletedPackAC>
   | ReturnType<typeof setUpdatedPackAC>
   | ReturnType<typeof updateCardGradeAC>
+  | ReturnType<typeof setNewDeckCoverAC>

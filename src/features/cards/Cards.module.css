@@ -38,3 +38,19 @@
     top: 100px;
     left: 40px;
 }
+
+.deckAva {
+    max-width: 200px;
+    max-height: 300px;
+    margin-right: 20px;
+}
+
+.cardImages {
+    display: flex;
+    justify-content: center;
+}
+
+.cardImages img {
+    max-width: 100px;
+    max-height: 50px;
+}

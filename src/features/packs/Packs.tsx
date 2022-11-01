@@ -52,6 +52,7 @@ export const Packs = () => {
 
   const [minLocalVal, setMinLocalVal] = useState(filters.min)
   const [maxLocalVal, setMaxLocalVal] = useState(filters.max)
+
   const minDebVal = useDebounce(minLocalVal, 500)
   const maxDebVal = useDebounce(maxLocalVal, 500)
 
@@ -88,11 +89,18 @@ export const Packs = () => {
     filters.page,
     filters.myPacks,
     filters.pageCount,
-    filters.min,
-    filters.max,
     filters.sortPacks,
     filters.searchValue,
   ])
+  useEffect(() => {
+    if (packsData.packsFetched) {
+      if (filters.min !== packsData.minCardsCount || filters.max !== packsData.maxCardsCount) {
+        dispatch(appSetStatusAC('loading'))
+        dispatch(getPacksTC(filters, false, setInitialValues))
+      }
+    }
+  }, [filters.min, filters.max])
+
   useEffect(() => {
     dispatch(setPacksPageAC(1))
     dispatch(setMinMaxAC(minLocalVal, filters.max))

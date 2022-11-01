@@ -36,6 +36,8 @@ export const UpdatePackModal = ({
   const onUpdatePackHandler = () => {
     dispatch(appSetStatusAC('loading'))
     dispatch(updatePackTC(id, newTitle, newCover, fromCards, callBack))
+    setNewTitle('')
+    setNewCover('')
   }
 
   return (

@@ -9,13 +9,29 @@ export const instance = axios.create({
 
 export const cardsAPI = {
   getCards(payload: string) {
-    return instance.get<GetCardsResponceType>(`/card?${payload}`)
+    return instance.get<GetCardsResponseType>(`/card?${payload}`)
   },
-  addCard(packId: string, question: string, answer: string) {
-    return instance.post('/card', { card: { cardsPack_id: packId, question, answer } })
+  addCard(
+    packId: string,
+    question: string,
+    answer: string,
+    questionImg: string,
+    answerImg: string
+  ) {
+    return instance.post('/card', {
+      card: { cardsPack_id: packId, question, answer, questionImg, answerImg },
+    })
   },
-  updateCard(cardId: string, question: string, answer: string) {
-    return instance.put('/card', { card: { _id: cardId, question, answer } })
+  updateCard(
+    cardId: string,
+    question: string,
+    answer: string,
+    questionImg: string,
+    answerImg: string
+  ) {
+    return instance.put('/card', {
+      card: { _id: cardId, question, answer, questionImg, answerImg },
+    })
   },
   deleteCard(cardId: string) {
     return instance.delete(`/card?id=${cardId}`)
@@ -25,7 +41,7 @@ export const cardsAPI = {
   },
 }
 
-type GetCardsResponceType = {
+type GetCardsResponseType = {
   cards: CardType[]
   cardsTotalCount: number
   maxGrade: number
@@ -33,4 +49,5 @@ type GetCardsResponceType = {
   page: number
   pageCount: number
   packUserId: string
+  packDeckCover: string
 }

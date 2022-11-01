@@ -11,6 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { appSetStatusAC } from '../../app/app-reducer'
 import { useAppDispatch, useAppSelector, useDebounce } from '../../app/hooks'
+import img_not_available from '../../assets/images/Image_not_available.png'
 import { Button } from '../../common/button/Button'
 import { InputText } from '../../common/inputText/InputText'
 import { AddPackModal } from '../../common/modals/AddCardModal/AddCardModal'
@@ -23,6 +24,7 @@ import { SelectNumber } from '../../common/select/SelectNumber'
 import { parseDate } from '../../utils/parse-date-util'
 
 import {
+  CardType,
   getCardsTC,
   setCardsAC,
   setCardsFiltersAC,
@@ -39,11 +41,11 @@ import { BackArrowButton } from 'common/BackArrowButton/BackArrowButton'
 export const Cards = () => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
+  const { packId, packName } = useParams()
   const cardsData = useAppSelector(state => state.cards)
+  const deckCover = cardsData.deckCover
   const editor = useAppSelector(state => state.auth.user?._id) === cardsData.creatorId
   const filters = cardsData.filters
-
-  const { packId, packName } = useParams()
   const isLoading = 'loading' === useAppSelector(state => state.app.appStatus)
   const pagesAmount = Math.ceil(cardsData.cardsTotalCount / filters.pageCount)
 
@@ -119,8 +121,6 @@ export const Cards = () => {
   }
 
   const changePackName = (newName: string) => {
-    console.log(newName)
-
     navigate(`/packs/${packId}/${newName}`)
   }
 
@@ -132,6 +132,11 @@ export const Cards = () => {
       <div className="pageContainer">
         <div className={s.titleAndButtons}>
           <div className={s.titleContainer}>
+            <img
+              className={s.deckAva}
+              src={deckCover ? deckCover : img_not_available}
+              alt="not_available"
+            />
             <h1>{packName}</h1>
             {editor && (
               <>
@@ -139,7 +144,7 @@ export const Cards = () => {
                   openButton={<EditIcon className="action" />}
                   name={packName ? packName : ''}
                   id={packId ? packId : ''}
-                  deckCover={''}
+                  deckCover={deckCover ? deckCover : img_not_available}
                   fromCards={true}
                   callBack={changePackName}
                 />
@@ -210,10 +215,26 @@ export const Cards = () => {
               </th>
               {editor && <th></th>}
             </tr>
-            {cardsData.cards.map(c => (
+            {cardsData.cards.map((c: CardType) => (
               <tr key={c._id} className={isLoading ? 'loading' : ''}>
-                <td>{c.question}</td>
-                <td>{c.answer}</td>
+                <td>
+                  {c.questionImg ? (
+                    <div className={s.cardImages}>
+                      <img src={c.questionImg ? c.questionImg : ''} alt="error" />
+                    </div>
+                  ) : (
+                    c.question
+                  )}
+                </td>
+                <td>
+                  {c.answerImg ? (
+                    <div className={s.cardImages}>
+                      <img src={c.answerImg ? c.answerImg : ''} alt="error" />
+                    </div>
+                  ) : (
+                    c.answer
+                  )}
+                </td>
                 <td>{parseDate(c.updated)}</td>
                 <td>
                   <Rating value={c.grade} />
@@ -226,6 +247,8 @@ export const Cards = () => {
                         id={c._id}
                         question={c.question}
                         answer={c.answer}
+                        questionImg={c.questionImg ? c.questionImg : ''}
+                        answerImg={c.answerImg ? c.answerImg : ''}
                       />
 
                       <DeleteCardModal
