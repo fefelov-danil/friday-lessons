@@ -29,6 +29,9 @@ export const authAPI = {
   changeUserProfile(data: UpdateUserType) {
     return instance.put<{ updatedUser: UserType; error?: string }>('auth/me', data)
   },
+  getUser(id: string) {
+    return instance.get<GetUserResponseType>(`social/user?id=${id}`)
+  },
 }
 
 // types
@@ -72,4 +75,8 @@ type ResponseUserType = {
 type UpdateUserType = {
   name?: string
   avatar?: string
+}
+export type AnotherUserType = Omit<ResponseUserType, 'rememberMe' | '__v'>
+type GetUserResponseType = {
+  user: AnotherUserType
 }

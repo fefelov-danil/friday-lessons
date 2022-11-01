@@ -4,6 +4,7 @@ import { Dispatch } from 'redux'
 import { appAlertAC, appSetLoadingAC, appSetStatusAC } from 'app/app-reducer'
 import { AllActionsType } from 'app/store'
 import {
+  AnotherUserType,
   authAPI,
   changePasswordType,
   forgotPasswordValuesType,
@@ -19,6 +20,7 @@ const authInitialState = {
   isRegistered: false,
   changePassword: null as null | changePasswordType,
   user: null as null | UserType,
+  guestUser: null as null | AnotherUserType,
 }
 
 export const authReducer = (
@@ -45,6 +47,8 @@ export const authReducer = (
       return { ...state, changePassword: action.changePassword }
     case 'auth/IS-PASSWORD-CHANGED':
       return { ...state, isPasswordChanged: action.isPasswordChanged }
+    case 'auth/SET-GUEST-USER-PROFILE':
+      return { ...state, guestUser: action.user }
 
     default:
       return state
@@ -67,6 +71,8 @@ export const authDeleteUserAC = () =>
   ({
     type: 'auth/DELETE-USER',
   } as const)
+export const setUserProfileAC = (user: AnotherUserType) =>
+  ({ type: 'auth/SET-GUEST-USER-PROFILE', user } as const)
 
 // Thunks
 export const registrationTC =
@@ -172,6 +178,20 @@ export const updateUserTC =
       handleServerError(err, dispatch)
     }
   }
+export const getGuestUserProfileTC = (id: string) => async (dispatch: Dispatch<AllActionsType>) => {
+  dispatch(appSetStatusAC('loading'))
+
+  try {
+    const res = await authAPI.getUser(id)
+
+    // dispatch(authUserAC(res.data.updatedUser))
+    dispatch(appSetStatusAC('succeeded'))
+  } catch (e) {
+    const err = e as Error | AxiosError<{ error: string }>
+
+    handleServerError(err, dispatch)
+  }
+}
 
 // Types
 type AuthStateType = typeof authInitialState
@@ -200,3 +220,4 @@ export type AuthActionsType =
   | ReturnType<typeof authChangePasswordAC>
   | ReturnType<typeof authIsPasswordChangedAC>
   | ReturnType<typeof authDeleteUserAC>
+  | ReturnType<typeof setUserProfileAC>
