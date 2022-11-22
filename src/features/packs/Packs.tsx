@@ -8,7 +8,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import SchoolIcon from '@mui/icons-material/School'
 import Pagination from '@mui/material/Pagination'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { AddPackModal } from '../../common/modals/AddPackModal/AddPackModal'
 import { DeletePackModal } from '../../common/modals/DeletePackModal/DeletePackModal'
@@ -40,12 +40,16 @@ import { ToggleSwitch } from 'common/toggleSwitch/ToggleSwitch'
 export const Packs = () => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
+  // const { paramUserId } = useParams()
+  // const data = useLocation()
   const userId = useAppSelector(state => state.auth.user?._id)
   const isLoading = 'loading' === useAppSelector(state => state.app.appStatus)
   const packsData = useAppSelector(state => state.packs)
   const filters = packsData.filters
 
   const pagesAmount = Math.ceil(packsData.cardPacksTotalCount / filters.pageCount)
+
+  const [data, setData] = useState<any>(useLocation()) //Location | null
 
   const [searchLocalVal, setSearchLocalVal] = useState('')
   const searchDebVal = useDebounce(searchLocalVal, 500)
@@ -62,7 +66,12 @@ export const Packs = () => {
   }
 
   useEffect(() => {
-    if (!packsData.packsFetched) {
+    // console.log('worked')
+    if (data.state) {
+      console.log('1')
+      dispatch(setPacksFiltersAC({ ...filters, myPacks: data.state.id, pageCount: data.state.packsCount }))
+      dispatch(getPacksTC({ ...filters, myPacks: data.state.id, pageCount: data.state.packsCount }, false))
+    } else if (!packsData.packsFetched) {
       dispatch(appSetStatusAC('loading'))
       const filtersFromSS = sessionStorage.getItem('packs-filters') // SS - SessionStorage
 
@@ -73,14 +82,23 @@ export const Packs = () => {
         setSearchLocalVal(parsedFiltersFromSS.searchValue)
 
         dispatch(setPacksFiltersAC(parsedFiltersFromSS))
+        console.log('2')
         dispatch(getPacksTC(parsedFiltersFromSS, true))
       } else {
+        console.log('3')
         dispatch(getPacksTC(filters, true, setInitialValues))
       }
     }
+
+    // return function cleanup() {
+    //   setData(null)
+    // }
   }, [])
   useEffect(() => {
-    if (packsData.packsFetched) {
+    if (data.state) {
+      console.log('5')
+    } else if (packsData.packsFetched) {
+      console.log('4')
       dispatch(appSetStatusAC('loading'))
       dispatch(getPacksTC(filters, false, setInitialValues))
     }
@@ -92,14 +110,15 @@ export const Packs = () => {
     filters.sortPacks,
     filters.searchValue,
   ])
-  useEffect(() => {
-    if (packsData.packsFetched) {
-      if (filters.min !== packsData.minCardsCount || filters.max !== packsData.maxCardsCount) {
-        dispatch(appSetStatusAC('loading'))
-        dispatch(getPacksTC(filters, false, setInitialValues))
-      }
-    }
-  }, [filters.min, filters.max])
+  // useEffect(() => {
+  //   if (packsData.packsFetched) {
+  //     if (filters.min !== packsData.minCardsCount || filters.max !== packsData.maxCardsCount) {
+  //       dispatch(appSetStatusAC('loading'))
+  //       console.log('min/max')
+  //       dispatch(getPacksTC(filters, false, setInitialValues))
+  //     }
+  //   }
+  // }, [filters.min, filters.max])
 
   useEffect(() => {
     dispatch(setPacksPageAC(1))
