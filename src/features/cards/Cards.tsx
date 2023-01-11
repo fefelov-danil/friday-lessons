@@ -7,7 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import SchoolIcon from '@mui/icons-material/School'
 import Pagination from '@mui/material/Pagination'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, NavLink } from 'react-router-dom'
 
 import { appSetStatusAC } from '../../app/app-reducer'
 import { useAppDispatch, useAppSelector, useDebounce } from '../../app/hooks'
@@ -42,6 +42,7 @@ export const Cards = () => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { packId, packName } = useParams()
+  const location = useLocation()
   const cardsData = useAppSelector(state => state.cards)
   const deckCover = cardsData.deckCover
   const editor = useAppSelector(state => state.auth.user?._id) === cardsData.creatorId
@@ -281,6 +282,11 @@ export const Cards = () => {
               shape="rounded"
             />
           )}
+          <span className={s.createdBy}>
+            <NavLink to={`/guest-profile/${cardsData.creatorId}`}>
+              created by {location.state}
+            </NavLink>
+          </span>
         </div>
       </div>
     </div>
