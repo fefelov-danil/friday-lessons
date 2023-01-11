@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { Cards } from '../features/cards/Cards'
 import { Packs } from '../features/packs/Packs'
+import { Users } from '../features/users/Users'
 
 import { useAppSelector } from 'app/hooks'
 import { PageNotFound } from 'common/404/PageNotFound'
@@ -19,6 +20,7 @@ export const PATH = {
   REGISTRATION: '/registration',
   PASSWORD_RECOVERY: '/password-recovery',
   CHANGE_PASSWORD: '/set-new-password/:token',
+  USERS: '/users',
   PROFILE: '/profile',
   PACKS: '/packs',
   LEARN: '/learn/:packId/:packName',
@@ -35,6 +37,7 @@ export const Pages = () => {
           <>
             <Route path={'/'} element={<Navigate to={PATH.PACKS} />} />
             <Route path={PATH.LOGIN} element={<Navigate to={PATH.PACKS} />} />
+            <Route path={PATH.USERS} element={<Users />} />
             <Route path={PATH.PROFILE} element={<Profile />} />
             <Route path={PATH.PACKS} element={<Packs />} />
             <Route path={PATH.LEARN} element={<Learning />} />

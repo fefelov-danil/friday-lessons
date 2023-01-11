@@ -3,12 +3,14 @@ import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk'
 
 import { CardsActionsType, cardsReducer } from '../features/cards/cards-reducer'
 import { PacksActionsType, packsReducer } from '../features/packs/packs-reducer'
+import { UsersActionsType, usersReducer } from '../features/users/users-reducer'
 
 import { AppActionsType, appReducer } from 'app/app-reducer'
 import { AuthActionsType, authReducer } from 'features/auth/auth-reducer'
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  users: usersReducer,
   app: appReducer,
   packs: packsReducer,
   cards: cardsReducer,
@@ -26,7 +28,12 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   AllActionsType
 >
 
-export type AllActionsType = AuthActionsType | AppActionsType | PacksActionsType | CardsActionsType
+export type AllActionsType =
+  | AuthActionsType
+  | UsersActionsType
+  | AppActionsType
+  | PacksActionsType
+  | CardsActionsType
 
 // @ts-ignore
 window.store = store
