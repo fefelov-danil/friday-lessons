@@ -11,6 +11,7 @@ import { handleServerError } from 'utils/error-utils'
 const packsInitialState = {
   packsFetched: false,
   cardPacks: [] as PackType[],
+  blockRequest: false,
   cardPacksChanged: 0,
   noResults: false,
   cardPacksTotalCount: 0,
@@ -42,6 +43,8 @@ export const packsReducer = (
       return { ...state, packsFetched: action.fetched }
     case 'packs/SET-MIN-MAX-CARDS-COUNT':
       return { ...state, minCardsCount: action.minCC, maxCardsCount: action.maxCC }
+    case 'packs/SET-BLOCK-REQUEST':
+      return { ...state, blockRequest: action.blockRequest }
     case 'packs/SET-NO-RESULTS':
       return { ...state, noResults: action.noResults }
     case 'packs/SET-CARDS-PACK-CHANGED':
@@ -81,6 +84,8 @@ export const setPacksFetchedAC = (fetched: boolean) =>
   ({ type: 'packs/SET-PACKS-FETCHED', fetched } as const)
 export const setMinMaxCardsCountAC = (minCC: number, maxCC: number) =>
   ({ type: 'packs/SET-MIN-MAX-CARDS-COUNT', minCC, maxCC } as const)
+export const setBlockRequestAC = (blockRequest: boolean) =>
+  ({ type: 'packs/SET-BLOCK-REQUEST', blockRequest } as const)
 export const setPacksNoResultsAC = (noResults: boolean) =>
   ({ type: 'packs/SET-NO-RESULTS', noResults } as const)
 export const setCardPacksChangedAC = () => ({ type: 'packs/SET-CARDS-PACK-CHANGED' } as const)
@@ -114,6 +119,8 @@ export const getPacksTC =
         `?page=${filters.page}&user_id=${filters.myPacks}&pageCount=${filters.pageCount}&min=${filters.min}&max=${filters.max}&sortPacks=${filters.sortPacks}&packName=${filters.searchValue}`
       )
 
+      dispatch(setBlockRequestAC(true))
+
       sessionStorage.setItem('packs-filters', JSON.stringify(filters))
 
       if (res.data.cardPacks.length === 0) {
@@ -130,7 +137,6 @@ export const getPacksTC =
           'packs-filters',
           JSON.stringify({ ...filters, min: res.data.minCardsCount, max: res.data.maxCardsCount })
         )
-        // dispatch(setMinMaxAC(res.data.minCardsCount, res.data.maxCardsCount))
         dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
         dispatch(setPacksFetchedAC(true))
       }
@@ -244,6 +250,7 @@ export type PacksActionsType =
   | ReturnType<typeof setPacksAC>
   | ReturnType<typeof setPacksFetchedAC>
   | ReturnType<typeof setPacksPageAC>
+  | ReturnType<typeof setBlockRequestAC>
   | ReturnType<typeof setMyPacksAC>
   | ReturnType<typeof setPacksPageCountAC>
   | ReturnType<typeof setPacksFiltersAC>
