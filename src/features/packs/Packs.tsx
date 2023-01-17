@@ -18,6 +18,7 @@ import { parseDate } from '../../utils/parse-date-util'
 import {
   getPacksTC,
   PackType,
+  setBlockRequestAC,
   setMinMaxAC,
   setMyPacksAC,
   setPacksFiltersAC,
@@ -56,6 +57,8 @@ export const Packs = () => {
   const minDebVal = useDebounce(minLocalVal, 500)
   const maxDebVal = useDebounce(maxLocalVal, 500)
 
+  console.log(packsData)
+
   const setInitialValues = (min: number, max: number) => {
     setMinLocalVal(min)
     setMaxLocalVal(max)
@@ -81,8 +84,10 @@ export const Packs = () => {
   }, [])
   useEffect(() => {
     if (packsData.packsFetched) {
-      dispatch(appSetStatusAC('loading'))
-      dispatch(getPacksTC(filters, false, setInitialValues))
+      if (!packsData.blockRequest) {
+        dispatch(appSetStatusAC('loading'))
+        dispatch(getPacksTC(filters, false, setInitialValues))
+      }
     }
   }, [
     packsData.cardPacksChanged,
@@ -94,7 +99,7 @@ export const Packs = () => {
   ])
   useEffect(() => {
     if (packsData.packsFetched) {
-      if (filters.min !== packsData.minCardsCount || filters.max !== packsData.maxCardsCount) {
+      if (!packsData.blockRequest) {
         dispatch(appSetStatusAC('loading'))
         dispatch(getPacksTC(filters, false, setInitialValues))
       }
@@ -115,17 +120,21 @@ export const Packs = () => {
   }, [searchDebVal])
 
   const onPageChange = (page: number) => {
+    dispatch(setBlockRequestAC(false))
     dispatch(setPacksPageAC(page))
   }
   const onMyPacksChange = (myPacks: boolean) => {
+    dispatch(setBlockRequestAC(false))
     dispatch(setPacksPageAC(1))
     dispatch(setMyPacksAC(myPacks ? `${userId}` : ''))
   }
   const onPageCountChange = (pageCount: number) => {
+    dispatch(setBlockRequestAC(false))
     dispatch(setPacksPageAC(1))
     dispatch(setPacksPageCountAC(pageCount))
   }
   const onSortChangeHandler = (sortParam: string) => {
+    dispatch(setBlockRequestAC(false))
     dispatch(setPacksPageAC(1))
     if (filters.sortPacks.substring(1) !== sortParam) {
       dispatch(setSortPacksAC(`0${sortParam}`))
@@ -138,6 +147,7 @@ export const Packs = () => {
     }
   }
   const onDeleteFiltersHandler = () => {
+    dispatch(setBlockRequestAC(false))
     const newFilters = {
       page: 1,
       pageCount: filters.pageCount,
@@ -168,6 +178,20 @@ export const Packs = () => {
 
   if (filters.sortPacks && filters.sortPacks.split('')[0] === '0') {
     sortIcon = <ArrowDropDownIcon />
+  }
+
+  const f1 = (min: number) => {
+    if (!isLoading) {
+      dispatch(setBlockRequestAC(false))
+      setMinLocalVal(min)
+    }
+  }
+
+  const f2 = (max: number) => {
+    if (!isLoading) {
+      dispatch(setBlockRequestAC(false))
+      setMaxLocalVal(max)
+    }
   }
 
   return (
@@ -207,8 +231,8 @@ export const Packs = () => {
             max={packsData.maxCardsCount}
             minVal={minLocalVal}
             maxVal={maxLocalVal}
-            setMinVal={(min: number) => !isLoading && setMinLocalVal(min)}
-            setMaxVal={(max: number) => !isLoading && setMaxLocalVal(max)}
+            setMinVal={f1}
+            setMaxVal={f2}
           />
 
           <Button
