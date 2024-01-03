@@ -19,6 +19,7 @@ import {
   getPacksTC,
   PackType,
   setMinMaxAC,
+  setMinMaxCardsCountAC,
   setMyPacksAC,
   setPacksFiltersAC,
   setPacksPageAC,
@@ -66,11 +67,13 @@ export const Packs = () => {
   }
 
   useEffect(() => {
-    // console.log('worked')
     if (data.state) {
-      console.log('1')
-      dispatch(setPacksFiltersAC({ ...filters, myPacks: data.state.id, pageCount: data.state.packsCount }))
-      dispatch(getPacksTC({ ...filters, myPacks: data.state.id, pageCount: data.state.packsCount }, false))
+      dispatch(
+        setPacksFiltersAC({ ...filters, myPacks: data.state.id, pageCount: data.state.packsCount })
+      )
+      dispatch(
+        getPacksTC({ ...filters, myPacks: data.state.id, pageCount: data.state.packsCount }, false)
+      )
     } else if (!packsData.packsFetched) {
       dispatch(appSetStatusAC('loading'))
       const filtersFromSS = sessionStorage.getItem('packs-filters') // SS - SessionStorage
@@ -81,24 +84,18 @@ export const Packs = () => {
         setInitialValues(parsedFiltersFromSS.min, parsedFiltersFromSS.max)
         setSearchLocalVal(parsedFiltersFromSS.searchValue)
 
+        dispatch(setMinMaxCardsCountAC(parsedFiltersFromSS.min, parsedFiltersFromSS.max))
         dispatch(setPacksFiltersAC(parsedFiltersFromSS))
-        console.log('2')
         dispatch(getPacksTC(parsedFiltersFromSS, true))
       } else {
-        console.log('3')
         dispatch(getPacksTC(filters, true, setInitialValues))
       }
     }
-
-    // return function cleanup() {
-    //   setData(null)
-    // }
   }, [])
   useEffect(() => {
-    if (data.state) {
-      console.log('5')
-    } else if (packsData.packsFetched) {
-      console.log('4')
+    /*if (data.state) {
+      
+    } else*/ if (packsData.packsFetched) {
       dispatch(appSetStatusAC('loading'))
       dispatch(getPacksTC(filters, false, setInitialValues))
     }
