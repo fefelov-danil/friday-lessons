@@ -1,10 +1,11 @@
 import { AxiosError } from 'axios'
 
 import { appSetStatusAC } from '../../app/app-reducer'
-import { AppThunk } from '../../app/store'
 import { handleServerError } from '../../utils/error-utils'
 
 import { cardsAPI } from './cards-API'
+
+import { AppDispatch } from 'app/store'
 
 const cardsInitialState = {
   creatorId: '',
@@ -72,44 +73,43 @@ export const cardsReducer = (
 }
 
 //Actions
-export const setCreatorIdAC = (id: string) => ({ type: 'cards/SET-CREATOR-ID', id } as const)
-export const setCardsAC = (cards: CardType[]) => ({ type: 'cards/SET-CARDS', cards } as const)
+export const setCreatorIdAC = (id: string) => ({ type: 'cards/SET-CREATOR-ID', id }) as const
+export const setCardsAC = (cards: CardType[]) => ({ type: 'cards/SET-CARDS', cards }) as const
 export const setCardsTotalCountAC = (cardsTotalCount: number) =>
-  ({ type: 'cards/SET-CARDS-TOTAL-COUNT', cardsTotalCount } as const)
+  ({ type: 'cards/SET-CARDS-TOTAL-COUNT', cardsTotalCount }) as const
 export const setCardsFetchedAC = (cardsFetched: boolean) =>
-  ({ type: 'cards/SET-CARDS-FETCHED', cardsFetched } as const)
+  ({ type: 'cards/SET-CARDS-FETCHED', cardsFetched }) as const
 export const setCardsNoResultsAC = (noResults: boolean) =>
-  ({ type: 'cards/SET-NO-RESULTS', noResults } as const)
-export const setCardsChangedAC = () => ({ type: 'cards/SET-CARDS-CHANGED' } as const)
+  ({ type: 'cards/SET-NO-RESULTS', noResults }) as const
+export const setCardsChangedAC = () => ({ type: 'cards/SET-CARDS-CHANGED' }) as const
 export const setDeletedPackAC = (deletedPack: boolean) =>
-  ({ type: 'cars/SET-DELETED-PACK', deletedPack } as const)
+  ({ type: 'cars/SET-DELETED-PACK', deletedPack }) as const
 export const setUpdatedPackAC = (newTitle: string) =>
-  ({ type: 'cards/SET-UPDATED-PACK', newTitle } as const)
+  ({ type: 'cards/SET-UPDATED-PACK', newTitle }) as const
 export const setNewDeckCoverAC = (deckCover: string) =>
-  ({ type: 'cards/SET-NEW-DECK-COVER', deckCover } as const)
+  ({ type: 'cards/SET-NEW-DECK-COVER', deckCover }) as const
 
 export const setCardsFiltersAC = (filters: typeof cardsInitialState.filters) =>
-  ({ type: 'cards/SET-FILTERS', filters } as const)
+  ({ type: 'cards/SET-FILTERS', filters }) as const
 
-export const setCardsPageAC = (page: number) => ({ type: 'cards/SET-PAGE', page } as const)
+export const setCardsPageAC = (page: number) => ({ type: 'cards/SET-PAGE', page }) as const
 export const setCardsPageCountAC = (pageCount: number) =>
-  ({ type: 'cards/SET-PAGE-COUNT', pageCount } as const)
+  ({ type: 'cards/SET-PAGE-COUNT', pageCount }) as const
 export const setCardsSearchValueAC = (searchValue: string) =>
-  ({ type: 'cards/SET-SEARCH-VALUE', searchValue } as const)
+  ({ type: 'cards/SET-SEARCH-VALUE', searchValue }) as const
 export const setSortCardsAC = (sortCards: string) =>
-  ({ type: 'cards/SET-SORT-CARDS', sortCards } as const)
+  ({ type: 'cards/SET-SORT-CARDS', sortCards }) as const
 export const updateCardGradeAC = (card_id: string, grade: number, shots: number) =>
   ({
     type: 'cards/SET-CARD-GRADE',
     card_id,
     grade,
     shots,
-  } as const)
+  }) as const
 
 //Thunks
 export const getCardsTC =
-  (packId: string, filters: typeof cardsInitialState.filters): AppThunk =>
-  async dispatch => {
+  (packId: string, filters: typeof cardsInitialState.filters) => async (dispatch: AppDispatch) => {
     try {
       const res = await cardsAPI.getCards(
         `cardsPack_id=${packId}&page=${filters.page}&pageCount=${filters.pageCount}&cardQuestion=${filters.searchValue}&sortCards=${filters.sortCards}`
@@ -135,14 +135,8 @@ export const getCardsTC =
     }
   }
 export const addCardTC =
-  (
-    packId: string,
-    question: string,
-    answer: string,
-    questionImg: string,
-    answerImg: string
-  ): AppThunk =>
-  async dispatch => {
+  (packId: string, question: string, answer: string, questionImg: string, answerImg: string) =>
+  async (dispatch: AppDispatch) => {
     try {
       await cardsAPI.addCard(packId, question, answer, questionImg, answerImg)
 
@@ -156,14 +150,8 @@ export const addCardTC =
     }
   }
 export const updateCardTC =
-  (
-    cardId: string,
-    question: string,
-    answer: string,
-    questionImage: string,
-    answerImage: string
-  ): AppThunk =>
-  async dispatch => {
+  (cardId: string, question: string, answer: string, questionImage: string, answerImage: string) =>
+  async (dispatch: AppDispatch) => {
     try {
       await cardsAPI.updateCard(cardId, question, answer, questionImage, answerImage)
 
@@ -176,24 +164,20 @@ export const updateCardTC =
       handleServerError(err, dispatch)
     }
   }
-export const deleteCardTC =
-  (cardId: string): AppThunk =>
-  async dispatch => {
-    try {
-      await cardsAPI.deleteCard(cardId)
+export const deleteCardTC = (cardId: string) => async (dispatch: AppDispatch) => {
+  try {
+    await cardsAPI.deleteCard(cardId)
+    dispatch(setCardsChangedAC())
+    dispatch(appSetStatusAC('succeeded'))
+  } catch (e) {
+    const err = e as Error | AxiosError<{ error: string }>
 
-      dispatch(setCardsChangedAC())
-      dispatch(appSetStatusAC('succeeded'))
-    } catch (e) {
-      const err = e as Error | AxiosError<{ error: string }>
-
-      dispatch(appSetStatusAC('failed'))
-      handleServerError(err, dispatch)
-    }
+    dispatch(appSetStatusAC('failed'))
+    handleServerError(err, dispatch)
   }
+}
 export const updateCardGradeTC =
-  (grade: number, cardId: string): AppThunk =>
-  async dispatch => {
+  (grade: number, cardId: string) => async (dispatch: AppDispatch) => {
     try {
       const res = await cardsAPI.updateCardGrade(grade, cardId)
 

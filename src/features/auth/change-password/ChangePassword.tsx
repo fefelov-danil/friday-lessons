@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { PATH } from 'app/Pages'
 import { Button } from 'common/button/Button'
 import { InputPassword } from 'common/inputPassword/InputPassword'
-import { changePasswordTC } from 'features/auth/auth-reducer'
+import { changePasswordThunk } from 'features/auth/auth-reducer'
 
 type FormikErrorType = {
   password?: string
@@ -37,7 +37,7 @@ export const ChangePassword = () => {
       return errors
     },
     onSubmit: values => {
-      dispatch(changePasswordTC(values))
+      dispatch(changePasswordThunk(values))
     },
   })
 

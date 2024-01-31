@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { Pages } from 'app/Pages'
 import AlertSnackbar from 'common/alertSnackbar/AlertSnackbar'
 import { Header } from 'common/header/Header'
-import { isAuthLoadingTC } from 'features/auth/auth-reducer'
+import { isAuthLoadingThunk } from 'features/auth/auth-reducer'
 
 const App = () => {
   const dispatch = useAppDispatch()
@@ -17,7 +17,7 @@ const App = () => {
   const isAuthLoading = useAppSelector(state => state.app.appIsLoading)
 
   useEffect(() => {
-    dispatch(isAuthLoadingTC())
+    dispatch(isAuthLoadingThunk())
   }, [])
 
   return (

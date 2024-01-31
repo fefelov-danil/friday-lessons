@@ -1,15 +1,15 @@
-import axios from 'axios'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-export const instance = axios.create({
-  baseURL: 'https://neko-back.herokuapp.com/2.0/social/users',
-  withCredentials: true,
-})
+export const usersApi = createApi({
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://neko-back.herokuapp.com/2.0/social/users', credentials: 'include' }),
+  endpoints: (builder) => ({
+    getUsers: builder.query<ResponseUsersType, string>({
+      query: (payload) => payload,
+    }),
+  }),
+});
 
-export const usersAPI = {
-  getUsers(payload: string) {
-    return instance.get<ResponseUsersType>(payload)
-  },
-}
+export const { useGetUsersQuery } = usersApi;
 
 export type userType = {
   avatar: string
@@ -30,3 +30,4 @@ type ResponseUsersType = {
   pageCount: number
   usersTotalCount: number
 }
+

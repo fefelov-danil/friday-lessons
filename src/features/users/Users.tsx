@@ -8,28 +8,20 @@ import { appSetStatusAC } from '../../app/app-reducer'
 import { useAppDispatch, useAppSelector, useDebounce } from '../../app/hooks'
 import { InputText } from '../../common/inputText/InputText'
 import { SelectNumber } from '../../common/select/SelectNumber'
-import { setPacksPageAC } from '../packs/packs-reducer'
 
 import {
-  getUsersTC,
-  setSearchValueAC,
-  setUsersFiltersAC,
-  setUsersPageAC,
-  setUsersPageCountAC,
-  setUsersSortValueAC,
+  getUsersThunk,
+  setUsersFilters,
+  setUsersPage,
+  setUsersPageCount,
+  setUsersSearchValue,
+  setUsersSortValue,
 } from './users-reducer'
 import s from './Users.module.css'
 
 export const Users = () => {
   const dispatch = useAppDispatch()
   const usersData = useAppSelector(state => state.users)
-  const isLoading = 'loading' === useAppSelector(state => state.app.appStatus)
-  const filters = usersData.filters
-
-  const [searchLocalVal, setSearchLocalVal] = useState('')
-  const searchDebVal = useDebounce(searchLocalVal, 500)
-
-  const pagesAmount = Math.ceil(usersData.usersTotalCount / filters.pageCount)
 
   useEffect(() => {
     if (!usersData.usersFetched) {
@@ -39,41 +31,50 @@ export const Users = () => {
       if (filtersFromSS) {
         const parsedFiltersFromSS = JSON.parse(filtersFromSS)
 
-        dispatch(setUsersFiltersAC(parsedFiltersFromSS))
-        dispatch(getUsersTC(parsedFiltersFromSS))
+        dispatch(setUsersFilters(parsedFiltersFromSS))
+        dispatch(getUsersThunk(parsedFiltersFromSS))
       } else {
-        dispatch(getUsersTC(usersData.filters))
+        dispatch(getUsersThunk(usersData.filters))
       }
     }
   }, [])
+
+  const isLoading = 'loading' === useAppSelector(state => state.app.appStatus)
+  const filters = usersData.filters
+
+  const [searchLocalVal, setSearchLocalVal] = useState('')
+  const searchDebVal = useDebounce(searchLocalVal, 500)
+
+  const pagesAmount = Math.ceil(usersData.usersTotalCount / filters.pageCount)
+
   useEffect(() => {
     if (usersData.usersFetched) {
       dispatch(appSetStatusAC('loading'))
-      dispatch(getUsersTC(usersData.filters))
+      dispatch(getUsersThunk(usersData.filters))
     }
   }, [filters.page, filters.pageCount, filters.sort, filters.userName])
   useEffect(() => {
-    dispatch(setPacksPageAC(1))
-    dispatch(setSearchValueAC(searchLocalVal))
+    dispatch(setUsersPage(1))
+    dispatch(setUsersSearchValue(searchLocalVal))
   }, [searchDebVal])
 
   const onPageCountChange = (pageCount: number) => {
-    dispatch(setUsersPageAC(1))
-    dispatch(setUsersPageCountAC(pageCount))
+    dispatch(setUsersPage(1))
+    dispatch(setUsersPageCount(pageCount))
   }
   const onPageChange = (page: number) => {
-    dispatch(setUsersPageAC(page))
+    dispatch(setUsersPage(page))
   }
 
   const onSortChangeHandler = (sortParam: string) => {
-    dispatch(setUsersPageAC(1))
+    dispatch(setUsersPage(1))
     if (filters.sort.substring(1) !== sortParam) {
-      dispatch(setUsersSortValueAC(`0${sortParam}`))
+      dispatch(setUsersSortValue(`0${sortParam}`))
     } else {
       if (filters.sort.split('')[0] === '0') {
-        dispatch(setUsersSortValueAC(`1${sortParam}`))
+        dispatch(setUsersSortValue(`1${sortParam}`))
       } else {
-        dispatch(setUsersSortValueAC(`0${sortParam}`))
+        dispatch(setUsersSortValue(`0${sortParam}`))
       }
     }
   }
@@ -90,7 +91,7 @@ export const Users = () => {
         <h1>Users</h1>
 
         <InputText
-          placeholder="Enter pack name"
+          placeholder="Enter user name"
           value={searchLocalVal}
           onChange={e => !isLoading && setSearchLocalVal(e.currentTarget.value)}
           className={s.username}

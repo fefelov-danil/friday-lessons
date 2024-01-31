@@ -10,7 +10,7 @@ import { PATH } from 'app/Pages'
 import { Button } from 'common/button/Button'
 import { InputPassword } from 'common/inputPassword/InputPassword'
 import { InputText } from 'common/inputText/InputText'
-import { authIsRegisteredAC, registrationTC } from 'features/auth/auth-reducer'
+import { setIsRegistered, registrationThunk } from 'features/auth/auth-reducer'
 
 type FormikErrorType = {
   email?: string
@@ -51,12 +51,12 @@ export const Registration = () => {
       return errors
     },
     onSubmit: values => {
-      dispatch(registrationTC({ email: values.email, password: values.password }))
+      dispatch(registrationThunk({ email: values.email, password: values.password }))
     },
   })
 
   if (isRegistered) {
-    dispatch(authIsRegisteredAC(false))
+    dispatch(setIsRegistered(false))
 
     return <Navigate to={PATH.LOGIN} />
   }

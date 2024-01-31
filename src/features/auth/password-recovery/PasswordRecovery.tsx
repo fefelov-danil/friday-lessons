@@ -9,7 +9,7 @@ import s from './PasswordRecovery.module.css'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { Button } from 'common/button/Button'
 import { InputText } from 'common/inputText/InputText'
-import { authCheckEmailRedirectAC, forgotPasswordTC } from 'features/auth/auth-reducer'
+import { setCheckEmailRedirect, forgotPasswordThunk } from 'features/auth/auth-reducer'
 
 type FormikErrorType = {
   email?: string
@@ -38,7 +38,7 @@ export const PasswordRecovery = () => {
       return errors
     },
     onSubmit: values => {
-      dispatch(forgotPasswordTC(values))
+      dispatch(forgotPasswordThunk(values))
       formik.resetForm()
     },
   })
@@ -58,7 +58,7 @@ export const PasswordRecovery = () => {
             <NavLink
               to={'/login'}
               className={'standardBtn'}
-              onClick={() => dispatch(authCheckEmailRedirectAC(false))}
+              onClick={() => dispatch(setCheckEmailRedirect(false))}
             >
               Sign in
             </NavLink>

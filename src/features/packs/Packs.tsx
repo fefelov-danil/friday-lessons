@@ -16,16 +16,16 @@ import { UpdatePackModal } from '../../common/modals/UpdatePackModal/UpdatePackM
 import { parseDate } from '../../utils/parse-date-util'
 
 import {
-  getPacksTC,
+  getPacksThunk,
   PackType,
-  setMinMaxAC,
-  setMinMaxCardsCountAC,
-  setMyPacksAC,
-  setPacksFiltersAC,
-  setPacksPageAC,
-  setPacksPageCountAC,
-  setPacksSearchValueAC,
-  setSortPacksAC,
+  setMinMax,
+  setMinMaxCardsCount,
+  setMyPacks,
+  setPacksFilters,
+  setPacksPage,
+  setPacksPageCount,
+  setPacksSearchValue,
+  setSortPacks,
 } from './packs-reducer'
 import s from './Packs.module.css'
 
@@ -67,37 +67,40 @@ export const Packs = () => {
   }
 
   useEffect(() => {
-    if (data.state) {
-      dispatch(
-        setPacksFiltersAC({ ...filters, myPacks: data.state.id, pageCount: data.state.packsCount })
-      )
-      dispatch(
-        getPacksTC({ ...filters, myPacks: data.state.id, pageCount: data.state.packsCount }, false)
-      )
-    } else if (!packsData.packsFetched) {
+    if (!packsData.packsFetched) {
       dispatch(appSetStatusAC('loading'))
       const filtersFromSS = sessionStorage.getItem('packs-filters') // SS - SessionStorage
 
-      if (filtersFromSS) {
+      if (data.state) {
+        dispatch(
+          setPacksFilters({ ...filters, myPacks: data.state.id, })
+        )
+        dispatch(
+          getPacksThunk({
+            filters: { ...filters, myPacks: data.state.id },
+            packsAreNotInitialized: true,
+            setInitialValues
+          })
+        )
+      }
+      else if (filtersFromSS) {
         const parsedFiltersFromSS = JSON.parse(filtersFromSS)
 
         setInitialValues(parsedFiltersFromSS.min, parsedFiltersFromSS.max)
         setSearchLocalVal(parsedFiltersFromSS.searchValue)
 
-        dispatch(setMinMaxCardsCountAC(parsedFiltersFromSS.min, parsedFiltersFromSS.max))
-        dispatch(setPacksFiltersAC(parsedFiltersFromSS))
-        dispatch(getPacksTC(parsedFiltersFromSS, true))
+        dispatch(setMinMaxCardsCount({minCardsCount: parsedFiltersFromSS.min, max: parsedFiltersFromSS.maxCardsCount}))
+        dispatch(setPacksFilters(parsedFiltersFromSS))
+        dispatch(getPacksThunk({filters: parsedFiltersFromSS, packsAreNotInitialized: true}))
       } else {
-        dispatch(getPacksTC(filters, true, setInitialValues))
+        dispatch(getPacksThunk({filters, packsAreNotInitialized: true, setInitialValues}))
       }
     }
   }, [])
   useEffect(() => {
-    /*if (data.state) {
-      
-    } else*/ if (packsData.packsFetched) {
+    if (packsData.packsFetched) {
       dispatch(appSetStatusAC('loading'))
-      dispatch(getPacksTC(filters, false, setInitialValues))
+      dispatch(getPacksThunk({filters, packsAreNotInitialized: false, setInitialValues}))
     }
   }, [
     packsData.cardPacksChanged,
@@ -107,49 +110,40 @@ export const Packs = () => {
     filters.sortPacks,
     filters.searchValue,
   ])
-  // useEffect(() => {
-  //   if (packsData.packsFetched) {
-  //     if (filters.min !== packsData.minCardsCount || filters.max !== packsData.maxCardsCount) {
-  //       dispatch(appSetStatusAC('loading'))
-  //       console.log('min/max')
-  //       dispatch(getPacksTC(filters, false, setInitialValues))
-  //     }
-  //   }
-  // }, [filters.min, filters.max])
 
   useEffect(() => {
-    dispatch(setPacksPageAC(1))
-    dispatch(setMinMaxAC(minLocalVal, filters.max))
+    dispatch(setPacksPage(1))
+    dispatch(setMinMax({min: minLocalVal, max: filters.max}))
   }, [minDebVal])
   useEffect(() => {
-    dispatch(setPacksPageAC(1))
-    dispatch(setMinMaxAC(filters.min, maxLocalVal))
+    dispatch(setPacksPage(1))
+    dispatch(setMinMax({min: filters.min, max: maxLocalVal}))
   }, [maxDebVal])
   useEffect(() => {
-    dispatch(setPacksPageAC(1))
-    dispatch(setPacksSearchValueAC(searchLocalVal))
+    dispatch(setPacksPage(1))
+    dispatch(setPacksSearchValue(searchLocalVal))
   }, [searchDebVal])
 
   const onPageChange = (page: number) => {
-    dispatch(setPacksPageAC(page))
+    dispatch(setPacksPage(page))
   }
   const onMyPacksChange = (myPacks: boolean) => {
-    dispatch(setPacksPageAC(1))
-    dispatch(setMyPacksAC(myPacks ? `${userId}` : ''))
+    dispatch(setPacksPage(1))
+    dispatch(setMyPacks(myPacks ? `${userId}` : ''))
   }
   const onPageCountChange = (pageCount: number) => {
-    dispatch(setPacksPageAC(1))
-    dispatch(setPacksPageCountAC(pageCount))
+    dispatch(setPacksPage(1))
+    dispatch(setPacksPageCount(pageCount))
   }
   const onSortChangeHandler = (sortParam: string) => {
-    dispatch(setPacksPageAC(1))
+    dispatch(setPacksPage(1))
     if (filters.sortPacks.substring(1) !== sortParam) {
-      dispatch(setSortPacksAC(`0${sortParam}`))
+      dispatch(setSortPacks(`0${sortParam}`))
     } else {
       if (filters.sortPacks.split('')[0] === '0') {
-        dispatch(setSortPacksAC(`1${sortParam}`))
+        dispatch(setSortPacks(`1${sortParam}`))
       } else {
-        dispatch(setSortPacksAC(`0${sortParam}`))
+        dispatch(setSortPacks(`0${sortParam}`))
       }
     }
   }
@@ -166,7 +160,7 @@ export const Packs = () => {
 
     setInitialValues(packsData.minCardsCount, packsData.maxCardsCount)
     setSearchLocalVal('')
-    dispatch(setPacksFiltersAC(newFilters))
+    dispatch(setPacksFilters(newFilters))
   }
   const openLearnPage = (packId: string, packName: string) => {
     navigate(`/learn/${packId}/${packName}`)
@@ -212,7 +206,7 @@ export const Packs = () => {
             <ToggleSwitch
               param1={'all'}
               param2={'my'}
-              selected={!!packsData.filters.myPacks}
+              selected={data.state ? undefined : !!packsData.filters.myPacks}
               onChange={onMyPacksChange}
               disabled={isLoading}
             />

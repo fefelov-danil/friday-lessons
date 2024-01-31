@@ -10,7 +10,7 @@ import { Button } from 'common/button/Button'
 import { Checkbox } from 'common/checkbox/Checkbox'
 import { InputPassword } from 'common/inputPassword/InputPassword'
 import { InputText } from 'common/inputText/InputText'
-import { loginTC } from 'features/auth/auth-reducer'
+import { loginThunk } from 'features/auth/auth-reducer'
 
 type FormikErrorType = {
   email?: string
@@ -45,7 +45,7 @@ export const Login = () => {
       return errors
     },
     onSubmit: values => {
-      dispatch(loginTC(values))
+      dispatch(loginThunk(values))
     },
   })
 

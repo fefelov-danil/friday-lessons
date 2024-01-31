@@ -1,3 +1,3 @@
 module.exports = {
-  extends: 'eslint-config-it-incubator',
-}
+  extends: ['eslint:recommended', 'plugin:prettier/recommended', 'eslint-config-it-incubator'],
+};

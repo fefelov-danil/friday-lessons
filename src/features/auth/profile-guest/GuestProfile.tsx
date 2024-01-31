@@ -5,7 +5,7 @@ import PermContactCalendarOutlinedIcon from '@mui/icons-material/PermContactCale
 import { Avatar, Skeleton } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { getGuestUserProfileTC } from '../auth-reducer'
+import { getGuestUserProfileThunk } from '../auth-reducer'
 
 import s from './GuestProfile.module.css'
 
@@ -22,7 +22,7 @@ export const GuestProfile = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    userId && dispatch(getGuestUserProfileTC(userId))
+    userId && dispatch(getGuestUserProfileThunk(userId))
   }, [userId])
 
   const showGuestPacks = (id: string | undefined, packsCount: number | undefined) => {

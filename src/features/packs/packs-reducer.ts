@@ -5,12 +5,13 @@ import { setDeletedPackAC, setNewDeckCoverAC, setUpdatedPackAC } from '../cards/
 import { packsAPI } from './packs-API'
 
 import { appSetStatusAC } from 'app/app-reducer'
-import { AppThunk } from 'app/store'
 import { handleServerError } from 'utils/error-utils'
+import { AppDispatch, RootState } from 'app/store'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
-const packsInitialState = {
+const initialState: PacksStateType = {
   packsFetched: false,
-  cardPacks: [] as PackType[],
+  cardPacks: [],
   blockRequest: false,
   cardPacksChanged: 0,
   noResults: false,
@@ -28,205 +29,239 @@ const packsInitialState = {
   },
 }
 
-export const packsReducer = (
-  state: PacksInitialStateType = packsInitialState,
-  action: PacksActionsType
-): PacksInitialStateType => {
-  switch (action.type) {
-    case 'packs/SET-PACKS':
-      return {
-        ...state,
-        cardPacks: action.cardPacks,
-        cardPacksTotalCount: action.cardPacksTotalCount,
-      }
-    case 'packs/SET-PACKS-FETCHED':
-      return { ...state, packsFetched: action.fetched }
-    case 'packs/SET-MIN-MAX-CARDS-COUNT':
-      return { ...state, minCardsCount: action.minCC, maxCardsCount: action.maxCC }
-    case 'packs/SET-BLOCK-REQUEST':
-      return { ...state, blockRequest: action.blockRequest }
-    case 'packs/SET-NO-RESULTS':
-      return { ...state, noResults: action.noResults }
-    case 'packs/SET-CARDS-PACK-CHANGED':
-      return { ...state, cardPacksChanged: state.cardPacksChanged + 1 }
-    case 'packs/SET-NEW-PACK-NAME':
-      return {
-        ...state,
-        cardPacks: state.cardPacks.map(p =>
-          p._id === action.id ? { ...p, name: action.newName } : p
-        ),
-      }
-
-    case 'packs/SET-FILTERS':
-      return { ...state, filters: action.filters }
-
-    case 'packs/SET-PAGE':
-      return { ...state, filters: { ...state.filters, page: action.page } }
-    case 'packs/SET-MY-PACKS':
-      return { ...state, filters: { ...state.filters, myPacks: action.myPacks } }
-    case 'packs/SET-PAGE-COUNT':
-      return { ...state, filters: { ...state.filters, pageCount: action.pageCount } }
-    case 'packs/SET-MIN-MAX':
-      return { ...state, filters: { ...state.filters, min: action.min, max: action.max } }
-    case 'packs/SET-SORT-PACKS':
-      return { ...state, filters: { ...state.filters, sortPacks: action.sortPacks } }
-    case 'packs/SET-SEARCH-VALUE':
-      return { ...state, filters: { ...state.filters, searchValue: action.searchValue } }
-    default:
-      return state
+export const packsSlice = createSlice({
+  name: 'packs',
+  initialState,
+  reducers: {
+    setMinMax(state, action) {
+      state.filters.min = action.payload.min
+      state.filters.max = action.payload.max
+    },
+    setMinMaxCardsCount(state, action)  {
+      state.minCardsCount = action.payload.minCardsCount
+      state.maxCardsCount = action.payload.maxCardsCount      
+    },
+    setMyPacks(state, action) {
+      state.filters.myPacks = action.payload
+    },
+    setPacksFilters(state, action) {
+      state.filters = action.payload
+    },
+    setPacksPage(state, action) {
+      state.filters.page = action.payload
+    },
+    setPacksPageCount(state, action) {
+      state.filters.pageCount = action.payload
+    },
+    setPacksSearchValue(state, action) {
+      state.filters.searchValue = action.payload
+    },
+    setSortPacks(state, action) {
+      state.filters.sortPacks = action.payload
+    }
+  }, 
+  extraReducers: builder => {
+    builder
+      .addCase(getPacksThunk.fulfilled, (state, action) => {
+        state.blockRequest = true
+        state.packsFetched = true
+        state.cardPacks = action.payload.cardPacks
+        state.cardPacksTotalCount = action.payload.cardPacksTotalCount
+        state.noResults = action.payload.noResults
+        state.minCardsCount = action.payload.minCardsCount
+        state.maxCardsCount = action.payload.maxCardsCount
+      })
+      .addCase(addPackThunk.fulfilled, state => {
+        state.cardPacksChanged = state.cardPacksChanged + 1
+      })
+      .addCase(deletePackThunk.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.cardPacksChanged = state.cardPacksChanged + 1
+        }
+      })
+      .addCase(updatePackThunk.fulfilled, (state, action) => {
+        state.cardPacksChanged = state.cardPacksChanged + 1
+        state.cardPacks.forEach(p => p._id === action.payload.id ? {...p, name: action.payload.title} : p)
+      })
   }
-}
+})
 
-//Actions
-export const setPacksAC = (cardPacks: PackType[], cardPacksTotalCount: number) =>
-  ({ type: 'packs/SET-PACKS', cardPacks, cardPacksTotalCount } as const)
-export const setPacksFetchedAC = (fetched: boolean) =>
-  ({ type: 'packs/SET-PACKS-FETCHED', fetched } as const)
-export const setMinMaxCardsCountAC = (minCC: number, maxCC: number) =>
-  ({ type: 'packs/SET-MIN-MAX-CARDS-COUNT', minCC, maxCC } as const)
-export const setBlockRequestAC = (blockRequest: boolean) =>
-  ({ type: 'packs/SET-BLOCK-REQUEST', blockRequest } as const)
-export const setPacksNoResultsAC = (noResults: boolean) =>
-  ({ type: 'packs/SET-NO-RESULTS', noResults } as const)
-export const setCardPacksChangedAC = () => ({ type: 'packs/SET-CARDS-PACK-CHANGED' } as const)
-export const setNewPackNameAC = (id: string, newName: string) =>
-  ({ type: 'packs/SET-NEW-PACK-NAME', id, newName } as const)
-
-export const setPacksFiltersAC = (filters: typeof packsInitialState.filters) =>
-  ({ type: 'packs/SET-FILTERS', filters } as const)
-
-export const setPacksPageAC = (page: number) => ({ type: 'packs/SET-PAGE', page } as const)
-export const setMyPacksAC = (myPacks: string) => ({ type: 'packs/SET-MY-PACKS', myPacks } as const)
-export const setPacksPageCountAC = (pageCount: number) =>
-  ({ type: 'packs/SET-PAGE-COUNT', pageCount } as const)
-export const setMinMaxAC = (min: number, max: number) =>
-  ({ type: 'packs/SET-MIN-MAX', min, max } as const)
-export const setSortPacksAC = (sortPacks: string) =>
-  ({ type: 'packs/SET-SORT-PACKS', sortPacks } as const)
-export const setPacksSearchValueAC = (searchValue: string) =>
-  ({ type: 'packs/SET-SEARCH-VALUE', searchValue } as const)
+export const {
+  setMinMax,
+  setMinMaxCardsCount,
+  setMyPacks,
+  setPacksFilters,
+  setPacksPage,
+  setPacksPageCount,
+  setPacksSearchValue,
+  setSortPacks,
+} = packsSlice.actions
+export const packsReducer = packsSlice.reducer
 
 //Thunks
-export const getPacksTC =
-  (
-    filters: typeof packsInitialState.filters,
+
+export const getPacksThunk = createAsyncThunk(
+  'packs/GET-PACKS',
+  async (props: {
+    filters: FiltersType,
     packsAreNotInitialized?: boolean,
     setInitialValues?: (min: number, max: number) => void
-  ): AppThunk =>
-  async (dispatch, getState) => {
+  }, {dispatch, getState, rejectWithValue}) => {
     try {
       const res = await packsAPI.getPacks(
-        `?page=${filters.page}&user_id=${filters.myPacks}&pageCount=${filters.pageCount}&min=${filters.min}&max=${filters.max}&sortPacks=${filters.sortPacks}&packName=${filters.searchValue}`
+        `?page=${props.filters.page}&user_id=${props.filters.myPacks}&pageCount=${props.filters.pageCount}&min=${props.filters.min}&max=${props.filters.max}&sortPacks=${props.filters.sortPacks}&packName=${props.filters.searchValue}`
       )
 
-      dispatch(setBlockRequestAC(true))
+      const state = getState() as RootState
 
-      sessionStorage.setItem('packs-filters', JSON.stringify(filters))
+      sessionStorage.setItem('packs-filters', JSON.stringify(props.filters))
 
-      if (res.data.cardPacks.length === 0) {
-        dispatch(setPacksNoResultsAC(true))
-      } else {
-        dispatch(setPacksNoResultsAC(false))
-      }
+      const noResults = res.data.cardPacks.length === 0
 
-      if (packsAreNotInitialized) {
-        if (setInitialValues) {
-          setInitialValues(res.data.minCardsCount, res.data.maxCardsCount)
+      let minCardsCount = state.packs.minCardsCount
+      let maxCardsCount = state.packs.maxCardsCount
+
+      if (props.packsAreNotInitialized) {
+        if (!!props.setInitialValues) {          
+          props.setInitialValues(res.data.minCardsCount, res.data.maxCardsCount)
         }
         sessionStorage.setItem(
           'packs-filters',
-          JSON.stringify({ ...filters, min: res.data.minCardsCount, max: res.data.maxCardsCount })
+          JSON.stringify({ ...props.filters, min: res.data.minCardsCount, max: res.data.maxCardsCount })
         )
-        dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
-        dispatch(setPacksFetchedAC(true))
+        minCardsCount = res.data.minCardsCount
+        maxCardsCount = res.data.maxCardsCount
       }
 
-      dispatch(setPacksAC(res.data.cardPacks, res.data.cardPacksTotalCount))
-
-      const currentMinCardsCount = getState().packs.minCardsCount
-      const currentMaxCardsCount = getState().packs.maxCardsCount
+      const currentMinCardsCount = state.packs.minCardsCount
+      const currentMaxCardsCount = state.packs.maxCardsCount
 
       if (
         res.data.minCardsCount !== currentMinCardsCount ||
         res.data.maxCardsCount !== currentMaxCardsCount
       ) {
-        if (setInitialValues) {
-          setInitialValues(res.data.minCardsCount, res.data.maxCardsCount)
+        if (props.setInitialValues) {
+          props.setInitialValues(res.data.minCardsCount, res.data.maxCardsCount)
         }
-        dispatch(setMinMaxCardsCountAC(res.data.minCardsCount, res.data.maxCardsCount))
+        minCardsCount = res.data.minCardsCount
+        maxCardsCount = res.data.maxCardsCount
         sessionStorage.setItem(
           'packs-filters',
-          JSON.stringify({ ...filters, min: res.data.minCardsCount, max: res.data.maxCardsCount })
+          JSON.stringify({ ...props.filters, min: res.data.minCardsCount, max: res.data.maxCardsCount })
         )
       }
       dispatch(appSetStatusAC('succeeded'))
+
+      return {noResults, minCardsCount, maxCardsCount, cardPacks: res.data.cardPacks, cardPacksTotalCount: res.data.cardPacksTotalCount}
     } catch (e) {
       const err = e as Error | AxiosError<{ error: string }>
 
       dispatch(appSetStatusAC('failed'))
-      handleServerError(err, dispatch)
+      handleServerError(err, dispatch as AppDispatch)
+
+      return rejectWithValue(e)
     }
   }
-export const addPackTC =
-  (name: string, deckCover: string, privatePack: boolean): AppThunk =>
-  async dispatch => {
-    try {
-      await packsAPI.createPack(name, deckCover, privatePack)
+)
 
-      dispatch(setCardPacksChangedAC())
+export const addPackThunk = createAsyncThunk(
+  'packs/ADD-PACK',
+  async (props: {
+    name: string,
+    deckCover: string,
+    privatePack: boolean
+  }, {dispatch}) => {
+    try {
+      await packsAPI.createPack(props.name, props.deckCover, props.privatePack)
+
       dispatch(appSetStatusAC('succeeded'))
     } catch (e) {
       const err = e as Error | AxiosError<{ error: string }>
 
       dispatch(appSetStatusAC('failed'))
-      handleServerError(err, dispatch)
+      handleServerError(err, dispatch as AppDispatch)
     }
   }
-export const deletePackTC =
-  (id: string, fromCards: boolean, callBack?: () => void): AppThunk =>
-  async dispatch => {
-    try {
-      await packsAPI.deletePack(id)
+)
 
-      if (!fromCards) dispatch(setCardPacksChangedAC())
-      else dispatch(setDeletedPackAC(true))
-      callBack && callBack()
+export const deletePackThunk = createAsyncThunk(
+  'packs/DELETE-PACK',
+  async (props: {
+    id: string,
+    fromCards: boolean,
+    callBack?: () => void
+  }, {dispatch}) => {
+    try {
+      await packsAPI.deletePack(props.id)
+
+      if (props.fromCards) dispatch(setDeletedPackAC(true))
+      props.callBack && props.callBack()
       dispatch(appSetStatusAC('succeeded'))
+
+      return !props.fromCards
     } catch (e) {
       const err = e as Error | AxiosError<{ error: string }>
 
       dispatch(appSetStatusAC('failed'))
-      handleServerError(err, dispatch)
+      handleServerError(err, dispatch as AppDispatch)
     }
   }
-export const updatePackTC =
-  (
+)
+
+export const updatePackThunk = createAsyncThunk(
+  'packs/UPDATE-PACK',
+  async (props: {
     id: string,
     newTitle: string,
     deckCover: string,
     fromCards: boolean,
     callBack?: (newName: string) => void
-  ): AppThunk =>
-  async dispatch => {
+  }, {dispatch, rejectWithValue}) => {
     try {
-      await packsAPI.changePack(id, newTitle, deckCover)
+      await packsAPI.changePack(props.id, props.newTitle, props.deckCover)
 
-      if (fromCards) dispatch(setUpdatedPackAC(newTitle))
+      if (props.fromCards) dispatch(setUpdatedPackAC(props.newTitle))
 
-      dispatch(setNewDeckCoverAC(deckCover))
-      dispatch(setCardPacksChangedAC())
-      dispatch(setNewPackNameAC(id, newTitle))
-      callBack && callBack(newTitle)
+      dispatch(setNewDeckCoverAC(props.deckCover))
+      props.callBack && props.callBack(props.newTitle)
       dispatch(appSetStatusAC('succeeded'))
+
+      return {id: props.id, title: props.newTitle}
     } catch (e) {
       const err = e as Error | AxiosError<{ error: string }>
 
       dispatch(appSetStatusAC('failed'))
-      handleServerError(err, dispatch)
+      handleServerError(err, dispatch as AppDispatch)
+      
+      return rejectWithValue(e)
     }
   }
+)
 
 //Types
+
+interface FiltersType {
+  page: number;
+  pageCount: number;
+  myPacks: string;
+  min: number;
+  max: number;
+  sortPacks: string;
+  searchValue: string;
+}
+
+interface PacksStateType {
+  packsFetched: boolean;
+  cardPacks: PackType[];
+  blockRequest: boolean;
+  cardPacksChanged: number;
+  noResults: boolean;
+  cardPacksTotalCount: number;
+  minCardsCount: number;
+  maxCardsCount: number;
+  filters: FiltersType;
+}
+
 export type PackType = {
   _id: string
   user_id: string
@@ -245,19 +280,3 @@ export type PackType = {
   __v: number
   deckCover: string
 }
-type PacksInitialStateType = typeof packsInitialState
-export type PacksActionsType =
-  | ReturnType<typeof setPacksAC>
-  | ReturnType<typeof setPacksFetchedAC>
-  | ReturnType<typeof setPacksPageAC>
-  | ReturnType<typeof setBlockRequestAC>
-  | ReturnType<typeof setMyPacksAC>
-  | ReturnType<typeof setPacksPageCountAC>
-  | ReturnType<typeof setPacksFiltersAC>
-  | ReturnType<typeof setMinMaxCardsCountAC>
-  | ReturnType<typeof setMinMaxAC>
-  | ReturnType<typeof setSortPacksAC>
-  | ReturnType<typeof setPacksSearchValueAC>
-  | ReturnType<typeof setPacksNoResultsAC>
-  | ReturnType<typeof setCardPacksChangedAC>
-  | ReturnType<typeof setNewPackNameAC>

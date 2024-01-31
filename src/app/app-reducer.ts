@@ -1,39 +1,36 @@
-const appInitialState = {
-  appStatus: 'idle' as RequestStatusType,
-  appIsLoading: true as boolean,
-  appAlert: { message: null, type: null } as AppAlertType,
-}
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-export const appReducer = (
-  state: AppStateType = appInitialState,
-  action: AppActionsType
-): AppStateType => {
-  switch (action.type) {
-    case 'app/SET-STATUS':
-      return { ...state, appStatus: action.appStatus }
-    case 'app/SET-LOADING':
-      return { ...state, appIsLoading: action.appIsLoading }
-    case 'app/SET-ALERT':
-      return { ...state, appAlert: action.appAlert }
-    default:
-      return state
-  }
-}
-
-// actions
-export const appSetStatusAC = (appStatus: RequestStatusType) =>
-  ({ type: 'app/SET-STATUS', appStatus } as const)
-export const appSetLoadingAC = (appIsLoading: boolean) =>
-  ({ type: 'app/SET-LOADING', appIsLoading } as const)
-export const appAlertAC = (message: string | null, type: AlertType) =>
-  ({ type: 'app/SET-ALERT', appAlert: { message, type } as AppAlertType } as const)
-
-// types
-type AppStateType = typeof appInitialState
-export type AppActionsType =
-  | ReturnType<typeof appSetStatusAC>
-  | ReturnType<typeof appSetLoadingAC>
-  | ReturnType<typeof appAlertAC>
 export type RequestStatusType = 'idle' | 'loading' | 'succeeded' | 'failed'
 type AppAlertType = { message: null | string; type: AlertType }
 export type AlertType = null | 'error' | 'success'
+
+type AppStateType = {
+  appStatus: RequestStatusType
+  appIsLoading: boolean
+  appAlert: AppAlertType
+}
+
+const initialState: AppStateType = {
+  appStatus: 'idle',
+  appIsLoading: true,
+  appAlert: { message: null, type: null },
+}
+
+const appSlice = createSlice({
+  name: 'app',
+  initialState,
+  reducers: {
+    appSetStatusAC(state, action: PayloadAction<RequestStatusType>) {
+      state.appStatus = action.payload
+    },
+    appSetLoadingAC(state, action: PayloadAction<boolean>) {
+      state.appIsLoading = action.payload
+    },
+    appAlertAC(state, action: PayloadAction<AppAlertType>) {
+      state.appAlert = action.payload
+    },
+  },
+})
+
+export const { appSetStatusAC, appSetLoadingAC, appAlertAC } = appSlice.actions
+export const appReducer = appSlice.reducer

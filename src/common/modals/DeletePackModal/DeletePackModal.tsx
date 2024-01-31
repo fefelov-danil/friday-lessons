@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react'
 
 import { appSetStatusAC } from '../../../app/app-reducer'
 import { useAppDispatch } from '../../../app/hooks'
-import { deletePackTC } from '../../../features/packs/packs-reducer'
+import { deletePackThunk } from '../../../features/packs/packs-reducer'
 import { BasicModal } from '../BasicModal'
 
 import s from './DeletePackModal.module.css'
@@ -20,7 +20,7 @@ export const DeletePackModal = ({ openButton, title, id, fromCards, callBack }: 
 
   const onDeletePackHandler = () => {
     dispatch(appSetStatusAC('loading'))
-    dispatch(deletePackTC(id, fromCards, callBack))
+    dispatch(deletePackThunk({id, fromCards, callBack}))
   }
 
   return (

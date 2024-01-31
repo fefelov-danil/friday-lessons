@@ -18,7 +18,7 @@ export default function AlertSnackbar() {
     if (reason === 'clickaway') {
       return
     }
-    dispatch(appAlertAC(null, null))
+    dispatch(appAlertAC({ message: null, type: null }))
   }
 
   return (

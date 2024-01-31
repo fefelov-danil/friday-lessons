@@ -4,7 +4,7 @@ import { Avatar, Button } from '@mui/material'
 
 import { appSetStatusAC } from '../../../app/app-reducer'
 import { useAppDispatch } from '../../../app/hooks'
-import { updatePackTC } from '../../../features/packs/packs-reducer'
+import { updatePackThunk } from '../../../features/packs/packs-reducer'
 import { InputText } from '../../inputText/InputText'
 import { BasicModal } from '../BasicModal'
 
@@ -35,7 +35,7 @@ export const UpdatePackModal = ({
 
   const onUpdatePackHandler = () => {
     dispatch(appSetStatusAC('loading'))
-    dispatch(updatePackTC(id, newTitle, newCover, fromCards, callBack))
+    dispatch(updatePackThunk({id, newTitle, deckCover: newCover, fromCards, callBack}))
     setNewTitle('')
     setNewCover('')
   }

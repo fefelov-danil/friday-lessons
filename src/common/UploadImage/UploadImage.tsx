@@ -21,7 +21,7 @@ export const UploadImage: React.FC<UploadImagePropsType> = ({ callBackFn, childr
           callBackFn(file64)
         })
       } else {
-        dispatch(appAlertAC('Incorrect file size or type', 'error'))
+        dispatch(appAlertAC({ message: 'Incorrect file size or type', type: 'error' }))
       }
     }
   }

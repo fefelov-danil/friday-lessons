@@ -1,12 +1,13 @@
-import { applyMiddleware, combineReducers, legacy_createStore as createStore } from 'redux'
-import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk'
+import { configureStore } from '@reduxjs/toolkit'
+import { combineReducers } from 'redux'
 
-import { CardsActionsType, cardsReducer } from '../features/cards/cards-reducer'
-import { PacksActionsType, packsReducer } from '../features/packs/packs-reducer'
-import { UsersActionsType, usersReducer } from '../features/users/users-reducer'
+import { cardsReducer } from '../features/cards/cards-reducer'
+import { packsReducer } from '../features/packs/packs-reducer'
+import { usersReducer } from '../features/users/users-reducer'
 
-import { AppActionsType, appReducer } from 'app/app-reducer'
-import { AuthActionsType, authReducer } from 'features/auth/auth-reducer'
+import { appReducer } from 'app/app-reducer'
+import { authReducer } from 'features/auth/auth-reducer'
+import { usersApi } from 'features/users/users-API'
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -16,24 +17,12 @@ const rootReducer = combineReducers({
   cards: cardsReducer,
 })
 
-export type RootReducerType = ReturnType<typeof rootReducer>
-export const store = createStore(rootReducer, applyMiddleware(thunk))
+export const store = configureStore({
+  reducer: rootReducer,
+})
 
+export type AppDispatch = typeof store.dispatch
 export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = ThunkDispatch<RootState, unknown, AllActionsType>
-export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  RootState,
-  unknown,
-  AllActionsType
->
-
-export type AllActionsType =
-  | AuthActionsType
-  | UsersActionsType
-  | AppActionsType
-  | PacksActionsType
-  | CardsActionsType
 
 // @ts-ignore
 window.store = store

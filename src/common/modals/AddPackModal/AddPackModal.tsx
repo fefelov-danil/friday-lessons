@@ -4,7 +4,7 @@ import { Avatar, Button } from '@mui/material'
 
 import { appSetStatusAC } from '../../../app/app-reducer'
 import { useAppDispatch } from '../../../app/hooks'
-import { addPackTC } from '../../../features/packs/packs-reducer'
+import { addPackThunk } from '../../../features/packs/packs-reducer'
 import { Checkbox } from '../../checkbox/Checkbox'
 import { InputText } from '../../inputText/InputText'
 import { UploadImage } from '../../UploadImage/UploadImage'
@@ -23,7 +23,7 @@ export const AddPackModal = ({ openButton }: PropsType) => {
 
   const onAddPackHandler = () => {
     dispatch(appSetStatusAC('loading'))
-    dispatch(addPackTC(packName, newCover, privatePack))
+    dispatch(addPackThunk({name: packName, deckCover: newCover, privatePack}))
     setPackName('')
     setPrivatePack(false)
     setNewCover('')

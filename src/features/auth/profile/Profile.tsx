@@ -3,7 +3,7 @@ import { useState } from 'react'
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
 import { Avatar, Badge, IconButton } from '@mui/material'
 
-import { logoutTC, updateUserTC } from '../auth-reducer'
+import { logoutThunk, updateUserThunk } from '../auth-reducer'
 
 import s from './Profile.module.css'
 
@@ -21,14 +21,14 @@ export const Profile = () => {
   const [newName, setNewName] = useState('')
 
   const logoutHandler = () => {
-    dispatch(logoutTC())
+    dispatch(logoutThunk())
   }
 
   const onSaveNameHandler = () => {
     if (newName.trim().length === 0) {
-      dispatch(appAlertAC('Name is required!', 'error'))
+      dispatch(appAlertAC({ message: 'Name is required!', type: 'error' }))
     } else {
-      dispatch(updateUserTC({ name: newName.trim() }))
+      dispatch(updateUserThunk({ name: newName.trim() }))
     }
     setIsNameChanging(false)
   }
@@ -47,11 +47,11 @@ export const Profile = () => {
     setIsNameChanging(true)
   }
   const changeAvatar = (file64: string): void => {
-    dispatch(updateUserTC({ avatar: file64 }))
+    dispatch(updateUserThunk({ avatar: file64 }))
   }
   const errorHandler = (): void => {
-    dispatch(updateUserTC({ avatar: ' ' }))
-    dispatch(appAlertAC('Broken image', 'error'))
+    dispatch(updateUserThunk({ avatar: ' ' }))
+    dispatch(appAlertAC({ message: 'Broken image', type: 'error' }))
   }
 
   return (
